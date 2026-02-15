@@ -8,11 +8,12 @@ export function useGroups() {
   return useQuery({
     queryKey: ["groups", user?.id],
     queryFn: async () => {
+      console.log("useGroups | Firing query", { userId: user?.id });
       if (!user?.id) return [];
       const response = await groupsAPI.getUserGroups();
       return response.data || [];
     },
     enabled: !!user?.id,
-    initialData: [],
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }

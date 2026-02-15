@@ -1,11 +1,8 @@
-import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Platform, StyleSheet, Text, View, TextInput, Alert } from "react-native";
-import { Link } from "expo-router";
+import { Platform, StyleSheet, Text, View, TextInput, Alert, Pressable } from "react-native";
 import { Colors } from "@/constants/theme";
 import { useState } from "react";
 import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { useRouter } from "expo-router";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
@@ -13,26 +10,22 @@ export default function SignIn() {
     password: "",
   });
   const { signIn } = useAuthProvider();
-  const router = useRouter();
 
   const handleSetFormData = (key: string, value: string) => {
     setFormData({ ...formData, [key]: value });
   };
 
   const handleSignInPress = async () => {
-    // Fixed validation logic
     if (!formData.email || !formData.password) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
     }
 
-    console.log("Sign In pressed with data:", formData);
-
-    await signIn(formData.email, formData.password);
-    setFormData({
-      email: "",
-      password: "",
-    });
+    try {
+      await signIn(formData.email, formData.password);
+    } catch (error: any) {
+      Alert.alert("Sign In Failed", error.message || "Check your credentials and try again.");
+    }
   };
 
   return (
@@ -43,7 +36,6 @@ export default function SignIn() {
           placeholder="Email"
           value={formData.email}
           onChangeText={(content) => handleSetFormData("email", content)}
-          onEndEditing={(e) => handleSetFormData("email", e.nativeEvent.text)}
           keyboardType="email-address"
           inputMode="email"
           autoComplete="email"
@@ -54,29 +46,21 @@ export default function SignIn() {
           placeholder="Password"
           value={formData.password}
           onChangeText={(content) => handleSetFormData("password", content)}
-          onEndEditing={(e) => handleSetFormData("password", e.nativeEvent.text)}
           secureTextEntry={true}
           inputMode="text"
           autoComplete="password"
           textContentType="password"
         />
       </View>
-      <SignInBtn onPress={handleSignInPress} />
+      <Pressable
+        style={[styles.input, styles.submitBtn]}
+        onPress={handleSignInPress}
+      >
+        <Text style={styles.submitBtnText}>Sign In</Text>
+      </Pressable>
     </ThemedView>
   );
 }
-
-const SignInBtn = ({ onPress }: { onPress: () => void }) => (
-  <Link
-    href="/sign-in"
-    style={[styles.input, { backgroundColor: Colors.light.tint, borderRadius: 20 }]}
-    onPress={onPress}
-  >
-    <Text style={{ color: Colors.light.background, fontWeight: "bold", textAlign: "center" }}>
-      Sign In
-    </Text>
-  </Link>
-);
 
 const styles = StyleSheet.create({
   container: {
@@ -105,5 +89,15 @@ const styles = StyleSheet.create({
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
       },
     }),
+  },
+  submitBtn: {
+    backgroundColor: Colors.light.tint,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  submitBtnText: {
+    color: Colors.light.background,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });

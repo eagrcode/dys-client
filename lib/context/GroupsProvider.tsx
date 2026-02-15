@@ -1,42 +1,52 @@
 import React, { createContext, use, useContext, useEffect, useState } from "react";
-import { useAuthProvider } from "./SessionProvider";
-import { groupsAPI } from "@/services/api/groups";
 import * as SecureStore from "expo-secure-store";
 
 type GroupContext = {
-  selectedGroup: any;
-  setSelectedGroup: React.Dispatch<React.SetStateAction<any>>;
-  switchGroup: (groupId: string) => Promise<void>;
+  selectedGroup: string | null;
+  selectGroup: (groupId: string | null) => Promise<void>;
+  isLoading: boolean;
 };
 
 const GroupsContext = createContext<GroupContext | undefined>(undefined);
 
 export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
-  const [selectedGroup, setSelectedGroup] = useState<any>(null);
-  const { user } = useAuthProvider();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
   useEffect(() => {
     initCurrentGroup();
   }, []);
 
   const initCurrentGroup = async () => {
+    console.log("GroupsProvider | Initialising current group...");
     try {
       const storedGroupJson = await SecureStore.getItemAsync("selectedGroup");
       if (storedGroupJson) {
+        console.log("GroupsProvider | Found stored group in secure storage:", storedGroupJson);
         setSelectedGroup(JSON.parse(storedGroupJson));
+      } else {
+        console.log("GroupsProvider | No stored group found in secure storage.");
       }
     } catch (error) {
-      console.error("Failed to load selected group:", error);
+      console.error("GroupsProvider | Failed to load selected group:", error);
+    } finally {
+      setIsLoading(false);
+      console.log("GroupsProvider | Finished initialising current group.");
     }
   };
 
-  const switchGroup = async (group: any) => {
-    setSelectedGroup(group);
-    await SecureStore.setItemAsync("selectedGroup", JSON.stringify(group));
+  const selectGroup = async (groupId: string | null) => {
+    console.log("GroupsProvider | Selecting group:", groupId);
+    setSelectedGroup(groupId);
+    if (groupId) {
+      await SecureStore.setItemAsync("selectedGroup", JSON.stringify(groupId));
+    } else {
+      await SecureStore.deleteItemAsync("selectedGroup");
+    }
   };
 
   return (
-    <GroupsContext.Provider value={{ selectedGroup, setSelectedGroup, switchGroup }}>
+    <GroupsContext.Provider value={{ selectedGroup, selectGroup, isLoading }}>
       {children}
     </GroupsContext.Provider>
   );

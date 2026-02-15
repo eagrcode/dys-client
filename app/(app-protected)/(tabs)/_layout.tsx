@@ -1,17 +1,32 @@
-import { Link, router, Stack, Tabs } from "expo-router";
-import React from "react";
+import { Link, Tabs } from "expo-router";
+import React, { useEffect } from "react";
+import * as SplashScreen from "expo-splash-screen";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { View, Pressable } from "react-native";
+import { View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { useGroupsProvider } from "@/lib/context/GroupsProvider";
+import { useGroupById } from "@/hooks/queries/useGroupById";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { selectedGroup } = useGroupsProvider();
+  const { selectedGroup, isLoading: groupsProviderLoading } = useGroupsProvider();
+  const { data: groupDetails, isLoading: groupDetailsLoading } = useGroupById(selectedGroup || "");
+
+  const isReady = !groupsProviderLoading && !groupDetailsLoading;
+
+  useEffect(() => {
+    if (isReady) {
+      SplashScreen.hideAsync();
+    }
+  }, [isReady]);
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <Tabs
@@ -22,7 +37,7 @@ export default function TabLayout() {
           <View>
             <Link href="/(app-protected)/modals/select-group">
               <ThemedText type="defaultSemiBold">
-                {selectedGroup ? selectedGroup.name : "No Group Selected"}
+                {groupDetails ? groupDetails.name : "No Group Selected"}
               </ThemedText>
             </Link>
           </View>
@@ -37,9 +52,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="create-group"
         options={{
-          title: "Explore",
+          title: "Create Group",
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
       />

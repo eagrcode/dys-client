@@ -1,20 +1,17 @@
-import { StyleSheet, Pressable, View, Alert, TextInput } from "react-native";
+import { StyleSheet, Pressable, View, Alert, TextInput, ActivityIndicator } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
-import { useState } from "react";
-import { groupsAPI } from "@/services/api/groups";
-import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
+import React, { useState } from "react";
+import { useCreateGroup } from "@/hooks/queries/useCreateGroup";
+import { ApiErrorResponse } from "@/utils/types/ApiError";
 
-export default function CreateGroup() {
-  const { setSelectedGroup } = useGroupsProvider();
-  const router = useRouter();
-
+const CreateGroup = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
   });
+
+  const { mutate: createGroup, isPending: isCreating, isError, error } = useCreateGroup();
 
   const handleSetFormData = (key: string, value: string) => {
     setFormData({ ...formData, [key]: value });
@@ -27,24 +24,11 @@ export default function CreateGroup() {
     }
 
     console.log("Create Group pressed with data:", formData);
+    createGroup({ name: formData.name, description: formData.description });
 
-    const res = await groupsAPI.createGroup(formData.name, formData.description);
-
-    if (res.success) {
-      Alert.alert("Success", "Group created successfully!");
-
-      await SecureStore.setItemAsync("selectedGroup", JSON.stringify(res.data.group));
-      setSelectedGroup(res.data.group);
-      console.log("Group created and selected:", res.data);
-      router.replace("/");
-    } else {
-      Alert.alert("Error", res.message || "Failed to create group.");
+    if (isError) {
+      console.error(error.message, JSON.stringify(error, null, 2));
     }
-
-    setFormData({
-      name: "",
-      description: "",
-    });
   };
 
   return (
@@ -62,6 +46,7 @@ export default function CreateGroup() {
           value={formData.name}
           onChangeText={(content) => handleSetFormData("name", content)}
           inputMode="text"
+          editable={!isCreating}
         />
         <TextInput
           style={styles.input}
@@ -69,25 +54,34 @@ export default function CreateGroup() {
           value={formData.description}
           onChangeText={(content) => handleSetFormData("description", content)}
           inputMode="text"
+          editable={!isCreating}
         />
-        <Pressable>
-          <ThemedText
-            style={{
-              textAlign: "center",
-              padding: 16,
-              backgroundColor: "#007AFF",
-              color: "#fff",
-              borderRadius: 8,
-            }}
-            onPress={handleCreateGroupPress}
-          >
-            Create Group
-          </ThemedText>
+        {isError && error.errors && formData.name && formData.description
+          ? error.errors.map((err, index) => (
+              <ThemedText key={index} style={{ color: "red" }}>
+                {err.msg}
+              </ThemedText>
+            ))
+          : isError && <ThemedText>{error?.message}</ThemedText>}
+
+        <Pressable
+          onPress={handleCreateGroupPress}
+          disabled={isCreating || !formData.name || !formData.description}
+          style={styles.submitBtn}
+        >
+          <ThemedText type="defaultSemiBold">{isCreating ? "Submitting..." : "Submit"}</ThemedText>
+          <View style={{ position: "absolute", right: 16 }}>
+            {isCreating ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <ThemedText type="subtitle">{">"}</ThemedText>
+            )}
+          </View>
         </Pressable>
       </View>
     </ThemedView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   titleContainer: {
@@ -111,4 +105,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     color: "#ffffff",
   },
+  submitBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
+    backgroundColor: "#0044ff",
+    borderRadius: 8,
+  },
 });
+
+export default CreateGroup;

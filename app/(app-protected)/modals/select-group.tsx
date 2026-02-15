@@ -6,7 +6,7 @@ import { Link, useRouter } from "expo-router";
 
 export default function Modal() {
   const { data: groups } = useGroups();
-  const { switchGroup } = useGroupsProvider();
+  const { selectGroup } = useGroupsProvider();
   const router = useRouter();
   const isPresented = router.canGoBack();
 
@@ -24,7 +24,7 @@ export default function Modal() {
         <Pressable
           key={group.id}
           onPress={() => {
-            switchGroup(group);
+            selectGroup(group.id);
             router.back();
           }}
         >

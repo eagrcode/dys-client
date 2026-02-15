@@ -12,4 +12,7 @@ export const groupsAPI = {
   getGroupById: async (groupId: string) => {
     return await apiCall(`/groups/${groupId}`, "GET");
   },
+  deleteGroup: async (groupId: string) => {
+    return await apiCall(`/groups/${groupId}`, "DELETE");
+  },
 };

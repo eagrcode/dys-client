@@ -1,9 +1,9 @@
-import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Platform, StyleSheet, Text, View, TextInput } from "react-native";
-import { Link } from "expo-router";
+import { Platform, StyleSheet, Text, View, TextInput, Alert, Pressable } from "react-native";
 import { Colors } from "@/constants/theme";
 import { useState } from "react";
+import { useAuthProvider } from "@/lib/context/SessionProvider";
+import { apiCall } from "@/utils/apiCall";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -12,110 +12,85 @@ export default function SignUp() {
     email: "",
     password: "",
   });
+  const { signIn } = useAuthProvider();
+
+  const formInputs = [
+    {
+      key: "first_name",
+      placeholder: "First name",
+      secure: false,
+      inputMode: "text",
+      keyboardType: "default",
+    },
+    {
+      key: "last_name",
+      placeholder: "Last name",
+      secure: false,
+      inputMode: "text",
+      keyboardType: "default",
+    },
+    {
+      key: "email",
+      placeholder: "Email",
+      secure: false,
+      inputMode: "email",
+      keyboardType: "email-address",
+    },
+    {
+      key: "password",
+      placeholder: "Password",
+      secure: true,
+      inputMode: "text",
+      keyboardType: "default",
+    },
+  ] as const;
 
   const handleSetFormData = (key: string, value: string) => {
     setFormData({ ...formData, [key]: value });
   };
 
   const handleSignUpPress = async () => {
-    !formData.first_name ||
-      !formData.last_name ||
-      !formData.email ||
-      (!formData.password && alert("Please fill in all fields."));
+    if (!formData.first_name || !formData.last_name || !formData.email || !formData.password) {
+      Alert.alert("Error", "Please fill in all fields.");
+      return;
+    }
 
-    console.log("Sign Up pressed with data:", formData);
-
-    const res = await apiCall();
-
-    console.log("API Response:", res);
-
-    setFormData({
-      first_name: "",
-      last_name: "",
-      email: "",
-      password: "",
-    });
-  };
-
-  const apiCall = async () => {
     try {
-      console.log("Attempting to fetch...");
-      const response = await fetch("http://192.168.1.241:3000/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      await apiCall("/auth/register", "POST", {
         body: JSON.stringify(formData),
       });
-
-      console.log("Response status:", response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log("Error response:", errorText);
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
-      const data = await response.json();
-      console.log("Success:", data);
-      return data;
+      await signIn(formData.email, formData.password);
     } catch (error: any) {
-      console.error("Full error:", error);
-      console.error("Error message:", error.message);
-      alert(`Error: ${error.message}`);
+      Alert.alert("Sign Up Failed", error.message || "Please try again.");
     }
   };
+
   return (
     <ThemedView style={styles.container}>
       <View style={{ width: "100%", gap: 8 }}>
-        <TextInput
-          style={styles.input}
-          placeholder="First name"
-          onChangeText={(content) => handleSetFormData("first_name", content)}
-          defaultValue={formData.first_name}
-          inputMode="text"
-        ></TextInput>
-        <TextInput
-          style={styles.input}
-          placeholder="Last name"
-          onChangeText={(content) => handleSetFormData("last_name", content)}
-          defaultValue={formData.last_name}
-          inputMode="text"
-        ></TextInput>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          onChangeText={(content) => handleSetFormData("email", content)}
-          defaultValue={formData.email}
-          keyboardType="email-address"
-          inputMode="email"
-          autoComplete="email"
-        ></TextInput>
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          onChangeText={(content) => handleSetFormData("password", content)}
-          defaultValue={formData.password}
-          secureTextEntry={true}
-          inputMode="text"
-        ></TextInput>
+        {formInputs.map(({ key, placeholder, secure, inputMode, keyboardType }) => (
+          <TextInput
+            key={key}
+            style={styles.input}
+            placeholder={placeholder}
+            value={(formData as any)[key]}
+            onChangeText={(content) => handleSetFormData(key, content)}
+            secureTextEntry={secure}
+            inputMode={inputMode || "text"}
+            keyboardType={keyboardType}
+            autoComplete={key === "email" ? "email" : "off"}
+            textContentType={
+              key === "email" ? "emailAddress" : key === "password" ? "password" : "none"
+            }
+          />
+        ))}
       </View>
-      <SignUpBtn onPress={handleSignUpPress} />
+      <Pressable style={[styles.input, styles.submitBtn]} onPress={handleSignUpPress}>
+        <Text style={styles.submitBtnText}>Sign Up</Text>
+      </Pressable>
     </ThemedView>
   );
 }
-
-const SignUpBtn = ({ onPress }: { onPress: () => void }) => (
-  <Link
-    href="/sign-up"
-    style={[styles.input, { backgroundColor: Colors.light.tint, borderRadius: 20 }]}
-    onPress={onPress}
-  >
-    <Text style={{ color: Colors.light.background, fontWeight: "bold", textAlign: "center" }}>
-      Sign Up
-    </Text>
-  </Link>
-);
 
 const styles = StyleSheet.create({
   container: {
@@ -144,5 +119,15 @@ const styles = StyleSheet.create({
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
       },
     }),
+  },
+  submitBtn: {
+    backgroundColor: Colors.light.tint,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  submitBtnText: {
+    color: Colors.light.background,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });

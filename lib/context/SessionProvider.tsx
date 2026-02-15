@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { useRouter, useSegments } from "expo-router";
+import { useRouter } from "expo-router";
 import { authAPI } from "@/services/api/auth";
 import { initializeToken, saveTokens, clearTokens } from "@/services/tokenManager";
 
@@ -39,19 +39,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const userData = await SecureStore.getItemAsync("userData");
         if (userData) {
           setUser(JSON.parse(userData));
-          console.log("Auth Provider | User data:", userData);
+          console.log("AuthProvider | User data:", userData);
         }
+      } else {
+        console.log("AuthProvider | No token found, user is not authenticated.");
       }
-      console.log("AuthProvider | No valid token found, user is not authenticated.");
     } catch (error) {
       console.error("Error loading user:", error);
     } finally {
       setIsLoading(false);
+      console.log("AuthProvider | Finished loading user.");
     }
-  };
-
-  const redirectUser = () => {
-    router.replace("/");
   };
 
   const signIn = async (email: string, password: string) => {
@@ -67,16 +65,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await saveTokens(data.user.accessToken, data.user.refreshToken);
     await SecureStore.setItemAsync("userData", JSON.stringify(userData));
     setUser(userData);
-
-    redirectUser();
+    router.replace("/");
   };
 
   const signOut = async () => {
     await clearTokens();
     await SecureStore.deleteItemAsync("userData");
     setUser(null);
-
-    redirectUser();
+    router.replace("/");
   };
 
   return (

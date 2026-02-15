@@ -1,14 +1,16 @@
 import { Stack } from "expo-router";
+import { GroupsProvider } from "@/lib/context/GroupsProvider";
 
 export default function OnboardingLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="create-group" />
-      <Stack.Screen name="join-group" />
-    </Stack>
+    <GroupsProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="create-group" />
+      </Stack>
+    </GroupsProvider>
   );
 }
