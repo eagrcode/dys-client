@@ -1,93 +1,160 @@
 import { ThemedView } from "@/components/themed-view";
-import { Platform, StyleSheet, Text, View, TextInput, Alert, Pressable } from "react-native";
-import { Colors } from "@/constants/theme";
+import { StyleSheet, View, ActivityIndicator } from "react-native";
 import { useState } from "react";
 import { useAuthProvider } from "@/lib/context/SessionProvider";
+import { ThemedText } from "@/components/themed-text";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { apiCall } from "@/utils/apiCall";
+import { Styling } from "@/constants/theme";
+import { ErrorText } from "@/components/ui/error-text";
+
+type FormData = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+};
 
 export default function SignUp() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     first_name: "",
     last_name: "",
     email: "",
     password: "",
   });
+  const [fieldErrors, setFieldErrors] = useState<{ [key in keyof FormData]: string }>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+  });
+  const [formError, setFormError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const { signIn } = useAuthProvider();
 
-  const formInputs = [
-    {
-      key: "first_name",
-      placeholder: "First name",
-      secure: false,
-      inputMode: "text",
-      keyboardType: "default",
-    },
-    {
-      key: "last_name",
-      placeholder: "Last name",
-      secure: false,
-      inputMode: "text",
-      keyboardType: "default",
-    },
-    {
-      key: "email",
-      placeholder: "Email",
-      secure: false,
-      inputMode: "email",
-      keyboardType: "email-address",
-    },
-    {
-      key: "password",
-      placeholder: "Password",
-      secure: true,
-      inputMode: "text",
-      keyboardType: "default",
-    },
-  ] as const;
+  const submitDisabled =
+    isLoading ||
+    !formData.first_name ||
+    !formData.last_name ||
+    !formData.email ||
+    !formData.password;
 
-  const handleSetFormData = (key: string, value: string) => {
+  const handleSetFormData = (key: keyof FormData, value: string) => {
+    // Clear previous errors
+    setFieldErrors((prev) => ({ ...prev, [key]: "" }));
+    setFormError("");
+
     setFormData({ ...formData, [key]: value });
   };
 
   const handleSignUpPress = async () => {
-    if (!formData.first_name || !formData.last_name || !formData.email || !formData.password) {
-      Alert.alert("Error", "Please fill in all fields.");
-      return;
-    }
+    // Clear previous errors
+    setFieldErrors({ first_name: "", last_name: "", email: "", password: "" });
+    setFormError("");
 
     try {
+      setIsLoading(true);
       await apiCall("/auth/register", "POST", {
         body: JSON.stringify(formData),
       });
       await signIn(formData.email, formData.password);
     } catch (error: any) {
-      Alert.alert("Sign Up Failed", error.message || "Please try again.");
+      handleErrors(error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleErrors = (error: any) => {
+    const code = error?.code;
+
+    if (code === "LIMIT_EXCEEDED") {
+      setFormError("Too many attempts. Please try again later.");
+    } else if (code === "VALIDATION_ERROR") {
+      const validationErrors = error?.errors;
+      validationErrors.forEach((fieldError: any) => {
+        const field = fieldError?.path;
+        const message = fieldError?.msg;
+        if (field && message) {
+          setFieldErrors((prev) => ({ ...prev, [field]: message }));
+        }
+      });
+    } else {
+      setFormError(error?.message || "An unexpected error occurred. Please try again.");
+    }
+  };
+
+  const renderFieldError = (field: keyof FormData) => {
+    if (fieldErrors[field]) {
+      return <ErrorText error={fieldErrors[field]} />;
+    }
+    return null;
+  };
+
+  const renderFormError = () => {
+    if (formError) {
+      return <ErrorText error={formError} />;
+    }
+    return null;
   };
 
   return (
     <ThemedView style={styles.container}>
-      <View style={{ width: "100%", gap: 8 }}>
-        {formInputs.map(({ key, placeholder, secure, inputMode, keyboardType }) => (
-          <TextInput
-            key={key}
-            style={styles.input}
-            placeholder={placeholder}
-            value={(formData as any)[key]}
-            onChangeText={(content) => handleSetFormData(key, content)}
-            secureTextEntry={secure}
-            inputMode={inputMode || "text"}
-            keyboardType={keyboardType}
-            autoComplete={key === "email" ? "email" : "off"}
-            textContentType={
-              key === "email" ? "emailAddress" : key === "password" ? "password" : "none"
-            }
+      <View style={styles.form}>
+        <View style={styles.inputs}>
+          <Input
+            placeholder="First name"
+            value={formData.first_name}
+            onChangeText={(content) => handleSetFormData("first_name", content)}
+            inputMode="text"
+            autoComplete="given-name"
+            textContentType="givenName"
           />
-        ))}
+          {renderFieldError("first_name")}
+          <Input
+            placeholder="Last name"
+            value={formData.last_name}
+            onChangeText={(content) => handleSetFormData("last_name", content)}
+            inputMode="text"
+            autoComplete="family-name"
+            textContentType="familyName"
+          />
+          {renderFieldError("last_name")}
+          <Input
+            placeholder="Email"
+            value={formData.email}
+            onChangeText={(content) => handleSetFormData("email", content)}
+            keyboardType="email-address"
+            inputMode="email"
+            autoComplete="email"
+            textContentType="emailAddress"
+          />
+          {renderFieldError("email")}
+          <Input
+            placeholder="Password"
+            value={formData.password}
+            onChangeText={(content) => handleSetFormData("password", content)}
+            secureTextEntry
+            inputMode="text"
+            autoComplete="password-new"
+            textContentType="password"
+          />
+          {renderFieldError("password")}
+        </View>
+        {renderFormError()}
+        <Button
+          variant="primary"
+          onPress={handleSignUpPress}
+          disabled={submitDisabled}
+          style={{ borderRadius: Styling.borderRadiusCTA }}
+        >
+          <ThemedText>
+            {isLoading ? <ActivityIndicator size="small" color="#fff" /> : "Sign Up"}
+          </ThemedText>
+        </Button>
       </View>
-      <Pressable style={[styles.input, styles.submitBtn]} onPress={handleSignUpPress}>
-        <Text style={styles.submitBtnText}>Sign Up</Text>
-      </Pressable>
     </ThemedView>
   );
 }
@@ -98,36 +165,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
+  },
+  form: {
+    width: "100%",
     gap: 16,
   },
-  input: {
-    width: "100%",
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: Colors.light.bgLayer2,
-    ...Platform.select({
-      ios: {
-        shadowColor: "hsl(240, 60%, 20%)",
-        shadowOffset: { width: 1, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-      },
-      android: {
-        elevation: 4,
-      },
-      web: {
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-      },
-    }),
-  },
-  submitBtn: {
-    backgroundColor: Colors.light.tint,
-    borderRadius: 20,
-    alignItems: "center",
-  },
-  submitBtnText: {
-    color: Colors.light.background,
-    fontWeight: "bold",
-    textAlign: "center",
+  inputs: {
+    gap: 8,
   },
 });

@@ -24,8 +24,10 @@ function AuthenticatedGate() {
   }
 
   if (userGroups.length === 0) {
+    console.log("AuthenticatedGate | No groups, redirecting to onboarding...");
     return <Redirect href="/(onboarding)/create-group" />;
   }
 
+  console.log("AuthenticatedGate | Has groups, redirecting to home...");
   return <Redirect href="/(app-protected)/(tabs)/home" />;
 }

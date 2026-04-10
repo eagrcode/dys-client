@@ -1,44 +1,34 @@
-import { StyleSheet, Pressable, ActivityIndicator } from "react-native";
+import { StyleSheet } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
-import { useGroupById } from "@/hooks/queries/useGroupById";
-import SignOut from "@/components/ui/sign-out";
-
-import { useDeleteGroup } from "@/hooks/queries/useDeleteGroup";
+import { Dashboard } from "@/components/ui/dashboard";
+import { useAuthProvider } from "@/lib/context/SessionProvider";
 
 export default function HomeScreen() {
-  const { selectedGroup } = useGroupsProvider();
-  const { data: groupDetails, isLoading: groupDetailsLoading } = useGroupById(selectedGroup || "");
-  const { mutate: deleteGroup, isPending: isDeleting } = useDeleteGroup();
+  const { user } = useAuthProvider();
 
-  console.log("Home Screen | Selected group:", JSON.stringify(groupDetails, null, 2));
+  const Header = () => {
+    const greeting = `Welcome back, ${user?.firstName || "User"}!`;
+
+    return (
+      <ThemedText type="subtitle" style={{ fontSize: 20 }}>
+        {greeting}
+      </ThemedText>
+    );
+  };
 
   return (
-    <ThemedView style={styles.titleContainer}>
-      <ThemedText type="subtitle" style={{ textAlign: "center" }}>
-        Group description: {groupDetails?.description}
-      </ThemedText>
-
-      <SignOut />
-      <Pressable
-        onPress={() => deleteGroup(selectedGroup)}
-        disabled={isDeleting}
-        style={{ marginTop: 20, padding: 10, backgroundColor: "#ff0000", borderRadius: 5 }}
-      >
-        <ThemedText style={{ color: "#fff" }}>
-          {isDeleting ? "Deleting..." : "Delete Group"}
-        </ThemedText>
-      </Pressable>
+    <ThemedView style={styles.container}>
+      <Header />
+      <Dashboard />
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 8,
+    padding: 16,
+    gap: 16,
   },
 });

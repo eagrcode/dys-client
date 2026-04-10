@@ -20,6 +20,10 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Module-level ref so apiCall.ts can trigger sign-out without React context
+let signOutFn: (() => Promise<void>) | null = null;
+export const forceSignOut = () => signOutFn?.();
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [user, setUser] = useState<User | null>(null);
@@ -30,6 +34,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const loadUser = async () => {
+    // await clearTokens();
+    // await SecureStore.deleteItemAsync("userData");
+    // await SecureStore.deleteItemAsync("selectedGroup");
+
     console.log("AuthProvider | Loading user...");
     try {
       console.log("AuthProvider | Checking for existing token...");
@@ -71,9 +79,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     await clearTokens();
     await SecureStore.deleteItemAsync("userData");
+    await SecureStore.deleteItemAsync("selectedGroup");
     setUser(null);
     router.replace("/");
   };
+
+  // Expose signOut for use outside React (e.g. apiCall.ts token refresh failure)
+  signOutFn = signOut;
 
   return (
     <AuthContext.Provider value={{ user, isLoading, signIn, signOut }}>

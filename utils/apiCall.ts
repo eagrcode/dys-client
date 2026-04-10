@@ -1,8 +1,39 @@
-import { getToken } from "@/services/tokenManager";
+import { getToken, getRefreshToken, saveTokens } from "@/services/tokenManager";
+import { forceSignOut } from "@/lib/context/SessionProvider";
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:3000";
 
-export async function apiCall(endpoint: string, method: string, options: RequestInit = {}) {
+let refreshPromise: Promise<boolean> | null = null;
+
+async function refreshTokens(): Promise<boolean> {
+  const refreshToken = getRefreshToken();
+
+  try {
+    const refreshResponse = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (refreshResponse.ok) {
+      const refreshData = await refreshResponse.json();
+      await saveTokens(refreshData.accessToken, refreshData.refreshToken);
+      console.log("Token refresh successful.");
+      return true;
+    }
+  } catch (error) {
+    console.error("Token refresh failed:", JSON.stringify(error, null, 2));
+  }
+
+  return false;
+}
+
+export async function apiCall(
+  endpoint: string,
+  method: string,
+  options: RequestInit = {},
+  isRetry = false,
+) {
   const token = getToken();
 
   const url = `${BASE_URL}${endpoint}`;
@@ -16,48 +47,72 @@ export async function apiCall(endpoint: string, method: string, options: Request
     ...options,
   };
 
+  // First attempt
   const response = await fetch(url, config);
+  const resData = await response.json().catch(() => null);
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({
+  // Attempt token refresh on 401, but only once
+  if (response.status === 401 && resData?.message === "Invalid token" && !isRetry) {
+    console.log("Access token expired, attempting refresh...");
+
+    // If first time hitting 401, initiate refresh and store the promise
+    if (!refreshPromise) {
+      refreshPromise = refreshTokens().finally(() => {
+        // Clear the refresh promise once done to allow future refresh attempts if needed
+        refreshPromise = null;
+      });
+    }
+
+    const refreshSucceeded = await refreshPromise;
+
+    if (refreshSucceeded) {
+      return await apiCall(endpoint, method, options, true);
+    }
+
+    // Refresh failed or returned non-ok — session is dead
+    console.error("Session expired, signing out...");
+    await forceSignOut();
+
+    const sessionError = {
+      endpoint,
+      method,
+      status: 401,
       success: false,
-      message: response.statusText,
-      code: "NETWORK_ERROR",
-    }));
-    console.error(
-      "API Error:",
-      JSON.stringify(
-        {
-          endpoint,
-          method,
-          status: response.status,
-          success: errorData.success,
-          message: errorData.message,
-          code: errorData.code,
-          ...(errorData.errors && { errors: errorData.errors }),
-        },
-        null,
-        2,
-      ),
-    );
-    throw errorData;
+      message: "Session expired",
+      code: "SESSION_EXPIRED",
+    };
+    throw sessionError;
   }
 
-  const apiCallData = {
-    endpoint,
-    method,
-    body: config.body,
-  };
-  const responseData = await response.clone().json();
+  // API error
+  if (!response.ok) {
+    const errorData = resData ?? {
+      success: false,
+      message: response.statusText,
+      code: "UNPARSEABLE_RESPONSE",
+    };
+    const apiError = {
+      endpoint,
+      method,
+      status: response.status,
+      success: errorData.success,
+      message: errorData.message,
+      code: errorData.code,
+      ...(errorData.errors && { errors: errorData.errors }),
+    };
+    console.warn("API Error:", JSON.stringify(apiError, null, 2));
+    throw apiError;
+  }
 
-  const responseObj = {
-    status: responseData.status,
-    success: responseData.success,
-    data: responseData.data,
-  };
+  console.log("API Call:", JSON.stringify({ endpoint, method, body: config.body }, null, 2));
+  console.log(
+    "Response:",
+    JSON.stringify(
+      { status: resData.status, success: resData.success, data: resData.data },
+      null,
+      2,
+    ),
+  );
 
-  console.log("API Call:", JSON.stringify(apiCallData, null, 2));
-  console.log("Response:", JSON.stringify(responseObj, null, 2));
-
-  return responseData;
+  return resData;
 }

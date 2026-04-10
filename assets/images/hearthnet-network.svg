@@ -1,0 +1,315 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" style="background:transparent">
+  <defs>
+    <!-- Glow filters -->
+    <filter id="glowEmber" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glowTeal" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glowSoft" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="nodeShadow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Radial gradients for nodes -->
+    <radialGradient id="nodeCore" cx="35%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#FFB347"/>
+      <stop offset="50%" stop-color="#E8652A"/>
+      <stop offset="100%" stop-color="#3D2B1A"/>
+    </radialGradient>
+    <radialGradient id="nodeMid" cx="35%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#F4843A"/>
+      <stop offset="50%" stop-color="#C8501A"/>
+      <stop offset="100%" stop-color="#2A1A10"/>
+    </radialGradient>
+    <radialGradient id="nodeSmall" cx="35%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#E8652A"/>
+      <stop offset="60%" stop-color="#8B3A1A"/>
+      <stop offset="100%" stop-color="#1A0E08"/>
+    </radialGradient>
+    <radialGradient id="nodeTiny" cx="35%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#00E5CC"/>
+      <stop offset="60%" stop-color="#007A6E"/>
+      <stop offset="100%" stop-color="#001A18"/>
+    </radialGradient>
+
+    <!-- Line gradient - ember to transparent -->
+    <linearGradient id="lineGradEmber" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E8652A" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#E8652A" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="lineGradTeal" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00E5CC" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#00E5CC" stop-opacity="0.05"/>
+    </linearGradient>
+
+    <!-- Pulse animation markers -->
+    <circle id="pulseMarker" r="3" fill="#FFB347" opacity="0.9"/>
+    <circle id="pulseMarkerTeal" r="2.5" fill="#00E5CC" opacity="0.9"/>
+
+    <!-- Avatar clip paths -->
+    <clipPath id="clip1"><circle cx="400" cy="220" r="36"/></clipPath>
+
+    <!-- Ambient glow behind center -->
+    <radialGradient id="ambientGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E8652A" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#E8652A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ambient background glow at center -->
+  <ellipse cx="400" cy="240" rx="180" ry="150" fill="url(#ambientGlow)"/>
+
+  <!-- ===================== EDGES / CONNECTIONS ===================== -->
+
+  <!-- Center to Left-Parent -->
+  <line x1="400" y1="220" x2="230" y2="180" stroke="#E8652A" stroke-width="1.5" stroke-opacity="0.5" stroke-dasharray="4 3"/>
+  <!-- Center to Right-Parent -->
+  <line x1="400" y1="220" x2="570" y2="175" stroke="#E8652A" stroke-width="1.5" stroke-opacity="0.5" stroke-dasharray="4 3"/>
+  <!-- Center to Bottom-Left Child -->
+  <line x1="400" y1="220" x2="270" y2="360" stroke="#E8652A" stroke-width="1.2" stroke-opacity="0.4" stroke-dasharray="4 3"/>
+  <!-- Center to Bottom-Right Child -->
+  <line x1="400" y1="220" x2="530" y2="370" stroke="#E8652A" stroke-width="1.2" stroke-opacity="0.4" stroke-dasharray="4 3"/>
+  <!-- Center to Top -->
+  <line x1="400" y1="220" x2="400" y2="90" stroke="#E8652A" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 3"/>
+
+  <!-- Left-Parent to its children -->
+  <line x1="230" y1="180" x2="110" y2="120" stroke="#E8652A" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="3 4"/>
+  <line x1="230" y1="180" x2="140" y2="290" stroke="#E8652A" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="3 4"/>
+  <line x1="230" y1="180" x2="90" y2="230" stroke="#E8652A" stroke-width="0.8" stroke-opacity="0.25" stroke-dasharray="3 4"/>
+
+  <!-- Right-Parent to its children -->
+  <line x1="570" y1="175" x2="690" y2="110" stroke="#E8652A" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="3 4"/>
+  <line x1="570" y1="175" x2="680" y2="260" stroke="#E8652A" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="3 4"/>
+  <line x1="570" y1="175" x2="650" y2="330" stroke="#00E5CC" stroke-width="0.8" stroke-opacity="0.25" stroke-dasharray="3 4"/>
+
+  <!-- Bottom children to grandchildren -->
+  <line x1="270" y1="360" x2="160" y2="450" stroke="#E8652A" stroke-width="0.8" stroke-opacity="0.25" stroke-dasharray="3 5"/>
+  <line x1="270" y1="360" x2="220" y2="490" stroke="#00E5CC" stroke-width="0.8" stroke-opacity="0.2" stroke-dasharray="3 5"/>
+  <line x1="270" y1="360" x2="320" y2="490" stroke="#E8652A" stroke-width="0.8" stroke-opacity="0.2" stroke-dasharray="3 5"/>
+  <line x1="530" y1="370" x2="620" y2="460" stroke="#E8652A" stroke-width="0.8" stroke-opacity="0.25" stroke-dasharray="3 5"/>
+  <line x1="530" y1="370" x2="490" y2="490" stroke="#00E5CC" stroke-width="0.8" stroke-opacity="0.2" stroke-dasharray="3 5"/>
+  <line x1="530" y1="370" x2="640" y2="490" stroke="#E8652A" stroke-width="0.8" stroke-opacity="0.2" stroke-dasharray="3 5"/>
+
+  <!-- Top node connections -->
+  <line x1="400" y1="90" x2="320" y2="45" stroke="#E8652A" stroke-width="0.8" stroke-opacity="0.25" stroke-dasharray="3 5"/>
+  <line x1="400" y1="90" x2="480" y2="45" stroke="#00E5CC" stroke-width="0.8" stroke-opacity="0.2" stroke-dasharray="3 5"/>
+
+  <!-- Cross connections (network mesh feel) -->
+  <line x1="230" y1="180" x2="270" y2="360" stroke="#E8652A" stroke-width="0.5" stroke-opacity="0.15" stroke-dasharray="2 6"/>
+  <line x1="570" y1="175" x2="530" y2="370" stroke="#E8652A" stroke-width="0.5" stroke-opacity="0.15" stroke-dasharray="2 6"/>
+  <line x1="140" y1="290" x2="270" y2="360" stroke="#00E5CC" stroke-width="0.5" stroke-opacity="0.12" stroke-dasharray="2 6"/>
+
+  <!-- ===================== PULSE DOTS TRAVELLING ALONG LINES ===================== -->
+
+  <!-- Pulse: center → left parent -->
+  <circle r="3" fill="#FFB347" opacity="0">
+    <animateMotion dur="3s" repeatCount="indefinite" begin="0s">
+      <mpath href="#path-c-lp"/>
+    </animateMotion>
+    <animate attributeName="opacity" values="0;0.9;0" dur="3s" repeatCount="indefinite" begin="0s"/>
+  </circle>
+
+  <!-- Pulse: center → right parent -->
+  <circle r="2.5" fill="#FFB347" opacity="0">
+    <animateMotion dur="2.8s" repeatCount="indefinite" begin="1.2s">
+      <mpath href="#path-c-rp"/>
+    </animateMotion>
+    <animate attributeName="opacity" values="0;0.9;0" dur="2.8s" repeatCount="indefinite" begin="1.2s"/>
+  </circle>
+
+  <!-- Pulse: center → bottom left -->
+  <circle r="2.5" fill="#E8652A" opacity="0">
+    <animateMotion dur="3.2s" repeatCount="indefinite" begin="0.5s">
+      <mpath href="#path-c-bl"/>
+    </animateMotion>
+    <animate attributeName="opacity" values="0;0.8;0" dur="3.2s" repeatCount="indefinite" begin="0.5s"/>
+  </circle>
+
+  <!-- Pulse: teal, right → grandchild -->
+  <circle r="2" fill="#00E5CC" opacity="0">
+    <animateMotion dur="2.5s" repeatCount="indefinite" begin="0.8s">
+      <mpath href="#path-rp-gc"/>
+    </animateMotion>
+    <animate attributeName="opacity" values="0;0.7;0" dur="2.5s" repeatCount="indefinite" begin="0.8s"/>
+  </circle>
+
+  <!-- Hidden paths for animateMotion -->
+  <path id="path-c-lp" d="M400,220 L230,180" fill="none" visibility="hidden"/>
+  <path id="path-c-rp" d="M400,220 L570,175" fill="none" visibility="hidden"/>
+  <path id="path-c-bl" d="M400,220 L270,360" fill="none" visibility="hidden"/>
+  <path id="path-rp-gc" d="M570,175 L680,260" fill="none" visibility="hidden"/>
+
+  <!-- ===================== NODES ===================== -->
+
+  <!-- === CENTER NODE (largest - the "you" / root) === -->
+  <g filter="url(#nodeShadow)">
+    <circle cx="400" cy="220" r="44" fill="#E8652A" opacity="0.15"/>
+  </g>
+  <!-- Outer ring pulse -->
+  <circle cx="400" cy="220" r="44" fill="none" stroke="#E8652A" stroke-width="1" stroke-opacity="0.4">
+    <animate attributeName="r" values="44;52;44" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="stroke-opacity" values="0.4;0;0.4" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="400" cy="220" r="38" fill="url(#nodeCore)" filter="url(#glowEmber)"/>
+  <!-- Inner ring -->
+  <circle cx="400" cy="220" r="38" fill="none" stroke="#FFB347" stroke-width="1.5" stroke-opacity="0.6"/>
+  <!-- User icon - center -->
+  <circle cx="400" cy="212" r="11" fill="#FFB347" opacity="0.9"/>
+  <path d="M374,240 Q374,228 400,228 Q426,228 426,240" fill="#FFB347" opacity="0.7"/>
+  <!-- Label -->
+  <text x="400" y="275" text-anchor="middle" font-family="'Share Tech Mono', monospace" font-size="11" fill="#FFB347" letter-spacing="1">YOU</text>
+
+  <!-- === LEFT PARENT NODE === -->
+  <g filter="url(#nodeShadow)">
+    <circle cx="230" cy="180" r="28" fill="#E8652A" opacity="0.1"/>
+  </g>
+  <circle cx="230" cy="180" r="28" fill="none" stroke="#E8652A" stroke-width="0.8" stroke-opacity="0.3">
+    <animate attributeName="r" values="28;34;28" dur="4s" repeatCount="indefinite" begin="0.5s"/>
+    <animate attributeName="stroke-opacity" values="0.3;0;0.3" dur="4s" repeatCount="indefinite" begin="0.5s"/>
+  </circle>
+  <circle cx="230" cy="180" r="26" fill="url(#nodeMid)" filter="url(#glowEmber)"/>
+  <circle cx="230" cy="180" r="26" fill="none" stroke="#F4843A" stroke-width="1" stroke-opacity="0.5"/>
+  <circle cx="230" cy="173" r="8" fill="#F4843A" opacity="0.85"/>
+  <path d="M210,194 Q210,185 230,185 Q250,185 250,194" fill="#F4843A" opacity="0.65"/>
+  <text x="230" y="218" text-anchor="middle" font-family="'Share Tech Mono', monospace" font-size="9" fill="#F4843A" letter-spacing="0.5">PARENT</text>
+
+  <!-- === RIGHT PARENT NODE === -->
+  <g filter="url(#nodeShadow)">
+    <circle cx="570" cy="175" r="28" fill="#E8652A" opacity="0.1"/>
+  </g>
+  <circle cx="570" cy="175" r="28" fill="none" stroke="#E8652A" stroke-width="0.8" stroke-opacity="0.3">
+    <animate attributeName="r" values="28;34;28" dur="3.5s" repeatCount="indefinite" begin="1s"/>
+    <animate attributeName="stroke-opacity" values="0.3;0;0.3" dur="3.5s" repeatCount="indefinite" begin="1s"/>
+  </circle>
+  <circle cx="570" cy="175" r="26" fill="url(#nodeMid)" filter="url(#glowEmber)"/>
+  <circle cx="570" cy="175" r="26" fill="none" stroke="#F4843A" stroke-width="1" stroke-opacity="0.5"/>
+  <circle cx="570" cy="168" r="8" fill="#F4843A" opacity="0.85"/>
+  <path d="M550,189 Q550,180 570,180 Q590,180 590,189" fill="#F4843A" opacity="0.65"/>
+  <text x="570" y="213" text-anchor="middle" font-family="'Share Tech Mono', monospace" font-size="9" fill="#F4843A" letter-spacing="0.5">PARTNER</text>
+
+  <!-- === TOP NODE === -->
+  <circle cx="400" cy="90" r="20" fill="none" stroke="#E8652A" stroke-width="0.6" stroke-opacity="0.25">
+    <animate attributeName="r" values="20;26;20" dur="5s" repeatCount="indefinite" begin="0.3s"/>
+    <animate attributeName="stroke-opacity" values="0.25;0;0.25" dur="5s" repeatCount="indefinite" begin="0.3s"/>
+  </circle>
+  <circle cx="400" cy="90" r="19" fill="url(#nodeSmall)" filter="url(#glowEmber)"/>
+  <circle cx="400" cy="90" r="19" fill="none" stroke="#E8652A" stroke-width="0.8" stroke-opacity="0.4"/>
+  <circle cx="400" cy="84" r="6" fill="#E8652A" opacity="0.8"/>
+  <path d="M385,99 Q385,92 400,92 Q415,92 415,99" fill="#E8652A" opacity="0.6"/>
+
+  <!-- === BOTTOM LEFT CHILD === -->
+  <circle cx="270" cy="360" r="22" fill="none" stroke="#E8652A" stroke-width="0.6" stroke-opacity="0.25">
+    <animate attributeName="r" values="22;28;22" dur="4.5s" repeatCount="indefinite" begin="0.7s"/>
+    <animate attributeName="stroke-opacity" values="0.25;0;0.25" dur="4.5s" repeatCount="indefinite" begin="0.7s"/>
+  </circle>
+  <circle cx="270" cy="360" r="20" fill="url(#nodeSmall)" filter="url(#glowEmber)"/>
+  <circle cx="270" cy="360" r="20" fill="none" stroke="#E8652A" stroke-width="0.8" stroke-opacity="0.4"/>
+  <circle cx="270" cy="354" r="6" fill="#E8652A" opacity="0.8"/>
+  <path d="M255,368 Q255,362 270,362 Q285,362 285,368" fill="#E8652A" opacity="0.6"/>
+  <text x="270" y="392" text-anchor="middle" font-family="'Share Tech Mono', monospace" font-size="8" fill="#E8652A" letter-spacing="0.5">CHILD</text>
+
+  <!-- === BOTTOM RIGHT CHILD === -->
+  <circle cx="530" cy="370" r="22" fill="none" stroke="#E8652A" stroke-width="0.6" stroke-opacity="0.25">
+    <animate attributeName="r" values="22;28;22" dur="4s" repeatCount="indefinite" begin="1.5s"/>
+    <animate attributeName="stroke-opacity" values="0.25;0;0.25" dur="4s" repeatCount="indefinite" begin="1.5s"/>
+  </circle>
+  <circle cx="530" cy="370" r="20" fill="url(#nodeSmall)" filter="url(#glowEmber)"/>
+  <circle cx="530" cy="370" r="20" fill="none" stroke="#E8652A" stroke-width="0.8" stroke-opacity="0.4"/>
+  <circle cx="530" cy="364" r="6" fill="#E8652A" opacity="0.8"/>
+  <path d="M515,378 Q515,372 530,372 Q545,372 545,378" fill="#E8652A" opacity="0.6"/>
+  <text x="530" y="402" text-anchor="middle" font-family="'Share Tech Mono', monospace" font-size="8" fill="#E8652A" letter-spacing="0.5">CHILD</text>
+
+  <!-- === SMALL LEAF NODES (left branch) === -->
+  <circle cx="110" cy="120" r="14" fill="url(#nodeSmall)" filter="url(#glowSoft)" opacity="0.8"/>
+  <circle cx="110" cy="120" r="14" fill="none" stroke="#E8652A" stroke-width="0.6" stroke-opacity="0.35"/>
+  <circle cx="110" cy="115" r="4.5" fill="#E8652A" opacity="0.7"/>
+  <path d="M99,126 Q99,121 110,121 Q121,121 121,126" fill="#E8652A" opacity="0.5"/>
+
+  <circle cx="90" cy="230" r="12" fill="url(#nodeSmall)" filter="url(#glowSoft)" opacity="0.7"/>
+  <circle cx="90" cy="230" r="12" fill="none" stroke="#E8652A" stroke-width="0.6" stroke-opacity="0.3"/>
+  <circle cx="90" cy="225" r="4" fill="#E8652A" opacity="0.65"/>
+  <path d="M80,235 Q80,231 90,231 Q100,231 100,235" fill="#E8652A" opacity="0.45"/>
+
+  <circle cx="140" cy="290" r="14" fill="url(#nodeSmall)" filter="url(#glowSoft)" opacity="0.75"/>
+  <circle cx="140" cy="290" r="14" fill="none" stroke="#E8652A" stroke-width="0.6" stroke-opacity="0.3"/>
+  <circle cx="140" cy="285" r="4.5" fill="#E8652A" opacity="0.65"/>
+  <path d="M129,296 Q129,291 140,291 Q151,291 151,296" fill="#E8652A" opacity="0.45"/>
+
+  <!-- === SMALL LEAF NODES (right branch) === -->
+  <circle cx="690" cy="110" r="14" fill="url(#nodeSmall)" filter="url(#glowSoft)" opacity="0.8"/>
+  <circle cx="690" cy="110" r="14" fill="none" stroke="#E8652A" stroke-width="0.6" stroke-opacity="0.35"/>
+  <circle cx="690" cy="105" r="4.5" fill="#E8652A" opacity="0.7"/>
+  <path d="M679,116 Q679,111 690,111 Q701,111 701,116" fill="#E8652A" opacity="0.5"/>
+
+  <circle cx="680" cy="260" r="14" fill="url(#nodeSmall)" filter="url(#glowSoft)" opacity="0.75"/>
+  <circle cx="680" cy="260" r="14" fill="none" stroke="#E8652A" stroke-width="0.6" stroke-opacity="0.3"/>
+  <circle cx="680" cy="255" r="4.5" fill="#E8652A" opacity="0.65"/>
+  <path d="M669,266 Q669,261 680,261 Q691,261 691,266" fill="#E8652A" opacity="0.45"/>
+
+  <!-- Teal node (different member type) -->
+  <circle cx="650" cy="330" r="12" fill="url(#nodeTiny)" filter="url(#glowTeal)" opacity="0.75"/>
+  <circle cx="650" cy="330" r="12" fill="none" stroke="#00E5CC" stroke-width="0.6" stroke-opacity="0.4"/>
+  <circle cx="650" cy="325" r="4" fill="#00E5CC" opacity="0.7"/>
+  <path d="M640,336 Q640,331 650,331 Q660,331 660,336" fill="#00E5CC" opacity="0.5"/>
+
+  <!-- === GRANDCHILD TINY NODES === -->
+  <circle cx="160" cy="450" r="10" fill="url(#nodeSmall)" opacity="0.6"/>
+  <circle cx="160" cy="450" r="10" fill="none" stroke="#E8652A" stroke-width="0.5" stroke-opacity="0.3"/>
+  <circle cx="220" cy="490" r="9" fill="url(#nodeTiny)" opacity="0.55"/>
+  <circle cx="220" cy="490" r="9" fill="none" stroke="#00E5CC" stroke-width="0.5" stroke-opacity="0.25"/>
+  <circle cx="320" cy="490" r="10" fill="url(#nodeSmall)" opacity="0.55"/>
+  <circle cx="320" cy="490" r="10" fill="none" stroke="#E8652A" stroke-width="0.5" stroke-opacity="0.25"/>
+  <circle cx="490" cy="490" r="9" fill="url(#nodeTiny)" opacity="0.5"/>
+  <circle cx="490" cy="490" r="9" fill="none" stroke="#00E5CC" stroke-width="0.5" stroke-opacity="0.22"/>
+  <circle cx="620" cy="460" r="10" fill="url(#nodeSmall)" opacity="0.55"/>
+  <circle cx="620" cy="460" r="10" fill="none" stroke="#E8652A" stroke-width="0.5" stroke-opacity="0.25"/>
+  <circle cx="640" cy="490" r="9" fill="url(#nodeSmall)" opacity="0.45"/>
+
+  <!-- Top tiny nodes -->
+  <circle cx="320" cy="45" r="10" fill="url(#nodeSmall)" opacity="0.6"/>
+  <circle cx="320" cy="45" r="10" fill="none" stroke="#E8652A" stroke-width="0.5" stroke-opacity="0.3"/>
+  <circle cx="480" cy="45" r="9" fill="url(#nodeTiny)" opacity="0.55"/>
+  <circle cx="480" cy="45" r="9" fill="none" stroke="#00E5CC" stroke-width="0.5" stroke-opacity="0.28"/>
+
+  <!-- ===================== DECORATIVE GRID LINES (subtle) ===================== -->
+  <line x1="0" y1="300" x2="800" y2="300" stroke="#E8652A" stroke-width="0.3" stroke-opacity="0.06"/>
+  <line x1="400" y1="0" x2="400" y2="600" stroke="#E8652A" stroke-width="0.3" stroke-opacity="0.06"/>
+
+  <!-- Corner bracket decorations -->
+  <path d="M20,20 L20,50 M20,20 L50,20" stroke="#E8652A" stroke-width="1" stroke-opacity="0.3" fill="none"/>
+  <path d="M780,20 L780,50 M780,20 L750,20" stroke="#E8652A" stroke-width="1" stroke-opacity="0.3" fill="none"/>
+  <path d="M20,580 L20,550 M20,580 L50,580" stroke="#E8652A" stroke-width="1" stroke-opacity="0.3" fill="none"/>
+  <path d="M780,580 L780,550 M780,580 L750,580" stroke="#E8652A" stroke-width="1" stroke-opacity="0.3" fill="none"/>
+
+  <!-- ===================== FLOATING DATA PARTICLES ===================== -->
+  <circle cx="340" cy="155" r="2" fill="#E8652A" opacity="0">
+    <animate attributeName="opacity" values="0;0.6;0" dur="4s" repeatCount="indefinite" begin="0s"/>
+    <animate attributeName="cy" values="155;145;155" dur="4s" repeatCount="indefinite" begin="0s"/>
+  </circle>
+  <circle cx="460" cy="170" r="1.5" fill="#FFB347" opacity="0">
+    <animate attributeName="opacity" values="0;0.5;0" dur="3s" repeatCount="indefinite" begin="1s"/>
+    <animate attributeName="cy" values="170;160;170" dur="3s" repeatCount="indefinite" begin="1s"/>
+  </circle>
+  <circle cx="310" cy="295" r="1.5" fill="#00E5CC" opacity="0">
+    <animate attributeName="opacity" values="0;0.4;0" dur="3.5s" repeatCount="indefinite" begin="0.5s"/>
+    <animate attributeName="cy" values="295;285;295" dur="3.5s" repeatCount="indefinite" begin="0.5s"/>
+  </circle>
+  <circle cx="490" cy="300" r="2" fill="#E8652A" opacity="0">
+    <animate attributeName="opacity" values="0;0.5;0" dur="4.5s" repeatCount="indefinite" begin="2s"/>
+    <animate attributeName="cy" values="300;290;300" dur="4.5s" repeatCount="indefinite" begin="2s"/>
+  </circle>
+  <circle cx="185" cy="235" r="1.5" fill="#FFB347" opacity="0">
+    <animate attributeName="opacity" values="0;0.4;0" dur="3.2s" repeatCount="indefinite" begin="1.5s"/>
+  </circle>
+  <circle cx="615" cy="225" r="1.5" fill="#00E5CC" opacity="0">
+    <animate attributeName="opacity" values="0;0.4;0" dur="3.8s" repeatCount="indefinite" begin="0.8s"/>
+  </circle>
+</svg>

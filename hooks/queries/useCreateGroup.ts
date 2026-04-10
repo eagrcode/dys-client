@@ -17,8 +17,13 @@ export function useCreateGroup() {
       groupsAPI.createGroup(name, description),
     onSuccess: async (res) => {
       await queryClient.refetchQueries({ queryKey: ["groups", user?.id], type: "all" });
-      selectGroup(res.data);
-      router.replace("/");
+      await selectGroup(res.data);
+
+      if (router.canDismiss()) {
+        router.dismissAll();
+      } else {
+        router.replace("/");
+      }
     },
   });
 }

@@ -1,84 +1,67 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { Button } from "@/components/ui/button";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export default function Welcome() {
   const router = useRouter();
+  const colorScheme = useColorScheme() ?? "light";
 
   useEffect(() => {
     SplashScreen.hideAsync();
   }, []);
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Family Wall</Text>
-        <Text style={styles.subtitle}>Keep your family connected and organized</Text>
+        <ThemedText type="title" style={[styles.title, { color: Colors[colorScheme].tint }]}>
+          HEARTHLINK
+        </ThemedText>
+
+        <ThemedText type="subtitle" style={styles.subtitle}>
+          Keep your family connected and organized
+        </ThemedText>
       </View>
 
       <View style={styles.buttons}>
-        <Pressable style={styles.primaryButton} onPress={() => router.push("/(public)/sign-up")}>
-          <Text style={styles.primaryButtonText}>Create Account</Text>
-        </Pressable>
+        <Button variant="primary" onPress={() => router.push("/(public)/sign-up")}>
+          <ThemedText type="button">Create Account</ThemedText>
+        </Button>
 
-        <Pressable style={styles.secondaryButton} onPress={() => router.push("/(public)/sign-in")}>
-          <Text style={styles.secondaryButtonText}>Log In</Text>
-        </Pressable>
+        <Button variant="secondary" onPress={() => router.push("/(public)/sign-in")}>
+          <ThemedText style={{ color: Colors[colorScheme].tint }}>Log In</ThemedText>
+        </Button>
       </View>
-    </View>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "space-between",
-    padding: 24,
-    backgroundColor: "#fff",
+    padding: 16,
+    width: "100%",
+    height: "100%",
   },
   content: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    gap: 8,
   },
   title: {
-    fontSize: 36,
-    fontWeight: "bold",
-    color: "#007AFF",
-    marginBottom: 12,
+    fontSize: 50,
   },
   subtitle: {
-    fontSize: 18,
-    color: "#666",
     textAlign: "center",
+    opacity: 0.6,
   },
   buttons: {
-    gap: 12,
+    gap: 8,
     marginBottom: 40,
-  },
-  primaryButton: {
-    backgroundColor: "#007AFF",
-    padding: 16,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  primaryButtonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  secondaryButton: {
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 12,
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#007AFF",
-  },
-  secondaryButtonText: {
-    color: "#007AFF",
-    fontSize: 18,
-    fontWeight: "600",
   },
 });

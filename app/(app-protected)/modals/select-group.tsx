@@ -1,49 +1,151 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, ScrollView, View } from "react-native";
 import { useGroups } from "@/hooks/queries/useGroups";
 import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useGroupsProvider } from "@/lib/context/GroupsProvider";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { BackButton } from "@/components/ui/back-button";
 
-export default function Modal() {
+export default function SelectGroupModal() {
   const { data: groups } = useGroups();
-  const { selectGroup } = useGroupsProvider();
+  const { selectedGroup, selectGroup } = useGroupsProvider();
   const router = useRouter();
   const isPresented = router.canGoBack();
+  const colorScheme = useColorScheme() ?? "light";
 
   return (
-    <View style={styles.container}>
-      {isPresented && (
-        <Link href="../" style={styles.closeBtn}>
-          <ThemedText type="title">x</ThemedText>
-        </Link>
-      )}
-      <ThemedText type="subtitle" style={{ textAlign: "center" }}>
-        You are part of {groups.length} group{groups.length !== 1 ? "s" : ""}.
+    <ThemedView style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.titleRow}>
+          <ThemedText style={{ fontSize: 22, letterSpacing: 2 }} type="title">
+            Your Groups
+          </ThemedText>
+          <Pressable
+            onPress={() => router.push("/(app-protected)/create-group")}
+            style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+          >
+            <IconSymbol name="plus.circle.fill" size={28} color={Colors[colorScheme].tint} />
+          </Pressable>
+        </View>
+        {isPresented && <BackButton type="down" />}
+      </View>
+
+      <ThemedText type="subtitle" style={styles.subtitle}>
+        {groups.length} group{groups.length !== 1 ? "s" : ""}
       </ThemedText>
-      {groups.map((group: any) => (
-        <Pressable
-          key={group.id}
-          onPress={() => {
-            selectGroup(group.id);
-            router.back();
-          }}
-        >
-          <ThemedText type="subtitle">{group.name}</ThemedText>
-        </Pressable>
-      ))}
-    </View>
+
+      <ScrollView
+        style={styles.list}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {groups.map((group: any) => (
+          <GroupTile
+            key={group.id}
+            group={group}
+            isSelected={group.id === selectedGroup}
+            colorScheme={colorScheme}
+            onPress={() => {
+              selectGroup(group.id);
+              router.dismissAll();
+            }}
+          />
+        ))}
+      </ScrollView>
+    </ThemedView>
   );
 }
+
+const GroupTile = ({
+  group,
+  isSelected,
+  colorScheme,
+  onPress,
+}: {
+  group: any;
+  isSelected: boolean;
+  colorScheme: "light" | "dark";
+  onPress: () => void;
+}) => {
+  return (
+    <Pressable onPress={onPress} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+      <View
+        style={[
+          tileStyles.tile,
+          {
+            borderColor: isSelected ? Colors[colorScheme].tint : Colors[colorScheme].border,
+          },
+        ]}
+      >
+        <View style={tileStyles.content}>
+          <ThemedText type="defaultSemiBold" style={tileStyles.name}>
+            {group.name}
+          </ThemedText>
+          {group.description ? (
+            <ThemedText style={tileStyles.description} numberOfLines={2}>
+              {group.description}
+            </ThemedText>
+          ) : null}
+        </View>
+        {isSelected && (
+          <IconSymbol name="chevron.right" size={16} color={Colors[colorScheme].tint} />
+        )}
+      </View>
+    </Pressable>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    paddingTop: 60,
+    paddingHorizontal: 16,
   },
-  closeBtn: {
-    position: "absolute",
-    top: 60,
-    right: 32,
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  subtitle: {
+    fontSize: 14,
+    opacity: 0.5,
+    marginBottom: 24,
+  },
+  list: {
+    flex: 1,
+  },
+  listContent: {
+    gap: 12,
+    paddingBottom: 40,
+  },
+});
+
+const tileStyles = StyleSheet.create({
+  tile: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  content: {
+    flex: 1,
+    gap: 4,
+  },
+  name: {
+    fontSize: 16,
+  },
+  description: {
+    fontSize: 14,
+    opacity: 0.6,
   },
 });

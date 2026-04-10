@@ -1,5 +1,6 @@
 import React, { createContext, use, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
+import { useGroups } from "@/hooks/queries/useGroups";
 
 type GroupContext = {
   selectedGroup: string | null;
@@ -13,27 +14,34 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
-  useEffect(() => {
-    initCurrentGroup();
-  }, []);
+  const { data: userGroups = [], isLoading: groupsLoading } = useGroups();
 
-  const initCurrentGroup = async () => {
-    console.log("GroupsProvider | Initialising current group...");
-    try {
-      const storedGroupJson = await SecureStore.getItemAsync("selectedGroup");
-      if (storedGroupJson) {
-        console.log("GroupsProvider | Found stored group in secure storage:", storedGroupJson);
-        setSelectedGroup(JSON.parse(storedGroupJson));
-      } else {
-        console.log("GroupsProvider | No stored group found in secure storage.");
+  useEffect(() => {
+    if (groupsLoading) return;
+
+    const initCurrentGroup = async () => {
+      console.log("GroupsProvider | Initialising current group...");
+      try {
+        const storedGroupJson = await SecureStore.getItemAsync("selectedGroup");
+        if (storedGroupJson) {
+          console.log("GroupsProvider | Found stored group in secure storage:", storedGroupJson);
+          setSelectedGroup(JSON.parse(storedGroupJson));
+        } else if (userGroups.length > 0) {
+          console.log("GroupsProvider | No stored group, selecting first group:", userGroups[0].id);
+          await selectGroup(userGroups[0].id);
+        } else {
+          console.log("GroupsProvider | No stored group and no groups available.");
+        }
+      } catch (error) {
+        console.error("GroupsProvider | Failed to load selected group:", error);
+      } finally {
+        setIsLoading(false);
+        console.log("GroupsProvider | Finished initialising current group.");
       }
-    } catch (error) {
-      console.error("GroupsProvider | Failed to load selected group:", error);
-    } finally {
-      setIsLoading(false);
-      console.log("GroupsProvider | Finished initialising current group.");
-    }
-  };
+    };
+
+    initCurrentGroup();
+  }, [groupsLoading]);
 
   const selectGroup = async (groupId: string | null) => {
     console.log("GroupsProvider | Selecting group:", groupId);

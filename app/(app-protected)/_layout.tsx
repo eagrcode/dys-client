@@ -6,12 +6,33 @@ export default function AppProtectedLayout() {
     <GroupsProvider>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="lists" options={{ headerShown: false }} />
+        <Stack.Screen name="list/[listId]" options={{ headerShown: false }} />
+        <Stack.Screen name="calendar" options={{ headerShown: true, title: "Calendar" }} />
+        <Stack.Screen name="albums" options={{ headerShown: true, title: "Albums" }} />
+        <Stack.Screen name="text-channels" options={{ headerShown: true, title: "Chat" }} />
+        <Stack.Screen
+          name="create-group"
+          options={{
+            presentation: "fullScreenModal",
+            headerShown: false,
+            title: "Create Group",
+          }}
+        />
         <Stack.Screen
           name="modals/select-group"
           options={{
             presentation: "fullScreenModal",
             headerShown: false,
             title: "Select Group",
+          }}
+        />
+        <Stack.Screen
+          name="modals/create-list"
+          options={{
+            presentation: "fullScreenModal",
+            headerShown: false,
+            title: "Create List",
           }}
         />
       </Stack>

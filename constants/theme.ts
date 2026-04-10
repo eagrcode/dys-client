@@ -1,43 +1,69 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 import { Platform } from "react-native";
 
-const tintColorLight = "hsl(242, 65%, 45%)";
-const tintColorDark = "#fff";
+const tintColorLight = "#1dbae2";
+const tintColorDark = "#4d9eb3";
+const tintColorDarkSoft = "hsla(192, 40%, 50%, 0.50)";
+const tintColorLightSoft = "hsla(192, 40%, 50%, 0.50)";
+const errorColor = "#ff6b6b";
+
+export const Styling = {
+  borderRadius: 6,
+  borderRadiusCTA: 12,
+};
 
 export const Colors = {
   light: {
-    text: "#11181C",
-    background: "hsl(245, 20%, 90%)",
-    bgLayer1: "hsl(245, 20%, 85%)",
-    bgLayer2: "hsl(245, 20%, 80%)",
+    text: "#0F0F1A",
+    errorText: errorColor,
+    background: "#E0DFE8",
+    bgLayer1: "rgba(255, 255, 255, 0.45)",
+    bgLayer2: "rgba(255, 255, 255, 0.6)",
     tint: tintColorLight,
-    icon: "#687076",
-    tabIconDefault: "#687076",
+    tintSoft: tintColorLightSoft,
+    icon: "#c6c6d2",
+    placeHolderTextColor: "hsla(260, 6%, 89%, 0.6)",
+    tabBar: "#D8D7E2",
+    header: "#1c1c21",
+    tabIconDefault: "#8e8ea4",
     tabIconSelected: tintColorLight,
+    border: "hsl(0, 0%, 100%)",
+    homeTileColors: {
+      Lists: "hsla(192, 40%, 60%, 0.70)",
+      Calendar: "hsla(48, 40%, 70%, 0.70)  ",
+      Albums: "hsla(286, 40%, 70%, 0.70)",
+      HearthChat: "hsla(147, 40%, 60%, 0.70)",
+    },
   },
   dark: {
-    text: "#ECEDEE",
-    background: "#151718",
+    text: "#e3e2e5",
+    errorText: errorColor,
+    background: "#08080F",
+    bgLayer1: "rgba(255, 255, 255, 0.1)",
+    bgLayer2: "rgba(255, 255, 255, 0.20)",
     tint: tintColorDark,
-    icon: "#9BA1A6",
-    tabIconDefault: "#9BA1A6",
+    tintSoft: tintColorDarkSoft,
+    icon: "#c6c6d2",
+    placeHolderTextColor: "hsla(260, 6%, 89%, 0.6)",
+    tabBar: "hsla(0, 0%, 100%, 0.06)",
+    header: "#1c1c21",
+    tabIconDefault: "#8e8ea4",
     tabIconSelected: tintColorDark,
+    border: "hsla(0, 0%, 100%, 0.10)",
+    borderTint: "#1dbae2b3",
+    homeTileColors: {
+      Lists: "hsla(192, 40%, 60%, 0.70)",
+      Calendar: "hsla(48, 40%, 70%, 0.70)  ",
+      Albums: "hsla(286, 40%, 70%, 0.70)",
+      HearthChat: "hsla(147, 40%, 60%, 0.70)",
+    },
   },
 };
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: "system-ui",
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: "ui-serif",
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: "ui-rounded",
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: "ui-monospace",
   },
   default: {

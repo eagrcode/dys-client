@@ -1,63 +1,129 @@
 import { ThemedView } from "@/components/themed-view";
-import { Platform, StyleSheet, Text, View, TextInput, Alert, Pressable } from "react-native";
-import { Colors } from "@/constants/theme";
+import { StyleSheet, View, ActivityIndicator } from "react-native";
 import { useState } from "react";
 import { useAuthProvider } from "@/lib/context/SessionProvider";
+import { ThemedText } from "@/components/themed-text";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Styling } from "@/constants/theme";
+import { ErrorText } from "@/components/ui/error-text";
+
+type FormData = {
+  email: string;
+  password: string;
+};
 
 export default function SignIn() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
   });
+  const [fieldErrors, setFieldErrors] = useState<{ [key in keyof FormData]: string }>({
+    email: "",
+    password: "",
+  });
+  const [formError, setFormError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const { signIn } = useAuthProvider();
 
-  const handleSetFormData = (key: string, value: string) => {
+  const submitDisabled = isLoading || !formData.email || !formData.password;
+
+  const handleSetFormData = (key: keyof FormData, value: string) => {
+    // Clear previous errors
+    setFieldErrors((prev) => ({ ...prev, [key]: "" }));
+    setFormError("");
+
     setFormData({ ...formData, [key]: value });
   };
 
   const handleSignInPress = async () => {
-    if (!formData.email || !formData.password) {
-      Alert.alert("Error", "Please fill in all fields.");
-      return;
-    }
+    // Clear previous errors
+    setFieldErrors({ email: "", password: "" });
+    setFormError("");
 
     try {
+      setIsLoading(true);
       await signIn(formData.email, formData.password);
     } catch (error: any) {
-      Alert.alert("Sign In Failed", error.message || "Check your credentials and try again.");
+      handleErrors(error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleErrors = (error: any) => {
+    const code = error?.code;
+
+    if (code === "LIMIT_EXCEEDED") {
+      setFormError("Too many failed attempts. Please try again later.");
+    } else if (code === "UNAUTHORISED") {
+      setFormError("Invalid email or password.");
+    } else if (code === "VALIDATION_ERROR") {
+      const validationErrors = error?.errors;
+      validationErrors.forEach((fieldError: any) => {
+        const field = fieldError?.path;
+        const message = fieldError?.msg;
+        if (field && message) {
+          setFieldErrors((prev) => ({ ...prev, [field]: message }));
+        }
+      });
+    } else {
+      setFormError("An unexpected error occurred. Please try again.");
+    }
+  };
+
+  const renderFieldError = (field: keyof FormData) => {
+    if (fieldErrors[field]) {
+      return <ErrorText error={fieldErrors[field]} />;
+    }
+    return null;
+  };
+
+  const renderFormError = () => {
+    if (formError) {
+      return <ErrorText error={formError} />;
+    }
+    return null;
   };
 
   return (
     <ThemedView style={styles.container}>
-      <View style={{ width: "100%", gap: 8 }}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={formData.email}
-          onChangeText={(content) => handleSetFormData("email", content)}
-          keyboardType="email-address"
-          inputMode="email"
-          autoComplete="email"
-          textContentType="emailAddress"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={formData.password}
-          onChangeText={(content) => handleSetFormData("password", content)}
-          secureTextEntry={true}
-          inputMode="text"
-          autoComplete="password"
-          textContentType="password"
-        />
+      <View style={styles.form}>
+        <View style={styles.inputs}>
+          <Input
+            placeholder="Email"
+            value={formData.email}
+            onChangeText={(content) => handleSetFormData("email", content)}
+            keyboardType="email-address"
+            inputMode="email"
+            autoComplete="email"
+            textContentType="emailAddress"
+          />
+          {renderFieldError("email")}
+          <Input
+            placeholder="Password"
+            value={formData.password}
+            onChangeText={(content) => handleSetFormData("password", content)}
+            secureTextEntry
+            inputMode="text"
+            autoComplete="password"
+            textContentType="password"
+          />
+          {renderFieldError("password")}
+        </View>
+        {renderFormError()}
+        <Button
+          variant="primary"
+          onPress={handleSignInPress}
+          disabled={submitDisabled}
+          style={{ borderRadius: Styling.borderRadiusCTA }}
+        >
+          <ThemedText>
+            {isLoading ? <ActivityIndicator size="small" color="#fff" /> : "Sign In"}
+          </ThemedText>
+        </Button>
       </View>
-      <Pressable
-        style={[styles.input, styles.submitBtn]}
-        onPress={handleSignInPress}
-      >
-        <Text style={styles.submitBtnText}>Sign In</Text>
-      </Pressable>
     </ThemedView>
   );
 }
@@ -68,36 +134,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
+  },
+  form: {
+    width: "100%",
     gap: 16,
   },
-  input: {
-    width: "100%",
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: Colors.light.bgLayer2,
-    ...Platform.select({
-      ios: {
-        shadowColor: "hsl(240, 60%, 20%)",
-        shadowOffset: { width: 1, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-      },
-      android: {
-        elevation: 4,
-      },
-      web: {
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-      },
-    }),
-  },
-  submitBtn: {
-    backgroundColor: Colors.light.tint,
-    borderRadius: 20,
-    alignItems: "center",
-  },
-  submitBtnText: {
-    color: Colors.light.background,
-    fontWeight: "bold",
-    textAlign: "center",
+  inputs: {
+    gap: 8,
   },
 });
