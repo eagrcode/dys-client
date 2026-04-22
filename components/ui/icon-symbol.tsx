@@ -1,11 +1,11 @@
 // Fallback for using MaterialIcons on Android and web.
 
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { SymbolWeight, SymbolViewProps } from 'expo-symbols';
-import { ComponentProps } from 'react';
-import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { SymbolWeight, SymbolViewProps } from "expo-symbols";
+import { ComponentProps } from "react";
+import { OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
 
-type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>;
+type IconMapping = Record<SymbolViewProps["name"], ComponentProps<typeof MaterialIcons>["name"]>;
 type IconSymbolName = keyof typeof MAPPING;
 
 /**
@@ -14,20 +14,21 @@ type IconSymbolName = keyof typeof MAPPING;
  * - see SF Symbols in the [SF Symbols](https://developer.apple.com/sf-symbols/) app.
  */
 const MAPPING = {
-  'house.fill': 'home',
-  'paperplane.fill': 'send',
-  'chevron.left.forwardslash.chevron.right': 'code',
-  'chevron.right': 'chevron-right',
-  'bell.fill': 'notifications',
-  'person.fill': 'person',
-  'list.bullet': 'list',
-  'calendar': 'calendar-today',
-  'photo.on.rectangle': 'photo-library',
-  'message.fill': 'chat',
-  'plus.circle.fill': 'add-circle',
-  'chevron.down': 'keyboard-arrow-down',
-  'sun.max.fill': 'light-mode',
-  'moon.fill': 'dark-mode',
+  "house.fill": "home",
+  "paperplane.fill": "send",
+  "chevron.left.forwardslash.chevron.right": "code",
+  "chevron.right": "chevron-right",
+  "bell.fill": "notifications",
+  "person.fill": "person",
+  "list.bullet": "list",
+  calendar: "calendar-today",
+  "photo.on.rectangle": "photo-library",
+  "message.fill": "chat",
+  "plus.circle.fill": "add-circle",
+  "chevron.down": "keyboard-arrow-down",
+  "sun.max.fill": "light-mode",
+  "moon.fill": "dark-mode",
+  ellipsis: "more-horiz",
 } as IconMapping;
 
 /**

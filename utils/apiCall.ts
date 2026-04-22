@@ -8,6 +8,11 @@ let refreshPromise: Promise<boolean> | null = null;
 async function refreshTokens(): Promise<boolean> {
   const refreshToken = getRefreshToken();
 
+  if (!refreshToken) {
+    console.error("Token refresh failed: no refresh token in cache");
+    return false;
+  }
+
   try {
     const refreshResponse = await fetch(`${BASE_URL}/auth/refresh`, {
       method: "POST",
@@ -21,6 +26,9 @@ async function refreshTokens(): Promise<boolean> {
       console.log("Token refresh successful.");
       return true;
     }
+
+    const errorData = await refreshResponse.json().catch(() => null);
+    console.error("Token refresh rejected:", refreshResponse.status, errorData);
   } catch (error) {
     console.error("Token refresh failed:", JSON.stringify(error, null, 2));
   }
@@ -55,15 +63,13 @@ export async function apiCall(
   if (response.status === 401 && resData?.message === "Invalid token" && !isRetry) {
     console.log("Access token expired, attempting refresh...");
 
-    // If first time hitting 401, initiate refresh and store the promise
+    // Deduplicate: all concurrent 401s share the same refresh attempt
     if (!refreshPromise) {
-      refreshPromise = refreshTokens().finally(() => {
-        // Clear the refresh promise once done to allow future refresh attempts if needed
-        refreshPromise = null;
-      });
+      refreshPromise = refreshTokens();
     }
 
     const refreshSucceeded = await refreshPromise;
+    refreshPromise = null;
 
     if (refreshSucceeded) {
       return await apiCall(endpoint, method, options, true);

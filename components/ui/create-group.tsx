@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { ErrorText } from "@/components/ui/error-text";
 import React, { useState } from "react";
 import { useCreateGroup } from "@/hooks/queries/useCreateGroup";
-import { Styling } from "@/constants/theme";
+import { Colors, Styling } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import Animated, { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
 
 type FormData = {
   name: string;
@@ -26,7 +28,15 @@ const CreateGroup = () => {
 
   const { mutateAsync: createGroup, isPending: isCreating } = useCreateGroup();
 
+  const colorScheme = useColorScheme() ?? "light";
+  const colors = Colors[colorScheme];
+
   const submitDisabled = isCreating || !formData.name || !formData.description;
+
+  const keyboard = useAnimatedKeyboard();
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: -keyboard.height.value / 5 }],
+  }));
 
   const handleSetFormData = (key: keyof FormData, value: string) => {
     // Clear previous errors
@@ -83,57 +93,61 @@ const CreateGroup = () => {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="subtitle" style={{ textAlign: "center", fontSize: 22 }}>
-        Create a Group
-      </ThemedText>
-
-      <View style={styles.form}>
-        <View style={styles.inputs}>
-          <Input
-            placeholder="Name"
-            value={formData.name}
-            onChangeText={(content) => handleSetFormData("name", content)}
-            inputMode="text"
-            editable={!isCreating}
-          />
-          {renderFieldError("name")}
-          <Input
-            placeholder="Description"
-            value={formData.description}
-            onChangeText={(content) => handleSetFormData("description", content)}
-            inputMode="text"
-            editable={!isCreating}
-          />
-          {renderFieldError("description")}
-        </View>
-        {renderFormError()}
-        <Button
-          variant="primary"
-          style={{ borderRadius: Styling.borderRadiusCTA }}
-          onPress={handleCreateGroupPress}
-          disabled={submitDisabled}
-          loading={isCreating}
-        >
-          <ThemedText type="defaultSemiBold" style={{ color: "#fff" }}>
-            Submit
+      <Animated.View style={animatedStyle}>
+        <View style={[styles.form, { backgroundColor: colors.background }]}>
+          <ThemedText type="subtitle" style={{ fontSize: 20, letterSpacing: 2 }}>
+            Create a Group
           </ThemedText>
-        </Button>
-      </View>
+          <View style={styles.inputs}>
+            <Input
+              placeholder="Name"
+              value={formData.name}
+              onChangeText={(content) => handleSetFormData("name", content)}
+              inputMode="text"
+              editable={!isCreating}
+            />
+            {renderFieldError("name")}
+            <Input
+              placeholder="Description"
+              value={formData.description}
+              onChangeText={(content) => handleSetFormData("description", content)}
+              inputMode="text"
+              editable={!isCreating}
+            />
+            {renderFieldError("description")}
+          </View>
+          {renderFormError()}
+          <Button
+            variant="primary"
+            style={{ borderRadius: Styling.borderRadiusCTA }}
+            onPress={handleCreateGroupPress}
+            disabled={submitDisabled}
+            loading={isCreating}
+          >
+            <ThemedText type="defaultSemiBold" style={{ color: "#fff" }}>
+              Submit
+            </ThemedText>
+          </Button>
+        </View>
+      </Animated.View>
     </ThemedView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    position: "relative",
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 16,
     padding: 16,
+    paddingTop: 60,
+    paddingBottom: 60,
+    gap: 16,
+    justifyContent: "center",
   },
   form: {
-    width: "100%",
     gap: 16,
+    padding: 16,
+    borderRadius: 8,
   },
   inputs: {
     gap: 8,

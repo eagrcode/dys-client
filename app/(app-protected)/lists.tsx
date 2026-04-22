@@ -14,8 +14,6 @@ import { BackButton } from "@/components/ui/back-button";
 
 type ListType = "shopping" | "todo" | "other";
 
-type ThemeColors = (typeof Colors)["light"];
-
 type List = {
   id: string;
   title: string;
@@ -79,19 +77,7 @@ export default function ListsScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <View style={styles.header}>
-        <BackButton type="left" size={24} />
-        <ThemedText type="title" style={{ fontSize: 20, letterSpacing: 2 }}>
-          Lists
-        </ThemedText>
-        <Pressable
-          onPress={() => router.push("/(app-protected)/modals/create-list")}
-          style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
-        >
-          <IconSymbol name={"plus"} size={28} color={colors.tint} />
-        </Pressable>
-      </View>
-
+      <Header />
       {sections.length === 0 ? (
         <View style={styles.centered}>
           <ThemedText style={{ opacity: 0.5 }}>No lists yet</ThemedText>
@@ -100,12 +86,10 @@ export default function ListsScreen() {
         <SectionList
           sections={sections}
           keyExtractor={(item: List) => item.id}
-          contentContainerStyle={styles.listContent}
-          renderSectionHeader={({ section }) => <SectionHeader colors={colors} section={section} />}
+          renderSectionHeader={({ section }) => <SectionHeader section={section} />}
           renderItem={({ item }: { item: List }) => (
             <ListRow
               item={item}
-              colors={colors}
               deletingId={deletingId}
               onPress={() => router.push(`/(app-protected)/list/${item.id}`)}
               onDelete={() => handleDelete(item.id, item.title)}
@@ -117,31 +101,56 @@ export default function ListsScreen() {
   );
 }
 
-const SectionHeader = ({ colors, section }: { colors: ThemeColors; section: Section }) => {
+function Header() {
+  const router = useRouter();
+  const colorScheme = useColorScheme() ?? "light";
+  const colors = Colors[colorScheme];
+
   return (
-    <View style={styles.sectionHeader}>
-      <IconSymbol name={section.icon as any} size={18} color={colors.icon} />
-      <ThemedText type="defaultSemiBold" style={styles.sectionTitle}>
-        {section.title}
+    <View style={headerStyles.header}>
+      <BackButton type="left" size={24} />
+      <ThemedText type="title" style={headerStyles.title}>
+        Lists
       </ThemedText>
-      <ThemedText style={styles.sectionCount}>{section.data.length}</ThemedText>
+      <Pressable
+        onPress={() => router.push("/(app-protected)/modals/create-list")}
+        style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+      >
+        <IconSymbol name={"plus"} size={28} color={colors.tint} />
+      </Pressable>
     </View>
   );
-};
+}
 
-const ListRow = ({
+function SectionHeader({ section }: { section: Section }) {
+  const colorScheme = useColorScheme() ?? "light";
+  const colors = Colors[colorScheme];
+
+  return (
+    <View style={sectionHeaderStyles.sectionHeader}>
+      <IconSymbol name={section.icon as any} size={18} color={colors.icon} />
+      <ThemedText type="defaultSemiBold" style={sectionHeaderStyles.sectionTitle}>
+        {section.title}
+      </ThemedText>
+      <ThemedText style={sectionHeaderStyles.sectionCount}>{section.data.length}</ThemedText>
+    </View>
+  );
+}
+
+function ListRow({
   item,
-  colors,
   deletingId,
   onPress,
   onDelete,
 }: {
   item: List;
-  colors: ThemeColors;
   deletingId: string | null;
   onPress: () => void;
   onDelete: () => void;
-}) => {
+}) {
+  const colorScheme = useColorScheme() ?? "light";
+  const colors = Colors[colorScheme];
+
   return (
     <Pressable
       onPress={onPress}
@@ -179,7 +188,7 @@ const ListRow = ({
       </Pressable>
     </Pressable>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -191,6 +200,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+});
+
+const headerStyles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -198,7 +210,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingTop: 60,
   },
-  listContent: {},
+  title: {
+    fontSize: 20,
+    letterSpacing: 2,
+  },
+});
+
+const sectionHeaderStyles = StyleSheet.create({
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",

@@ -10,8 +10,33 @@ import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { useToggleCompleteListItem } from "@/hooks/queries/useToggleCompleteListItem";
 import { useListById } from "@/hooks/queries/useListById";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import BackButton from "@/components/ui/back-button";
+import { useRef, useState } from "react";
+import { TextInput } from "react-native";
+import { BackButton } from "@/components/ui/back-button";
+
+type ListItem = {
+  id: string;
+  list_id: string;
+  content: string;
+  completed: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+type List = {
+  id: string;
+  title: string;
+  list_type: string;
+  created_by: string;
+  group_id: string;
+  assigned_to?: string;
+  due_date?: string;
+  completed: boolean;
+  completed_at?: string;
+  created_at: string;
+  updated_at: string;
+  items: ListItem[];
+};
 
 const LIST_TYPE_ICONS: Record<string, string> = {
   shopping: "cart.fill",
@@ -25,6 +50,8 @@ const LIST_TYPE_LABELS: Record<string, string> = {
   other: "Other",
 };
 
+const SCREEN_PADDING = 16;
+
 export default function ListViewScreen() {
   const [newItem, setNewItem] = useState<string>("");
   const { listId } = useLocalSearchParams<{ listId: string }>();
@@ -35,7 +62,7 @@ export default function ListViewScreen() {
   const colorScheme = useColorScheme() ?? "light";
 
   const colors = Colors[colorScheme];
-  const completedCount = list?.items?.filter((i: any) => i.completed).length ?? 0;
+  const completedCount = list?.items?.filter((i: ListItem) => i.completed).length ?? 0;
   const totalCount = list?.items?.length ?? 0;
 
   const handleAddItemPress = () => {
@@ -69,68 +96,12 @@ export default function ListViewScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <BackButton type="left" size={24} />
-          <ThemedText type="title" style={{ fontSize: 20, letterSpacing: 2 }}>
-            {list.title}
-          </ThemedText>
-          <View style={[styles.typeChip, { backgroundColor: colors.bgLayer1 }]}>
-            <IconSymbol
-              name={LIST_TYPE_ICONS[list.list_type] as any}
-              size={14}
-              color={colors.tint}
-            />
-            <ThemedText style={{ fontSize: 12, color: colors.tint }}>
-              {LIST_TYPE_LABELS[list.list_type] || list.list_type}
-            </ThemedText>
-          </View>
-        </View>
-
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          {totalCount > 0 && (
-            <View style={styles.progressRow}>
-              <View style={[styles.progressTrack, { backgroundColor: colors.bgLayer1 }]}>
-                <View
-                  style={[
-                    styles.progressFill,
-                    {
-                      backgroundColor: colors.tint,
-                      width: `${(completedCount / totalCount) * 100}%`,
-                    },
-                  ]}
-                />
-              </View>
-              <ThemedText style={styles.progressText}>
-                {completedCount}/{totalCount}
-              </ThemedText>
-            </View>
-          )}
-        </View>
-      </View>
-
-      {/* Input for adding new items */}
-      <View
-        style={{ flexDirection: "row", gap: 8, justifyContent: "center", alignItems: "center" }}
-      >
-        <Input
-          style={{
-            flex: 1,
-            width: undefined,
-          }}
-          placeholder="New item"
-          value={newItem}
-          onChangeText={(content) => setNewItem(content)}
-        />
-        <Pressable
-          onPress={handleAddItemPress}
-          disabled={!newItem.trim()}
-          style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
-        >
-          <IconSymbol name="plus" size={30} color={!newItem.trim() ? colors.icon : colors.tint} />
-        </Pressable>
-      </View>
+      <Header list={list} completedCount={completedCount} totalCount={totalCount} />
+      <NewItemInput
+        newItem={newItem}
+        setNewItem={setNewItem}
+        handleAddItemPress={handleAddItemPress}
+      />
 
       {/* Placeholder for empty list */}
       {totalCount === 0 ? (
@@ -141,38 +112,11 @@ export default function ListViewScreen() {
       ) : (
         <FlatList
           data={list.items}
-          keyExtractor={(item: any) => item.id}
-          contentContainerStyle={styles.listContent}
-          renderItem={({ item, index }: { item: any; index: number }) => (
-            <View
-              style={[
-                styles.itemRow,
-                {
-                  borderBottomWidth: index < totalCount - 1 ? 1 : 0,
-                  borderBottomColor: colors.bgLayer1,
-                },
-              ]}
-            >
-              <Pressable onPress={() => handleToggleCompleteItem(item.id, item.completed)}>
-                <IconSymbol
-                  name={item.completed ? "checkmark.circle.fill" : "circle"}
-                  size={25}
-                  color={item.completed ? colors.tint : colors.icon}
-                />
-              </Pressable>
-
-              <ThemedText
-                style={[
-                  styles.itemText,
-                  item.completed && {
-                    textDecorationLine: "line-through",
-                    opacity: 0.4,
-                  },
-                ]}
-              >
-                {item.content}
-              </ThemedText>
-            </View>
+          keyExtractor={(item: ListItem) => item.id}
+          contentContainerStyle={styles.list}
+          keyboardDismissMode="on-drag"
+          renderItem={({ item }: { item: ListItem }) => (
+            <ItemRow item={item} handleToggleCompleteItem={handleToggleCompleteItem} />
           )}
         />
       )}
@@ -180,10 +124,145 @@ export default function ListViewScreen() {
   );
 }
 
+function Header({
+  list,
+  completedCount,
+  totalCount,
+}: {
+  list: List;
+  completedCount: number;
+  totalCount: number;
+}) {
+  const colorScheme = useColorScheme() ?? "light";
+  const colors = Colors[colorScheme];
+
+  return (
+    <View style={headerStyles.header}>
+      <View style={headerStyles.headerTop}>
+        <BackButton type="left" size={24} />
+        <ThemedText type="title" style={headerStyles.title}>
+          {list.title}
+        </ThemedText>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <View style={[headerStyles.typeChip, { backgroundColor: colors.bgLayer1 }]}>
+            <IconSymbol
+              name={LIST_TYPE_ICONS[list.list_type] as any}
+              size={14}
+              color={colors.tint}
+            />
+            <ThemedText style={{ fontSize: 12, color: colors.tint }}>
+              {LIST_TYPE_LABELS[list.list_type] || list.list_type}
+            </ThemedText>
+          </View>
+          <IconSymbol name="ellipsis" size={30} color={colors.icon} />
+        </View>
+      </View>
+
+      {/* Progress Indicator */}
+      <View style={{ flexDirection: "row", gap: 8 }}>
+        {totalCount > 0 && (
+          <View style={headerStyles.progressRow}>
+            <View style={[headerStyles.progressTrack, { backgroundColor: colors.bgLayer1 }]}>
+              <View
+                style={[
+                  headerStyles.progressFill,
+                  {
+                    backgroundColor: colors.tint,
+                    width: `${(completedCount / totalCount) * 100}%`,
+                  },
+                ]}
+              />
+            </View>
+            <ThemedText style={headerStyles.progressText}>
+              {completedCount}/{totalCount}
+            </ThemedText>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
+
+function NewItemInput({
+  newItem,
+  setNewItem,
+  handleAddItemPress,
+}: {
+  newItem: string;
+  setNewItem: (content: string) => void;
+  handleAddItemPress: () => void;
+}) {
+  const colorScheme = useColorScheme() ?? "light";
+  const colors = Colors[colorScheme];
+  const inputRef = useRef<TextInput>(null);
+
+  return (
+    <View
+      style={[
+        newItemInputStyles.container,
+        {
+          // borderColor: !newItem.trim() ? colors.border : colors.icon,
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
+      <IconSymbol
+        name="plus"
+        size={30}
+        color={!newItem.trim() ? colors.placeHolderTextColor : colors.icon}
+      />
+      <Input
+        ref={inputRef}
+        style={[newItemInputStyles.input]}
+        placeholder="New item"
+        value={newItem}
+        onChangeText={(content) => setNewItem(content)}
+        onSubmitEditing={handleAddItemPress}
+        submitBehavior="submit"
+      />
+    </View>
+  );
+}
+
+function ItemRow({
+  item,
+  handleToggleCompleteItem,
+}: {
+  item: ListItem;
+  handleToggleCompleteItem: (id: string, completed: boolean) => void;
+}) {
+  const colorScheme = useColorScheme() ?? "light";
+  const colors = Colors[colorScheme];
+
+  return (
+    <View style={[itemRowStyles.itemRow]}>
+      <Pressable onPress={() => handleToggleCompleteItem(item.id, item.completed)}>
+        <IconSymbol
+          name={item.completed ? "checkmark.circle.fill" : "circle"}
+          size={25}
+          color={item.completed ? colors.tintSoft : colors.icon}
+        />
+      </Pressable>
+
+      <ThemedText
+        style={[
+          itemRowStyles.itemText,
+          item.completed && {
+            textDecorationLine: "line-through",
+            opacity: 0.4,
+          },
+        ]}
+      >
+        {item.content}
+      </ThemedText>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 0,
     gap: 16,
   },
   centered: {
@@ -191,9 +270,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  list: {
+    flexGrow: 1,
+    paddingHorizontal: SCREEN_PADDING,
+  },
+});
+
+const headerStyles = StyleSheet.create({
   header: {
     paddingTop: 60,
     gap: 8,
+    paddingHorizontal: SCREEN_PADDING,
   },
   headerTop: {
     flexDirection: "row",
@@ -201,6 +288,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 16,
   },
+  title: { fontSize: 20, letterSpacing: 2 },
   typeChip: {
     flexDirection: "row",
     alignItems: "center",
@@ -210,16 +298,12 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 20,
   },
-  title: {
-    fontSize: 16,
-    letterSpacing: 3,
-  },
   progressRow: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
+    gap: 16,
   },
   progressTrack: {
     flex: 1,
@@ -235,13 +319,36 @@ const styles = StyleSheet.create({
     fontSize: 14,
     opacity: 0.5,
   },
-  listContent: {},
+});
+
+const newItemInputStyles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: SCREEN_PADDING,
+    // borderLeftWidth: 0,
+    // borderRightWidth: 0,
+    // borderTopWidth: 1,
+    // borderBottomWidth: 1,
+    borderWidth: 0,
+  },
+  input: {
+    flex: 1,
+    width: undefined,
+    borderWidth: 0,
+    paddingVertical: 16,
+    paddingHorizontal: 0,
+  },
+});
+
+const itemRowStyles = StyleSheet.create({
   itemRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 4,
+    gap: 16,
+    paddingVertical: 16,
   },
   itemText: {
     flex: 1,

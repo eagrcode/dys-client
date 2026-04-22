@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import {
   TextInput,
   StyleSheet,
@@ -17,6 +18,11 @@ type InputProps = {
   keyboardType?: KeyboardTypeOptions;
   inputMode?: "none" | "text" | "decimal" | "numeric" | "tel" | "search" | "email" | "url";
   autoComplete?: string;
+  editable?: boolean;
+  autoFocus?: boolean;
+  style?: StyleProp<TextStyle>;
+  onSubmitEditing?: () => void;
+  submitBehavior?: "submit" | "blurAndSubmit" | "newline";
   textContentType?:
     | "none"
     | "emailAddress"
@@ -25,29 +31,32 @@ type InputProps = {
     | "name"
     | "givenName"
     | "familyName";
-  editable?: boolean;
-  autoFocus?: boolean;
-  style?: StyleProp<TextStyle>;
 };
 
-export function Input({
-  placeholder,
-  value,
-  onChangeText,
-  secureTextEntry,
-  keyboardType,
-  inputMode,
-  autoComplete,
-  textContentType,
-  editable,
-  autoFocus = false,
-  style,
-}: InputProps) {
+export const Input = forwardRef<TextInput, InputProps>(function Input(
+  {
+    placeholder,
+    value,
+    onChangeText,
+    secureTextEntry,
+    keyboardType,
+    inputMode,
+    autoComplete,
+    textContentType,
+    editable,
+    autoFocus = false,
+    style,
+    onSubmitEditing,
+    submitBehavior,
+  },
+  ref,
+) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
 
   return (
     <TextInput
+      ref={ref}
       style={[
         styles.base,
         {
@@ -69,9 +78,11 @@ export function Input({
       textContentType={textContentType}
       editable={editable}
       autoFocus={autoFocus}
+      onSubmitEditing={onSubmitEditing}
+      submitBehavior={submitBehavior}
     />
   );
-}
+});
 
 const styles = StyleSheet.create({
   base: {

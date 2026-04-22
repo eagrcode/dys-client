@@ -1,4 +1,4 @@
-import { type ViewProps, Keyboard, TouchableWithoutFeedback } from "react-native";
+import { type ViewProps } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
@@ -10,13 +10,11 @@ export function ThemedView({ style, ...otherProps }: ViewProps) {
   const colors = colorScheme === "light" ? LIGHT_GRADIENT : DARK_GRADIENT;
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <LinearGradient
-        colors={[...colors]}
-        locations={[0, 0.5, 1]}
-        style={[{ flex: 1 }, style]}
-        {...otherProps}
-      />
-    </TouchableWithoutFeedback>
+    <LinearGradient
+      colors={[...colors]}
+      locations={[0, 0.5, 1]}
+      style={[{ flex: 1 }, style]}
+      {...otherProps}
+    />
   );
 }

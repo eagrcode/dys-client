@@ -2,8 +2,8 @@ import { Platform } from "react-native";
 
 const tintColorLight = "#1dbae2";
 const tintColorDark = "#4d9eb3";
-const tintColorDarkSoft = "hsla(192, 40%, 50%, 0.50)";
-const tintColorLightSoft = "hsla(192, 40%, 50%, 0.50)";
+const tintColorDarkSoft = "#4d9eb380";
+const tintColorLightSoft = "#4d9eb380";
 const errorColor = "#ff6b6b";
 
 export const Styling = {
@@ -37,13 +37,13 @@ export const Colors = {
   dark: {
     text: "#e3e2e5",
     errorText: errorColor,
-    background: "#08080F",
+    background: "hsl(240, 8%, 10%)",
     bgLayer1: "rgba(255, 255, 255, 0.1)",
     bgLayer2: "rgba(255, 255, 255, 0.20)",
     tint: tintColorDark,
     tintSoft: tintColorDarkSoft,
     icon: "#c6c6d2",
-    placeHolderTextColor: "hsla(260, 6%, 89%, 0.6)",
+    placeHolderTextColor: "#e2e1e599",
     tabBar: "hsla(0, 0%, 100%, 0.06)",
     header: "#1c1c21",
     tabIconDefault: "#8e8ea4",

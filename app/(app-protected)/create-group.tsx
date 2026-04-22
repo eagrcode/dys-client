@@ -4,6 +4,7 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import CreateGroup from "@/components/ui/create-group";
+import { BackButton } from "@/components/ui/back-button";
 
 export default function CreateGroupScreen() {
   const router = useRouter();
@@ -13,12 +14,11 @@ export default function CreateGroupScreen() {
   return (
     <View style={styles.container}>
       {isPresented && (
-        <Pressable
-          onPress={() => router.back()}
-          style={({ pressed }) => [styles.closeBtn, { opacity: pressed ? 0.6 : 1 }]}
-        >
-          <IconSymbol name="chevron.down" size={30} color={Colors[colorScheme].icon} />
-        </Pressable>
+        <BackButton
+          type="close"
+          size={24}
+          style={{ position: "absolute", top: 60, right: 16, zIndex: 1 }}
+        />
       )}
       <CreateGroup />
     </View>
@@ -28,11 +28,5 @@ export default function CreateGroupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  closeBtn: {
-    position: "absolute",
-    top: 60,
-    right: 16,
-    zIndex: 1,
   },
 });

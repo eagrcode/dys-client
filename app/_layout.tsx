@@ -1,4 +1,4 @@
-import "../wdyr";
+// import "../wdyr";
 import "react-native-reanimated";
 import { Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";

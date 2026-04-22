@@ -20,20 +20,22 @@ export function useCreateListItem() {
     },
 
     onMutate: async ({ listId, content }) => {
-      await queryClient.cancelQueries({ queryKey: ["list", user?.id, selectedGroup, listId] });
+      const queryKey = ["list", user?.id, selectedGroup, listId];
+      await queryClient.cancelQueries({ queryKey });
 
-      const prevList = queryClient.getQueryData(["list", user?.id, selectedGroup, listId]);
+      const prevList = queryClient.getQueryData(queryKey);
+      console.log("prevList exists:", !!prevList);
 
-      queryClient.setQueryData(["list", user?.id, selectedGroup, listId], (old: any = {}) => ({
+      queryClient.setQueryData(queryKey, (old: any = {}) => ({
         ...old,
         items: [
-          ...(old?.items ?? []),
           {
             id: `temp-${Date.now()}`,
             content,
             completed: false,
             created_at: new Date().toISOString(),
           },
+          ...(old?.items ?? []),
         ],
       }));
 
