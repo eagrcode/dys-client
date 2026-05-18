@@ -1,27 +1,26 @@
 import { View, Pressable, StyleSheet } from "react-native";
-import { BlurView } from "expo-blur";
 import { type BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTheme } from "@/hooks/use-theme";
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
-  const isDark = colorScheme === "dark";
+  const theme = useTheme();
   const insets = useSafeAreaInsets();
 
   return (
     <View
       style={[
         styles.container,
-        { backgroundColor: isDark ? "hsla(240, 10%, 15%, 0.5)" : "rgba(224, 223, 232, 0.5)" },
+        {
+          paddingBottom: insets.bottom ? insets.bottom : 16,
+          borderColor: theme.colors.border,
+          backgroundColor: theme.colors.header,
+        },
       ]}
+      pointerEvents="box-none"
     >
-      <BlurView intensity={80} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
-
-      <View style={styles.tabs}>
+      <View style={[styles.tabs, { borderColor: theme.colors.border }]}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const focused = state.index === index;
@@ -46,32 +45,29 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             <Pressable key={route.key} onPress={onPress} style={styles.tabButton}>
               {options.tabBarIcon?.({
                 focused,
-                color: focused ? colors.tint : colors.tabIconDefault,
-                size: 30,
+                color: focused ? theme.colors.accent : theme.colors.textMuted,
+                size: 28,
               })}
             </Pressable>
           );
         })}
       </View>
-
-      <View style={{ height: insets.bottom }} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
+    borderTopWidth: 1,
   },
+
   tabs: {
     flexDirection: "row",
+    width: "100%",
     justifyContent: "space-evenly",
-    padding: 12,
+    gap: 8,
   },
   tabButton: {
-    justifyContent: "center",
-    alignItems: "center",
+    padding: 16,
   },
 });

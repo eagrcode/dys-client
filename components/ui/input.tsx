@@ -1,4 +1,5 @@
-import { forwardRef } from "react";
+import { type Ref } from "react";
+import { useTheme } from "@/hooks/use-theme";
 import {
   TextInput,
   StyleSheet,
@@ -6,11 +7,9 @@ import {
   type TextStyle,
   type KeyboardTypeOptions,
 } from "react-native";
-import { Colors } from "@/constants/theme";
-import { Styling } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 
 type InputProps = {
+  ref?: Ref<TextInput>;
   placeholder?: string;
   value: string;
   onChangeText: (text: string) => void;
@@ -33,26 +32,24 @@ type InputProps = {
     | "familyName";
 };
 
-export const Input = forwardRef<TextInput, InputProps>(function Input(
-  {
-    placeholder,
-    value,
-    onChangeText,
-    secureTextEntry,
-    keyboardType,
-    inputMode,
-    autoComplete,
-    textContentType,
-    editable,
-    autoFocus = false,
-    style,
-    onSubmitEditing,
-    submitBehavior,
-  },
+export function Input({
   ref,
-) {
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  placeholder,
+  value,
+  onChangeText,
+  secureTextEntry,
+  keyboardType,
+  inputMode,
+  autoComplete,
+  textContentType,
+  editable,
+  autoFocus = false,
+  style,
+  onSubmitEditing,
+  submitBehavior,
+}: InputProps) {
+  const theme = useTheme();
+  const colors = theme.colors;
 
   return (
     <TextInput
@@ -60,15 +57,14 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
       style={[
         styles.base,
         {
-          backgroundColor: "transparent",
-          borderWidth: 1,
           borderColor: colors.border,
           color: colors.text,
+          borderRadius: theme.radius.sm,
         },
         style,
       ]}
       placeholder={placeholder}
-      placeholderTextColor={colors.placeHolderTextColor}
+      placeholderTextColor={colors.textMuted}
       value={value}
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
@@ -82,7 +78,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
       submitBehavior={submitBehavior}
     />
   );
-});
+}
 
 const styles = StyleSheet.create({
   base: {
@@ -90,6 +86,7 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 16,
     fontFamily: "DMSans_400Regular",
-    borderRadius: Styling.borderRadius,
+    backgroundColor: "transparent",
+    borderWidth: 1,
   },
 });

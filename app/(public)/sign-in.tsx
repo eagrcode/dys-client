@@ -113,12 +113,7 @@ export default function SignIn() {
           {renderFieldError("password")}
         </View>
         {renderFormError()}
-        <Button
-          variant="primary"
-          onPress={handleSignInPress}
-          disabled={submitDisabled}
-          style={{ borderRadius: Styling.borderRadiusCTA }}
-        >
+        <Button variant="primary" onPress={handleSignInPress} disabled={submitDisabled}>
           <ThemedText>
             {isLoading ? <ActivityIndicator size="small" color="#fff" /> : "Sign In"}
           </ThemedText>

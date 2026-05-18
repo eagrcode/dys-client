@@ -3,8 +3,7 @@ import React, { useEffect, useRef } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { TabBar } from "@/components/ui/tab-bar";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTheme } from "@/hooks/use-theme";
 import { ActivityIndicator, Pressable, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -14,7 +13,7 @@ import { useGroupById } from "@/hooks/queries/useGroupById";
 import { useGroupLists } from "@/hooks/queries/useGroupLists";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme() ?? "light";
+  const theme = useTheme();
   const router = useRouter();
   const { user } = useAuthProvider();
   const { selectedGroup, isLoading: groupsProviderLoading } = useGroupsProvider();
@@ -35,7 +34,7 @@ export default function TabLayout() {
   if (!isReady) {
     return (
       <ThemedView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color={Colors[colorScheme].tint} />
+        <ActivityIndicator size="large" color={theme.colors.accent} />
       </ThemedView>
     );
   }
@@ -45,10 +44,14 @@ export default function TabLayout() {
       safeAreaInsets={{ bottom: 0 }}
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
+        tabBarStyle: {
+          borderTopWidth: 1,
+          borderColor: theme.colors.border,
+        },
         headerStyle: {
-          backgroundColor: Colors[colorScheme].header,
+          backgroundColor: theme.colors.header,
           borderBottomWidth: 1,
-          borderColor: Colors[colorScheme].border,
+          borderColor: theme.colors.border,
           height: 120,
         },
         headerShadowVisible: false,
@@ -57,17 +60,21 @@ export default function TabLayout() {
             onPress={() => router.push("/(app-protected)/modals/select-group")}
             style={({ pressed }) => ({ marginLeft: 16, opacity: pressed ? 0.6 : 1 })}
           >
-            <ThemedText style={{ fontSize: 18, letterSpacing: 2 }} type="title">
+            <ThemedText style={{ fontSize: 18, letterSpacing: 2 }} variant="title">
               {groupDetails ? groupDetails.name : "No Group Selected"}
             </ThemedText>
-            <ThemedText style={{ fontSize: 14, opacity: 0.6, width: 200 }} numberOfLines={2}>
+            <ThemedText
+              style={{ fontSize: 14, opacity: 0.6, width: 200 }}
+              variant="subtitle"
+              numberOfLines={2}
+            >
               {groupDetails ? groupDetails.description : "No Group Selected"}
             </ThemedText>
           </Pressable>
         ),
         headerRight: () => (
           <View style={{ marginRight: 16 }}>
-            <IconSymbol name="gearshape.fill" size={24} color={Colors[colorScheme].icon} />
+            <IconSymbol name="gearshape.fill" size={24} color={theme.colors.icon} />
           </View>
         ),
         headerTitle: "",

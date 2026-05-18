@@ -5,9 +5,8 @@ import {
   type StyleProp,
   type ViewStyle,
 } from "react-native";
-import { Colors } from "@/constants/theme";
-import { Styling } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { LinearGradient } from "expo-linear-gradient";
+import { useTheme } from "@/hooks/use-theme";
 
 type ButtonVariant = "primary" | "secondary" | "secondaryFill1" | "secondaryFill2";
 
@@ -28,15 +27,15 @@ export function Button({
   style,
   children,
 }: ButtonProps) {
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const theme = useTheme();
+
   const isDisabled = disabled || loading;
 
   const variantStyles: Record<ButtonVariant, ViewStyle> = {
-    primary: { backgroundColor: colors.tint },
-    secondary: { backgroundColor: "transparent", borderWidth: 1, borderColor: colors.border },
-    secondaryFill1: { backgroundColor: colors.bgLayer1 },
-    secondaryFill2: { backgroundColor: colors.bgLayer2 },
+    primary: {},
+    secondary: { backgroundColor: "transparent", borderWidth: 1, borderColor: theme.colors.border },
+    secondaryFill1: { backgroundColor: theme.colors.bgLayer1 },
+    secondaryFill2: { backgroundColor: theme.colors.bgLayer2 },
   };
 
   return (
@@ -46,12 +45,27 @@ export function Button({
       style={({ pressed }) => [
         styles.base,
         variantStyles[variant],
-        { opacity: pressed ? 0.85 : isDisabled ? 0.5 : 1 },
+        {
+          opacity: pressed ? 0.85 : isDisabled ? 0.5 : 1,
+          borderRadius: theme.radius.md,
+          overflow: "hidden",
+        },
         style,
       ]}
     >
+      {variant === "primary" && (
+        <LinearGradient
+          colors={theme.colors.accentGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+      )}
       {loading ? (
-        <ActivityIndicator size="small" color={variant === "primary" ? "#fff" : colors.tint} />
+        <ActivityIndicator
+          size="small"
+          color={variant === "primary" ? "#fff" : theme.colors.accent}
+        />
       ) : (
         children
       )}
@@ -64,6 +78,5 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: Styling.borderRadius,
   },
 });

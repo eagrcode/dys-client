@@ -11,7 +11,7 @@ export default function HomeScreen() {
     const greeting = `Welcome back, ${user?.firstName || "User"}!`;
 
     return (
-      <ThemedText type="subtitle" style={{ fontSize: 20 }}>
+      <ThemedText variant="subtitle" style={{ fontSize: 20 }}>
         {greeting}
       </ThemedText>
     );

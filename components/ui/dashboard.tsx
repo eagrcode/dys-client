@@ -2,8 +2,7 @@ import { StyleSheet, FlatList, Pressable, useWindowDimensions, View } from "reac
 import { useRouter, type Href } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTheme } from "@/hooks/use-theme";
 import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { useGroupLists } from "@/hooks/queries/useGroupLists";
 
@@ -17,7 +16,7 @@ type Feature = {
 
 const Tile = ({ name, icon, route, count, tag }: Feature) => {
   const router = useRouter();
-  const colorScheme = useColorScheme() ?? "light";
+  const theme = useTheme();
   const { width } = useWindowDimensions();
   const tileWidth = (width - 48) / 2;
 
@@ -31,19 +30,45 @@ const Tile = ({ name, icon, route, count, tag }: Feature) => {
           tileStyles.tile,
           {
             width: tileWidth,
-            backgroundColor:
-              Colors[colorScheme].homeTileColors[
-                name as keyof (typeof Colors)[typeof colorScheme]["homeTileColors"]
-              ],
+            borderRadius: theme.radius.lg,
+            backgroundColor: (
+              theme.colors.homeTileColors[name as keyof typeof theme.colors.homeTileColors] as {
+                bg: string;
+                border: string;
+                icon: string;
+                label: string;
+              }
+            ).bg,
+            borderColor: (
+              theme.colors.homeTileColors[name as keyof typeof theme.colors.homeTileColors] as {
+                bg: string;
+                border: string;
+                icon: string;
+                label: string;
+              }
+            ).border,
           },
         ]}
       >
         <View>
-          <ThemedText type="defaultSemiBold">{name}</ThemedText>
+          <ThemedText variant="defaultSemiBold">{name}</ThemedText>
           <ThemedText style={{ fontSize: 14, opacity: 0.7 }}>{`${count} ${tag}`}</ThemedText>
         </View>
 
-        <IconSymbol name={icon} size={36} color={Colors[colorScheme].icon} />
+        <IconSymbol
+          name={icon}
+          size={36}
+          color={
+            (
+              theme.colors.homeTileColors[name as keyof typeof theme.colors.homeTileColors] as {
+                bg: string;
+                border: string;
+                icon: string;
+                label: string;
+              }
+            ).icon
+          }
+        />
       </View>
     </Pressable>
   );
@@ -107,10 +132,11 @@ const dashboardStyles = StyleSheet.create({
 
 const tileStyles = StyleSheet.create({
   tile: {
-    height: 80,
+    height: 100,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
+    borderWidth: 1,
   },
 });

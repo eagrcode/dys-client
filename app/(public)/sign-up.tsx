@@ -144,12 +144,7 @@ export default function SignUp() {
           {renderFieldError("password")}
         </View>
         {renderFormError()}
-        <Button
-          variant="primary"
-          onPress={handleSignUpPress}
-          disabled={submitDisabled}
-          style={{ borderRadius: Styling.borderRadiusCTA }}
-        >
+        <Button variant="primary" onPress={handleSignUpPress} disabled={submitDisabled}>
           <ThemedText>
             {isLoading ? <ActivityIndicator size="small" color="#fff" /> : "Sign Up"}
           </ThemedText>
