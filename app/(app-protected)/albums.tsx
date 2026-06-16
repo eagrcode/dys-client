@@ -5,7 +5,7 @@ import { ThemedView } from "@/components/themed-view";
 export default function AlbumsScreen() {
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title">Albums</ThemedText>
+      <ThemedText variant="title">Albums</ThemedText>
       <ThemedText>Coming soon...</ThemedText>
     </ThemedView>
   );

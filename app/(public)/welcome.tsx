@@ -1,44 +1,22 @@
-import { View, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { AccentGlow } from "@/components/accent-glow";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/hooks/use-theme";
-import { AccentGlow } from "@/components/accent-glow";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { useRouter } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
+import { StyleSheet, View } from "react-native";
+
+const PILL_CONTENT = ["Lists", "Calendar", "Albums", "Chat"];
 
 export default function Welcome() {
   const router = useRouter();
-  const theme = useTheme();
+  const theme = useCurrentTheme();
 
   useEffect(() => {
     SplashScreen.hideAsync();
   }, []);
-
-  function Pills() {
-    const content = ["Lists", "Calendar", "Albums", "Chat"];
-
-    return (
-      <View style={{ flexDirection: "row", gap: 8 }}>
-        {content.map((pill) => (
-          <View
-            key={pill}
-            style={{
-              backgroundColor: theme.colors.bgLayer1,
-              borderWidth: 1,
-              borderColor: theme.colors.border,
-              paddingHorizontal: 12,
-              paddingVertical: 6,
-              borderRadius: 999,
-            }}
-          >
-            <ThemedText variant="soft">{pill}</ThemedText>
-          </View>
-        ))}
-      </View>
-    );
-  }
 
   return (
     <ThemedView style={styles.container}>
@@ -70,6 +48,29 @@ export default function Welcome() {
   );
 }
 
+function Pills() {
+  const theme = useCurrentTheme();
+
+  return (
+    <View style={pillStyles.container}>
+      {PILL_CONTENT.map((pill) => (
+        <View
+          key={pill}
+          style={[
+            pillStyles.pill,
+            {
+              backgroundColor: theme.colors.bgLayer1,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        >
+          <ThemedText variant="soft">{pill}</ThemedText>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     padding: 16,
@@ -95,5 +96,18 @@ const styles = StyleSheet.create({
   buttons: {
     gap: 16,
     marginBottom: 40,
+  },
+});
+
+const pillStyles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  pill: {
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
   },
 });

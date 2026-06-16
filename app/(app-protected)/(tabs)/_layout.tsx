@@ -1,19 +1,19 @@
-import { Tabs, useRouter } from "expo-router";
-import React, { useEffect, useRef } from "react";
-import * as SplashScreen from "expo-splash-screen";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { TabBar } from "@/components/ui/tab-bar";
-import { useTheme } from "@/hooks/use-theme";
-import { ActivityIndicator, Pressable, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { TabBar } from "@/components/ui/tab-bar";
 import { useGroupById } from "@/hooks/queries/useGroupById";
 import { useGroupLists } from "@/hooks/queries/useGroupLists";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { useGroupsProvider } from "@/lib/context/GroupsProvider";
+import { useAuthProvider } from "@/lib/context/SessionProvider";
+import { Tabs, useRouter } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import React, { useEffect, useRef } from "react";
+import { ActivityIndicator, Pressable, View } from "react-native";
 
 export default function TabLayout() {
-  const theme = useTheme();
+  const theme = useCurrentTheme();
   const router = useRouter();
   const { user } = useAuthProvider();
   const { selectedGroup, isLoading: groupsProviderLoading } = useGroupsProvider();

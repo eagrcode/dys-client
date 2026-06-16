@@ -1,10 +1,10 @@
-import { StyleSheet, FlatList, Pressable, useWindowDimensions, View } from "react-native";
-import { useRouter, type Href } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useTheme } from "@/hooks/use-theme";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { useGroupLists } from "@/hooks/queries/useGroupLists";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { useGroupsProvider } from "@/lib/context/GroupsProvider";
+import { useRouter, type Href } from "expo-router";
+import { FlatList, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 
 type Feature = {
   name: string;
@@ -16,7 +16,7 @@ type Feature = {
 
 const Tile = ({ name, icon, route, count, tag }: Feature) => {
   const router = useRouter();
-  const theme = useTheme();
+  const theme = useCurrentTheme();
   const { width } = useWindowDimensions();
   const tileWidth = (width - 48) / 2;
 
@@ -76,7 +76,7 @@ const Tile = ({ name, icon, route, count, tag }: Feature) => {
 
 export const Dashboard = () => {
   const { selectedGroup } = useGroupsProvider();
-  const { data: groupLists, isLoading: groupListsLoading } = useGroupLists(selectedGroup || "");
+  const { data: groupLists } = useGroupLists(selectedGroup || "");
 
   const features: Feature[] = [
     {

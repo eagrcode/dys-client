@@ -5,7 +5,7 @@ import { ThemedView } from "@/components/themed-view";
 export default function NotificationsScreen() {
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title">Notifications</ThemedText>
+      <ThemedText variant="title">Notifications</ThemedText>
       <ThemedText>Coming soon...</ThemedText>
     </ThemedView>
   );

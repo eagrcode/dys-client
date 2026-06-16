@@ -1,11 +1,11 @@
-import { View, Pressable, StyleSheet } from "react-native";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 import { type BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
+import { Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme } from "@/hooks/use-theme";
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
-  const theme = useTheme();
+  const theme = useCurrentTheme();
   const insets = useSafeAreaInsets();
 
   return (

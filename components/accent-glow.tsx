@@ -1,14 +1,14 @@
 import { StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 
 // Drop this inside your Welcome screen, as the first child
 export function AccentGlow() {
-  const colorScheme = useColorScheme();
+  const theme = useCurrentTheme();
 
   // Teal accent at ~18% opacity fading to transparent
   const glowColor =
-    colorScheme === "dark"
+    theme.scheme === "dark"
       ? "hsla(240, 70%, 70%, 0.3)" // AccentTeal in dark
       : "hsla(240, 92%, 68%, 0.1)"; // softer in light
 

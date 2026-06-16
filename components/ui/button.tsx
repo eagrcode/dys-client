@@ -1,12 +1,12 @@
+import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { LinearGradient } from "expo-linear-gradient";
 import {
-  Pressable,
   ActivityIndicator,
+  Pressable,
   StyleSheet,
   type StyleProp,
   type ViewStyle,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { useTheme } from "@/hooks/use-theme";
 
 type ButtonVariant = "primary" | "secondary" | "secondaryFill1" | "secondaryFill2";
 
@@ -27,7 +27,7 @@ export function Button({
   style,
   children,
 }: ButtonProps) {
-  const theme = useTheme();
+  const theme = useCurrentTheme();
 
   const isDisabled = disabled || loading;
 

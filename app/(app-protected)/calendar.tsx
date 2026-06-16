@@ -5,7 +5,7 @@ import { ThemedView } from "@/components/themed-view";
 export default function CalendarScreen() {
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title">Calendar</ThemedText>
+      <ThemedText variant="title">Calendar</ThemedText>
       <ThemedText>Coming soon...</ThemedText>
     </ThemedView>
   );

@@ -1,8 +1,7 @@
-import { Colors } from "@/constants/theme";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 import { router } from "expo-router";
 import { Pressable, StyleProp, TextStyle, StyleSheet } from "react-native";
 import { IconSymbol } from "./icon-symbol";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 
 type Props = {
   type: "down" | "left" | "close";
@@ -11,7 +10,7 @@ type Props = {
 };
 
 export function BackButton({ type, size = 30, style }: Props) {
-  const colorScheme = useColorScheme() ?? "light";
+  const theme = useCurrentTheme();
 
   return (
     <Pressable
@@ -21,7 +20,7 @@ export function BackButton({ type, size = 30, style }: Props) {
       <IconSymbol
         name={type === "down" ? "chevron.down" : type === "left" ? "chevron.left" : "xmark"}
         size={size}
-        color={Colors[colorScheme].icon}
+        color={theme.colors.icon}
       />
     </Pressable>
   );

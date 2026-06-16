@@ -1,5 +1,5 @@
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 import { StyleProp, Text, type TextStyle } from "react-native";
-import { useTheme } from "@/hooks/use-theme";
 
 type Variant = "default" | "soft" | "title" | "defaultSemiBold" | "subtitle" | "link" | "button";
 
@@ -17,7 +17,7 @@ export function ThemedText({
   numberOfLines,
   ...rest
 }: Props) {
-  const theme = useTheme();
+  const theme = useCurrentTheme();
 
   const variantStyles: Record<Variant, TextStyle> = {
     default: {

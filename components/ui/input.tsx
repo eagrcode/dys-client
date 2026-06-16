@@ -1,11 +1,11 @@
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 import { type Ref } from "react";
-import { useTheme } from "@/hooks/use-theme";
 import {
-  TextInput,
   StyleSheet,
+  TextInput,
+  type KeyboardTypeOptions,
   type StyleProp,
   type TextStyle,
-  type KeyboardTypeOptions,
 } from "react-native";
 
 type InputProps = {
@@ -48,7 +48,7 @@ export function Input({
   onSubmitEditing,
   submitBehavior,
 }: InputProps) {
-  const theme = useTheme();
+  const theme = useCurrentTheme();
   const colors = theme.colors;
 
   return (

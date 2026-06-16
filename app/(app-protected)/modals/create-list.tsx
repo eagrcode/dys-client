@@ -2,8 +2,7 @@ import { ThemedText } from "@/components/themed-text";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ThemedView } from "@/components/themed-view";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 import { useState } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
@@ -31,8 +30,7 @@ export default function CreateListModal() {
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState<ListType>("todo");
 
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const theme = useCurrentTheme();
 
   const { mutate: createList, isPending: isCreating } = useCreateList();
 
@@ -56,13 +54,17 @@ export default function CreateListModal() {
 
       <Animated.View style={animatedStyle}>
         <View style={{ gap: 16 }}>
-          <View style={[styles.form, { backgroundColor: colors.background }]}>
+          <View style={[styles.form, { backgroundColor: theme.colors.background }]}>
             {/* Form Header */}
             <View style={styles.formHeader}>
-              <ThemedText type="title" style={styles.formTitle}>
+              <ThemedText variant="title" style={styles.formTitle}>
                 {titleText}
               </ThemedText>
-              <IconSymbol name={LIST_TYPE_ICONS[newType] as any} size={25} color={colors.text} />
+              <IconSymbol
+                name={LIST_TYPE_ICONS[newType] as any}
+                size={25}
+                color={theme.colors.text}
+              />
             </View>
 
             {/* Title Input */}
@@ -82,12 +84,12 @@ export default function CreateListModal() {
                   <IconSymbol
                     name={LIST_TYPE_ICONS[type] as any}
                     size={20}
-                    color={newType === type ? colors.tint : colors.placeHolderTextColor}
+                    color={newType === type ? theme.colors.accent : theme.colors.textMuted}
                   />
                   <ThemedText
-                    type="defaultSemiBold"
+                    variant="defaultSemiBold"
                     style={{
-                      color: newType === type ? colors.tint : colors.placeHolderTextColor,
+                      color: newType === type ? theme.colors.accent : theme.colors.textMuted,
                     }}
                   >
                     {LIST_TYPE_LABELS[type]}

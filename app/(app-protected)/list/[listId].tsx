@@ -1,17 +1,22 @@
-import { View, StyleSheet, ActivityIndicator, FlatList, Pressable } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  type TextInput,
+} from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 import { useCreateListItem } from "@/hooks/queries/useCreateListItem";
 import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { useToggleCompleteListItem } from "@/hooks/queries/useToggleCompleteListItem";
 import { useListById } from "@/hooks/queries/useListById";
 import { Input } from "@/components/ui/input";
 import { useRef, useState } from "react";
-import { TextInput } from "react-native";
 import { BackButton } from "@/components/ui/back-button";
 
 type ListItem = {
@@ -59,9 +64,7 @@ export default function ListViewScreen() {
   const { data: list, isLoading } = useListById(selectedGroup || "", listId || "");
   const { mutate: createListItem } = useCreateListItem();
   const { mutate: toggleCompleteListItem } = useToggleCompleteListItem();
-  const colorScheme = useColorScheme() ?? "light";
-
-  const colors = Colors[colorScheme];
+  const theme = useCurrentTheme();
   const completedCount = list?.items?.filter((i: ListItem) => i.completed).length ?? 0;
   const totalCount = list?.items?.length ?? 0;
 
@@ -81,7 +84,7 @@ export default function ListViewScreen() {
   if (isLoading) {
     return (
       <ThemedView style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color={colors.tint} />
+        <ActivityIndicator size="large" color={theme.colors.accent} />
       </ThemedView>
     );
   }
@@ -106,7 +109,7 @@ export default function ListViewScreen() {
       {/* Placeholder for empty list */}
       {totalCount === 0 ? (
         <View style={styles.centered}>
-          <IconSymbol name="tray" size={40} color={colors.icon} />
+          <IconSymbol name="tray" size={40} color={theme.colors.icon} />
           <ThemedText style={{ opacity: 0.5, marginTop: 12 }}>No items yet</ThemedText>
         </View>
       ) : (
@@ -133,28 +136,27 @@ function Header({
   completedCount: number;
   totalCount: number;
 }) {
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const theme = useCurrentTheme();
 
   return (
     <View style={headerStyles.header}>
       <View style={headerStyles.headerTop}>
         <BackButton type="left" size={24} />
-        <ThemedText type="title" style={headerStyles.title}>
+        <ThemedText variant="title" style={headerStyles.title}>
           {list.title}
         </ThemedText>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <View style={[headerStyles.typeChip, { backgroundColor: colors.bgLayer1 }]}>
+          <View style={[headerStyles.typeChip, { backgroundColor: theme.colors.bgLayer1 }]}>
             <IconSymbol
               name={LIST_TYPE_ICONS[list.list_type] as any}
               size={14}
-              color={colors.tint}
+              color={theme.colors.accent}
             />
-            <ThemedText style={{ fontSize: 12, color: colors.tint }}>
+            <ThemedText style={{ fontSize: 12, color: theme.colors.accent }}>
               {LIST_TYPE_LABELS[list.list_type] || list.list_type}
             </ThemedText>
           </View>
-          <IconSymbol name="ellipsis" size={30} color={colors.icon} />
+          <IconSymbol name="ellipsis" size={30} color={theme.colors.icon} />
         </View>
       </View>
 
@@ -162,12 +164,14 @@ function Header({
       <View style={{ flexDirection: "row", gap: 8 }}>
         {totalCount > 0 && (
           <View style={headerStyles.progressRow}>
-            <View style={[headerStyles.progressTrack, { backgroundColor: colors.bgLayer1 }]}>
+            <View
+              style={[headerStyles.progressTrack, { backgroundColor: theme.colors.bgLayer1 }]}
+            >
               <View
                 style={[
                   headerStyles.progressFill,
                   {
-                    backgroundColor: colors.tint,
+                    backgroundColor: theme.colors.accent,
                     width: `${(completedCount / totalCount) * 100}%`,
                   },
                 ]}
@@ -192,8 +196,7 @@ function NewItemInput({
   setNewItem: (content: string) => void;
   handleAddItemPress: () => void;
 }) {
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const theme = useCurrentTheme();
   const inputRef = useRef<TextInput>(null);
 
   return (
@@ -201,15 +204,14 @@ function NewItemInput({
       style={[
         newItemInputStyles.container,
         {
-          // borderColor: !newItem.trim() ? colors.border : colors.icon,
-          backgroundColor: colors.background,
+          backgroundColor: theme.colors.background,
         },
       ]}
     >
       <IconSymbol
         name="plus"
         size={30}
-        color={!newItem.trim() ? colors.placeHolderTextColor : colors.icon}
+        color={!newItem.trim() ? theme.colors.textMuted : theme.colors.icon}
       />
       <Input
         ref={inputRef}
@@ -231,8 +233,7 @@ function ItemRow({
   item: ListItem;
   handleToggleCompleteItem: (id: string, completed: boolean) => void;
 }) {
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const theme = useCurrentTheme();
 
   return (
     <View style={[itemRowStyles.itemRow]}>
@@ -240,7 +241,7 @@ function ItemRow({
         <IconSymbol
           name={item.completed ? "checkmark.circle.fill" : "circle"}
           size={25}
-          color={item.completed ? colors.tintSoft : colors.icon}
+          color={item.completed ? theme.colors.accentSoft : theme.colors.icon}
         />
       </Pressable>
 

@@ -5,8 +5,7 @@ import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { useRouter } from "expo-router";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 import { BackButton } from "@/components/ui/back-button";
 
 export default function SelectGroupModal() {
@@ -14,26 +13,26 @@ export default function SelectGroupModal() {
   const { selectedGroup, selectGroup } = useGroupsProvider();
   const router = useRouter();
   const isPresented = router.canGoBack();
-  const colorScheme = useColorScheme() ?? "light";
+  const theme = useCurrentTheme();
 
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.titleRow}>
-          <ThemedText style={{ fontSize: 22, letterSpacing: 2 }} type="title">
+          <ThemedText style={{ fontSize: 22, letterSpacing: 2 }} variant="title">
             Your Groups
           </ThemedText>
           <Pressable
             onPress={() => router.push("/(app-protected)/create-group")}
             style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
           >
-            <IconSymbol name="plus.circle.fill" size={28} color={Colors[colorScheme].tint} />
+            <IconSymbol name="plus.circle.fill" size={28} color={theme.colors.icon} />
           </Pressable>
         </View>
         {isPresented && <BackButton type="down" />}
       </View>
 
-      <ThemedText type="subtitle" style={styles.subtitle}>
+      <ThemedText variant="subtitle" style={styles.subtitle}>
         {groups.length} group{groups.length !== 1 ? "s" : ""}
       </ThemedText>
 
@@ -47,7 +46,6 @@ export default function SelectGroupModal() {
             key={group.id}
             group={group}
             isSelected={group.id === selectedGroup}
-            colorScheme={colorScheme}
             onPress={() => {
               selectGroup(group.id);
               router.dismissAll();
@@ -62,26 +60,26 @@ export default function SelectGroupModal() {
 const GroupTile = ({
   group,
   isSelected,
-  colorScheme,
   onPress,
 }: {
   group: any;
   isSelected: boolean;
-  colorScheme: "light" | "dark";
   onPress: () => void;
 }) => {
+  const theme = useCurrentTheme();
+
   return (
     <Pressable onPress={onPress} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
       <View
         style={[
           tileStyles.tile,
           {
-            borderColor: isSelected ? Colors[colorScheme].tint : Colors[colorScheme].border,
+            borderColor: isSelected ? theme.colors.accent : theme.colors.border,
           },
         ]}
       >
         <View style={tileStyles.content}>
-          <ThemedText type="defaultSemiBold" style={tileStyles.name}>
+          <ThemedText variant="defaultSemiBold" style={tileStyles.name}>
             {group.name}
           </ThemedText>
           {group.description ? (
@@ -90,9 +88,7 @@ const GroupTile = ({
             </ThemedText>
           ) : null}
         </View>
-        {isSelected && (
-          <IconSymbol name="chevron.right" size={16} color={Colors[colorScheme].tint} />
-        )}
+        {isSelected && <IconSymbol name="chevron.right" size={16} color={theme.colors.accent} />}
       </View>
     </Pressable>
   );

@@ -5,6 +5,7 @@ import { useGroups } from "@/hooks/queries/useGroups";
 export default function Index() {
   const { user, isLoading: authLoading } = useAuthProvider();
 
+  // Do nothing while Splash Screen is still in effect
   if (authLoading) {
     return null;
   }
@@ -19,6 +20,7 @@ export default function Index() {
 function AuthenticatedGate() {
   const { data: userGroups = [], isLoading: userGroupsLoading } = useGroups();
 
+  // Do nothing while Splash Screen is still in effect
   if (userGroupsLoading) {
     return null;
   }

@@ -1,13 +1,12 @@
-import { ThemedView } from "@/components/themed-view";
-import { StyleSheet, View, ActivityIndicator } from "react-native";
-import { useState } from "react";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
 import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { apiCall } from "@/utils/apiCall";
-import { Styling } from "@/constants/theme";
 import { ErrorText } from "@/components/ui/error-text";
+import { Input } from "@/components/ui/input";
+import { useAuthProvider } from "@/lib/context/SessionProvider";
+import { apiCall } from "@/utils/apiCall";
+import { useState } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 type FormData = {
   first_name: string;

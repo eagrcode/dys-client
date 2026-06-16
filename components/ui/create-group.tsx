@@ -6,8 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ErrorText } from "@/components/ui/error-text";
 import React, { useState } from "react";
 import { useCreateGroup } from "@/hooks/queries/useCreateGroup";
-import { Colors, Styling } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
 
 type FormData = {
@@ -28,8 +27,7 @@ const CreateGroup = () => {
 
   const { mutateAsync: createGroup, isPending: isCreating } = useCreateGroup();
 
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const theme = useCurrentTheme();
 
   const submitDisabled = isCreating || !formData.name || !formData.description;
 
@@ -94,8 +92,8 @@ const CreateGroup = () => {
   return (
     <ThemedView style={styles.container}>
       <Animated.View style={animatedStyle}>
-        <View style={[styles.form, { backgroundColor: colors.background }]}>
-          <ThemedText type="subtitle" style={{ fontSize: 20, letterSpacing: 2 }}>
+        <View style={[styles.form, { backgroundColor: theme.colors.background }]}>
+          <ThemedText variant="subtitle" style={{ fontSize: 20, letterSpacing: 2 }}>
             Create a Group
           </ThemedText>
           <View style={styles.inputs}>
@@ -119,12 +117,12 @@ const CreateGroup = () => {
           {renderFormError()}
           <Button
             variant="primary"
-            style={{ borderRadius: Styling.borderRadiusCTA }}
+            style={{ borderRadius: theme.radius.md }}
             onPress={handleCreateGroupPress}
             disabled={submitDisabled}
             loading={isCreating}
           >
-            <ThemedText type="defaultSemiBold" style={{ color: "#fff" }}>
+            <ThemedText variant="defaultSemiBold" style={{ color: "#fff" }}>
               Submit
             </ThemedText>
           </Button>

@@ -3,8 +3,7 @@ import { StyleSheet, SectionList, View, Pressable, ActivityIndicator, Alert } fr
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { useGroupLists } from "@/hooks/queries/useGroupLists";
 import { useDeleteList } from "@/hooks/queries/useDeleteList";
@@ -35,8 +34,7 @@ const SECTION_CONFIG: Record<ListType, { label: string; icon: string }> = {
 };
 
 export default function ListsScreen() {
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const theme = useCurrentTheme();
   const { selectedGroup } = useGroupsProvider();
   const { data: lists = [], isLoading: listsLoading } = useGroupLists(selectedGroup || "");
   const { isPending: isCreating } = useCreateList();
@@ -70,7 +68,7 @@ export default function ListsScreen() {
   if (listsLoading || isCreating) {
     return (
       <ThemedView style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color={colors.tint} />
+        <ActivityIndicator size="large" color={theme.colors.accent} />
       </ThemedView>
     );
   }
@@ -103,33 +101,31 @@ export default function ListsScreen() {
 
 function Header() {
   const router = useRouter();
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const theme = useCurrentTheme();
 
   return (
     <View style={headerStyles.header}>
       <BackButton type="left" size={24} />
-      <ThemedText type="title" style={headerStyles.title}>
+      <ThemedText variant="title" style={headerStyles.title}>
         Lists
       </ThemedText>
       <Pressable
         onPress={() => router.push("/(app-protected)/modals/create-list")}
         style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
       >
-        <IconSymbol name={"plus"} size={28} color={colors.tint} />
+        <IconSymbol name={"plus"} size={28} color={theme.colors.accent} />
       </Pressable>
     </View>
   );
 }
 
 function SectionHeader({ section }: { section: Section }) {
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const theme = useCurrentTheme();
 
   return (
     <View style={sectionHeaderStyles.sectionHeader}>
-      <IconSymbol name={section.icon as any} size={18} color={colors.icon} />
-      <ThemedText type="defaultSemiBold" style={sectionHeaderStyles.sectionTitle}>
+      <IconSymbol name={section.icon as any} size={18} color={theme.colors.icon} />
+      <ThemedText variant="defaultSemiBold" style={sectionHeaderStyles.sectionTitle}>
         {section.title}
       </ThemedText>
       <ThemedText style={sectionHeaderStyles.sectionCount}>{section.data.length}</ThemedText>
@@ -148,22 +144,21 @@ function ListRow({
   onPress: () => void;
   onDelete: () => void;
 }) {
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const theme = useCurrentTheme();
 
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [
         rowStyles.row,
-        { backgroundColor: colors.bgLayer1, opacity: pressed ? 0.7 : 1 },
+        { backgroundColor: theme.colors.bgLayer1, opacity: pressed ? 0.7 : 1 },
       ]}
     >
       <View style={rowStyles.content}>
         <IconSymbol
           name={item.completed ? "checkmark.circle.fill" : "circle"}
           size={22}
-          color={item.completed ? colors.tint : colors.icon}
+          color={item.completed ? theme.colors.accent : theme.colors.icon}
         />
         <View style={rowStyles.text}>
           <ThemedText

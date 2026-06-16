@@ -5,7 +5,7 @@ import { ThemedView } from "@/components/themed-view";
 export default function TextChannelsScreen() {
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title">Chat</ThemedText>
+      <ThemedText variant="title">Chat</ThemedText>
       <ThemedText>Coming soon...</ThemedText>
     </ThemedView>
   );

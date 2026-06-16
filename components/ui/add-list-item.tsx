@@ -1,7 +1,6 @@
 import { View, StyleSheet, TextInput, ViewStyle, StyleProp } from "react-native";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 import { IconSymbol } from "./icon-symbol.ios";
-import { Colors } from "@/constants/theme";
 import { useRef, useState } from "react";
 import { Input } from "./input";
 
@@ -15,15 +14,14 @@ export function AddListItem({ handleAddItemPress, style }: Props) {
 
   const inputRef = useRef<TextInput>(null);
 
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const theme = useCurrentTheme();
 
   return (
     <View
       style={[
         styles.container,
         {
-          backgroundColor: colors.background,
+          backgroundColor: theme.colors.background,
         },
         style,
       ]}
@@ -31,7 +29,7 @@ export function AddListItem({ handleAddItemPress, style }: Props) {
       <IconSymbol
         name="plus"
         size={30}
-        color={!newItem.trim() ? colors.placeHolderTextColor : colors.icon}
+        color={!newItem.trim() ? theme.colors.textMuted : theme.colors.icon}
       />
       <Input
         ref={inputRef}
