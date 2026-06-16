@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { useRouter } from "expo-router";
 import { authAPI } from "@/services/api/auth";
-import { initializeToken, saveTokens, clearTokens } from "@/services/tokenManager";
+import { initialiseToken, saveTokens, clearTokens } from "@/services/tokenManager";
 
 type User = {
   id: string;
@@ -20,8 +20,8 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Module-level ref so apiCall.ts can trigger sign-out without React context
 let signOutFn: (() => Promise<void>) | null = null;
+
 export const forceSignOut = () => signOutFn?.();
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log("AuthProvider | Loading user...");
     try {
       console.log("AuthProvider | Checking for existing token...");
-      const { token } = await initializeToken();
+      const { token } = await initialiseToken();
       if (token) {
         console.log("AuthProvider | Token found, loading user data...");
         const userData = await SecureStore.getItemAsync("userData");
@@ -84,7 +84,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     router.replace("/");
   };
 
-  // Expose signOut for use outside React (e.g. apiCall.ts token refresh failure)
   signOutFn = signOut;
 
   return (

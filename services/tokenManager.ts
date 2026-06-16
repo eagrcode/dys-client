@@ -4,8 +4,8 @@ import * as SecureStore from "expo-secure-store";
 let cachedToken: string | null = null;
 let cachedRefreshToken: string | null = null;
 
-// Initialize tokens from storage (call on app start)
-export async function initializeToken(): Promise<{
+// Initialise tokens from storage - app start
+export async function initialiseToken(): Promise<{
   token: string | null;
   refreshToken: string | null;
 }> {
@@ -32,7 +32,7 @@ export async function saveTokens(token: string, refreshToken: string): Promise<v
   await SecureStore.setItemAsync("refreshToken", refreshToken);
 }
 
-// Save just access token (after refresh)
+// Save just access token
 export async function saveToken(token: string): Promise<void> {
   cachedToken = token;
   await SecureStore.setItemAsync("userToken", token);
