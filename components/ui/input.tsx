@@ -76,6 +76,7 @@ export function Input({
       autoFocus={autoFocus}
       onSubmitEditing={onSubmitEditing}
       submitBehavior={submitBehavior}
+      autoCapitalize="none"
     />
   );
 }
