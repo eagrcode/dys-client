@@ -6,7 +6,7 @@ const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:3000"
 let refreshPromise: Promise<boolean> | null = null;
 
 async function refreshTokens(): Promise<boolean> {
-  const refreshToken = getRefreshToken();
+  const refreshToken = await getRefreshToken();
 
   if (!refreshToken) {
     console.error("Token refresh failed: no refresh token in cache");
@@ -29,6 +29,8 @@ async function refreshTokens(): Promise<boolean> {
 
     const errorData = await refreshResponse.json().catch(() => null);
     console.error("Token refresh rejected:", refreshResponse.status, errorData);
+
+    return false;
   } catch (error) {
     console.error("Token refresh failed:", JSON.stringify(error, null, 2));
   }
@@ -42,7 +44,7 @@ export async function apiCall(
   options: RequestInit = {},
   isRetry = false,
 ) {
-  const token = getToken();
+  const token = await getToken();
 
   const url = `${BASE_URL}${endpoint}`;
   const config: RequestInit = {

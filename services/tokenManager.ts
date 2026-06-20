@@ -1,52 +1,26 @@
 import * as SecureStore from "expo-secure-store";
 
-// Memory cache
-let cachedToken: string | null = null;
-let cachedRefreshToken: string | null = null;
+const ACCESS_TOKEN_KEY = "userToken";
+const REFRESH_TOKEN_KEY = "refreshToken";
 
-// Initialise tokens from storage - app start
-export async function initialiseToken(): Promise<{
-  token: string | null;
-  refreshToken: string | null;
-}> {
-  cachedToken = await SecureStore.getItemAsync("userToken");
-  cachedRefreshToken = await SecureStore.getItemAsync("refreshToken");
-  return { token: cachedToken, refreshToken: cachedRefreshToken };
+export async function getToken(): Promise<string | null> {
+  return await SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
 }
 
-// Get current access token from cache
-export function getToken(): string | null {
-  return cachedToken;
+export async function getRefreshToken(): Promise<string | null> {
+  return await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
 }
 
-// Get current refresh token from cache
-export function getRefreshToken(): string | null {
-  return cachedRefreshToken;
-}
-
-// Save both tokens at once
 export async function saveTokens(token: string, refreshToken: string): Promise<void> {
-  cachedToken = token;
-  cachedRefreshToken = refreshToken;
-  await SecureStore.setItemAsync("userToken", token);
-  await SecureStore.setItemAsync("refreshToken", refreshToken);
+  await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, token);
+  await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refreshToken);
 }
 
-// Save just access token
-export async function saveToken(token: string): Promise<void> {
-  cachedToken = token;
-  await SecureStore.setItemAsync("userToken", token);
+export async function saveAccessToken(token: string): Promise<void> {
+  await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, token);
 }
 
-// Clear all tokens
 export async function clearTokens(): Promise<void> {
-  cachedToken = null;
-  cachedRefreshToken = null;
-  await SecureStore.deleteItemAsync("userToken");
-  await SecureStore.deleteItemAsync("refreshToken");
-}
-
-// Check if user is authenticated
-export function isAuthenticated(): boolean {
-  return cachedToken !== null;
+  await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
+  await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
 }

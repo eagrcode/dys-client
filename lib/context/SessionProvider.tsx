@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { useRouter } from "expo-router";
 import { authAPI } from "@/services/api/auth";
-import { initialiseToken, saveTokens, clearTokens } from "@/services/tokenManager";
+import { saveTokens, clearTokens, getToken } from "@/services/tokenManager";
 
 type User = {
   id: string;
@@ -34,23 +34,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const loadUser = async () => {
-    // await clearTokens();
-    // await SecureStore.deleteItemAsync("userData");
-    // await SecureStore.deleteItemAsync("selectedGroup");
-
     console.log("AuthProvider | Loading user...");
     try {
       console.log("AuthProvider | Checking for existing token...");
-      const { token } = await initialiseToken();
-      if (token) {
-        console.log("AuthProvider | Token found, loading user data...");
-        const userData = await SecureStore.getItemAsync("userData");
-        if (userData) {
-          setUser(JSON.parse(userData));
-          console.log("AuthProvider | User data:", userData);
-        }
-      } else {
+      const token = await getToken();
+
+      if (!token) {
         console.log("AuthProvider | No token found, user is not authenticated.");
+        return;
+      }
+
+      console.log("AuthProvider | Token found, loading user data...");
+      const userData = await SecureStore.getItemAsync("userData");
+
+      if (userData) {
+        setUser(JSON.parse(userData));
+        console.log("AuthProvider | User data:", userData);
       }
     } catch (error) {
       console.error("Error loading user:", error);
@@ -88,7 +87,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ user, isLoading, signIn, signOut }}>
-      {children}
+      {isLoading ? null : children}
     </AuthContext.Provider>
   );
 };
