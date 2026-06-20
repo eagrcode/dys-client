@@ -1,11 +1,11 @@
 import { Platform } from "react-native";
 
 export const Accent = {
-  accent: "hsl(195, 90%, 50%)",
-  accentSoft: "hsl(179, 28%, 48%)",
-  accentText: "hsl(195, 90%, 70%)",
-  accentDeep: "hsl(195, 90%, 30%)",
-  accentGradient: ["hsl(195, 90%, 50%)", "hsl(205, 80%, 50%)"] as const,
+  accent: "#0db9f2",
+  accentSoft: "#589d9c",
+  accentText: "#6ed5f7",
+  accentDeep: "#086f91",
+  accentGradient: ["#0db9f2", "#1991e6"] as const,
 };
 
 export const Styling = {
