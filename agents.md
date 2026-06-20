@@ -1,62 +1,34 @@
-# Theme Cleanup Notes
+# Agent Notes
 
-## General Instructions
+## General
 
 - Use UK English spelling in commit messages, documentation, comments, and user-facing copy.
+- Keep changes scoped to the requested behaviour and preserve unrelated user work.
+- This directory is its own Git repository. The sibling `server` directory is separate, so check and commit each repository independently.
 
-Date: 2026-06-07
+## Client Structure
 
-This is a reference note from the theme cleanup discussion. It describes the current direction and the known follow-up. It is not a final architecture document.
+- The app is an Expo Router React Native app. Routes live under `app/`.
+- Reusable UI lives under `components/`; shared context lives under `lib/context/`.
+- API wrappers live under `services/`; lower-level request helpers live under `utils/`.
+- Use the `@/` path alias for local imports when matching existing code.
 
-## Starting Point
+## Theme
 
-- The app had a `ThemePreferenceProvider` in `lib/context/ThemePreferenceProvider.tsx`.
-- That provider stored the effective app colour scheme and a `toggleTheme` function.
-- React Native's system theme hook was imported as `useColorScheme as useSystemColorScheme`.
-- The project also had `hooks/use-color-scheme.ts` and `hooks/use-color-scheme.web.ts`, but both only re-exported the provider's `useColorScheme`.
-- `hooks/use-theme.ts` used `useColorScheme`, merged `Colors[scheme]` with `Accent`, and wrapped the returned theme object in `useMemo`.
-- `hooks/use-theme-color.ts` was an older Expo-style helper and was still imported by `components/parallax-scroll-view.tsx`.
-- Components were split between two approaches: some used `useTheme()`, others read `Colors[colorScheme]` directly.
-- `Colors.light` and `Colors.dark` did not have the same shape. For example, dark dashboard tile colours were objects, while light dashboard tile colours were strings.
-- `ThemedText` had moved to a `variant` prop, but several screens still passed the old `type` prop.
+- `ThemePreferenceProvider` in `lib/context/ThemeModeProvider.tsx` owns the persisted user preference and falls back to the system colour scheme.
+- Use `useCurrentTheme()` for styling tokens.
+- Use `useThemePreference()` only when a component needs the current mode or needs to toggle it.
+- Keep `Colors.light` and `Colors.dark` structurally identical in `constants/theme.ts`. If one palette gains or loses a token, update the other at the same time.
+- Avoid new direct `Colors[colorScheme]` lookups in components unless there is a clear reason.
 
-## Changes Made
+## Auth Tokens
 
-- Removed the old alias hooks:
-  - `hooks/use-color-scheme.ts`
-  - `hooks/use-color-scheme.web.ts`
-- Removed the old Expo helper:
-  - `hooks/use-theme-color.ts`
-- Removed the old theme hook:
-  - `hooks/use-theme.ts`
-- Added `lib/context/ThemeModeProvider.tsx`.
-- Added `hooks/use-current-theme.ts`.
-- Updated the root layout to import `ThemePreferenceProvider` from `@/lib/context/ThemeModeProvider`.
-- Updated several styling consumers to import from `@/hooks/use-current-theme` instead of `@/hooks/use-theme`.
-- Removed the commented-out old purple `Accent` block from `constants/theme.ts`.
-- Changed `Colors.light` so it now broadly matches the `Colors.dark` shape, including accent tokens, `errorText`, `borderStrong`, `tabIconSelected`, and object-shaped `homeTileColors`.
-- Updated some `ThemedText` usage from `type` to `variant`, including the You screen and Select Group modal.
-- Changed the You screen avatar from `colors.tint` to `colors.accent`.
-- There are also unrelated auth/token naming changes in the working tree:
-  - `initializeToken` was renamed to `initialiseToken`.
-  - `SessionProvider` was updated to call `initialiseToken`.
+- `services/tokenManager.ts` is the access point for auth token storage.
+- `getToken()` and `getRefreshToken()` read from `expo-secure-store` and are async, so callers must `await` them.
+- Save token pairs with `saveTokens()` and clear auth state with `clearTokens()`.
+- Do not add new direct token reads from `SecureStore` outside the token manager.
 
-## Current Intended Model
+## Validation
 
-- The provider owns theme mode state.
-- React Native's `useColorScheme` should mean the system/device setting only.
-- `useThemePreference()` should return the current effective app mode and the toggle function.
-- `useCurrentTheme()` should return styling tokens for the current mode.
-- UI components should generally use `useCurrentTheme()` for styling.
-- Components should only use `useThemePreference()` when they need the mode itself or need to toggle it.
-- Direct `Colors[colorScheme]` usage should be phased out in components.
-
-## Remaining Follow-up
-
-- `Colors.light` currently appears to contain dark-mode values. Decide later whether that is temporary or intentional.
-
-## Suggested Next Pass
-
-1. Review the intended light-mode palette.
-2. Keep new styling consumers on `useCurrentTheme()` instead of direct `Colors[colorScheme]` access.
-3. Run `npx tsc --noEmit` before committing theme changes.
+- Run `npx tsc --noEmit` for TypeScript changes.
+- Run `npm run lint` for routing, UI, and styling changes.
