@@ -1,44 +1,42 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/services/api/lists";
 import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
+import { List } from "@/utils/types/T_Lists";
 
-export function useDeleteList() {
+export function useDeleteList(groupId: string) {
   const queryClient = useQueryClient();
   const { user } = useAuthProvider();
-  const { selectedGroup } = useGroupsProvider();
+  const userId = user?.id;
+  const groupListsQK = ["groupLists", userId, groupId];
+  const dashboardListsQK = ["dashboardData", userId, groupId, "lists"];
 
-  return useMutation<any, Error, string, { prevGroupLists: any[] | undefined }>({
+  return useMutation({
     mutationFn: (listId: string) => {
-      if (!selectedGroup) throw new Error("No group selected");
-      return listsAPI.deleteList(selectedGroup, listId);
+      if (!groupId) throw new Error("No group selected");
+      return listsAPI.deleteList(groupId, listId);
     },
 
-    onMutate: async (listId) => {
-      await queryClient.cancelQueries({ queryKey: ["groupLists", user?.id, selectedGroup] });
+    onMutate: async (listId, context) => {
+      await context.client.cancelQueries({ queryKey: groupListsQK });
 
-      const prevGroupLists = queryClient.getQueryData<any[]>([
-        "groupLists",
-        user?.id,
-        selectedGroup,
-      ]);
+      const prevGroupLists = context.client.getQueryData<List[]>(groupListsQK);
 
-      queryClient.setQueryData(["groupLists", user?.id, selectedGroup], (old: any[] = []) =>
-        (old ?? []).filter((list: any) => list.id !== listId),
+      context.client.setQueryData<List[]>(groupListsQK, (old = []) =>
+        old.filter((list) => list.id !== listId),
       );
 
       return { prevGroupLists };
     },
 
-    onError: (_err, _listId, context) => {
-      queryClient.setQueryData(
-        ["groupLists", user?.id, selectedGroup],
-        context?.prevGroupLists ?? [],
-      );
+    onError: (err, newList, onMutateResult, context) => {
+      context.client.setQueryData(groupListsQK, onMutateResult?.prevGroupLists);
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["groupLists", user?.id, selectedGroup] });
+      queryClient.invalidateQueries({ queryKey: groupListsQK });
+      queryClient.invalidateQueries({
+        queryKey: dashboardListsQK,
+      });
     },
   });
 }

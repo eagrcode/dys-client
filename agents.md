@@ -32,3 +32,7 @@
 
 - Run `npx tsc --noEmit` for TypeScript changes.
 - Run `npm run lint` for routing, UI, and styling changes.
+
+## Recent Changes
+
+- Added group dashboard count endpoints on the server and wired the client dashboard to fetch live list, calendar, album, and message counts with typed list query helpers.

@@ -8,8 +8,7 @@ export function useListById(groupId: string, listId: string) {
   return useQuery({
     queryKey: ["list", user?.id, groupId, listId],
     queryFn: async () => {
-      const response = await listsAPI.getListById(groupId, listId);
-      return response.data;
+      return await listsAPI.getListById(groupId, listId);
     },
     enabled: !!user?.id && !!groupId && !!listId,
     staleTime: 5 * 60 * 1000,

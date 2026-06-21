@@ -5,23 +5,23 @@ import { Dashboard } from "@/components/ui/dashboard";
 import { useAuthProvider } from "@/lib/context/SessionProvider";
 
 export default function HomeScreen() {
-  const { user } = useAuthProvider();
-
-  const Header = () => {
-    const greeting = `Welcome back, ${user?.firstName || "User"}!`;
-
-    return (
-      <ThemedText variant="subtitle" style={{ fontSize: 20 }}>
-        {greeting}
-      </ThemedText>
-    );
-  };
-
   return (
     <ThemedView style={styles.container}>
       <Header />
       <Dashboard />
     </ThemedView>
+  );
+}
+
+function Header() {
+  const { user } = useAuthProvider();
+
+  const greeting = `Welcome back, ${user?.firstName || "User"}!`;
+
+  return (
+    <ThemedText variant="subtitle" style={{ fontSize: 20 }}>
+      {greeting}
+    </ThemedText>
   );
 }
 

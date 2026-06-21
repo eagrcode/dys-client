@@ -38,7 +38,7 @@ export default function ListsScreen() {
   const { selectedGroup } = useGroupsProvider();
   const { data: lists = [], isLoading: listsLoading } = useGroupLists(selectedGroup || "");
   const { isPending: isCreating } = useCreateList();
-  const { mutate: deleteList } = useDeleteList();
+  const { mutate: deleteList } = useDeleteList(selectedGroup || "");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
 

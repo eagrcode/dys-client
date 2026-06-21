@@ -18,30 +18,7 @@ import { useListById } from "@/hooks/queries/useListById";
 import { Input } from "@/components/ui/input";
 import { useRef, useState } from "react";
 import { BackButton } from "@/components/ui/back-button";
-
-type ListItem = {
-  id: string;
-  list_id: string;
-  content: string;
-  completed: boolean;
-  created_at: string;
-  updated_at: string;
-};
-
-type List = {
-  id: string;
-  title: string;
-  list_type: string;
-  created_by: string;
-  group_id: string;
-  assigned_to?: string;
-  due_date?: string;
-  completed: boolean;
-  completed_at?: string;
-  created_at: string;
-  updated_at: string;
-  items: ListItem[];
-};
+import { ListItem, ListType, ListWithItems } from "@/utils/types/T_Lists";
 
 const LIST_TYPE_ICONS: Record<string, string> = {
   shopping: "cart.fill",
@@ -49,7 +26,7 @@ const LIST_TYPE_ICONS: Record<string, string> = {
   other: "list.bullet",
 };
 
-const LIST_TYPE_LABELS: Record<string, string> = {
+const LIST_TYPE_LABELS: Record<ListType, string> = {
   shopping: "Shopping",
   todo: "Todo",
   other: "Other",
@@ -132,7 +109,7 @@ function Header({
   completedCount,
   totalCount,
 }: {
-  list: List;
+  list: ListWithItems;
   completedCount: number;
   totalCount: number;
 }) {

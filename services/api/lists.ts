@@ -1,4 +1,5 @@
 import { apiCall } from "@/utils/apiCall";
+import { List, ListType, ListWithItems } from "@/utils/types/T_Lists";
 
 const BASE_URL = `/groups`;
 
@@ -10,21 +11,23 @@ type ToggleCompleteListItem = {
 };
 
 export const listsAPI = {
-  getGroupLists: async (groupId: string) => {
-    return await apiCall(`${BASE_URL}/${groupId}/lists`, "GET");
+  getGroupLists: async (groupId: string): Promise<List[]> => {
+    const response = await apiCall(`${BASE_URL}/${groupId}/lists`, "GET");
+    return response.data;
   },
 
   createList: async (
     groupId: string,
-    data: { title: string; listType: string; itemsArr?: string[] },
+    data: { title: string; listType: ListType; itemsArr?: string[] },
   ) => {
     return await apiCall(`${BASE_URL}/${groupId}/lists`, "POST", {
       body: JSON.stringify(data),
     });
   },
 
-  getListById: async (groupId: string, listId: string) => {
-    return await apiCall(`${BASE_URL}/${groupId}/lists/${listId}`, "GET");
+  getListById: async (groupId: string, listId: string): Promise<ListWithItems> => {
+    const response = await apiCall(`${BASE_URL}/${groupId}/lists/${listId}`, "GET");
+    return response.data;
   },
 
   deleteList: async (groupId: string, listId: string) => {

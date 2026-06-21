@@ -3,6 +3,7 @@ import { listsAPI } from "@/services/api/lists";
 import { useAuthProvider } from "@/lib/context/SessionProvider";
 import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { ApiErrorResponse } from "@/utils/types/ApiError";
+import { ListType } from "@/utils/types/T_Lists";
 import { useRouter } from "expo-router";
 
 export function useCreateList() {
@@ -14,7 +15,7 @@ export function useCreateList() {
   return useMutation<
     any,
     ApiErrorResponse,
-    { title: string; listType: string; itemsArr?: string[] }
+    { title: string; listType: ListType; itemsArr?: string[] }
   >({
     mutationFn: ({ title, listType, itemsArr = [] }) => {
       console.log("useCreateList | Firing mutation...");

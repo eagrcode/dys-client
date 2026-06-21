@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useGroupLists } from "@/hooks/queries/useGroupLists";
+import { useDashboardData } from "@/hooks/queries/useDashboardData";
 import { useCurrentTheme } from "@/hooks/use-current-theme";
 import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { useRouter, type Href } from "expo-router";
@@ -13,6 +13,58 @@ type Feature = {
   count: number;
   tag: string;
 };
+
+export function Dashboard() {
+  const { selectedGroup } = useGroupsProvider();
+  const { lists, calendar, albums, messages } = useDashboardData(selectedGroup || "");
+
+  const listsCount = lists.data?.count ?? 0;
+  const calendarCount = calendar.data?.count ?? 0;
+  const albumsCount = albums.data?.count ?? 0;
+  const messagesCount = messages.data?.count ?? 0;
+
+  const features: Feature[] = [
+    {
+      name: "Lists",
+      icon: "list.bullet",
+      route: "/(app-protected)/lists",
+      count: listsCount,
+      tag: "outstanding",
+    },
+    {
+      name: "Calendar",
+      icon: "calendar",
+      route: "/(app-protected)/calendar",
+      count: calendarCount,
+      tag: "upcoming",
+    },
+    {
+      name: "Albums",
+      icon: "photo.on.rectangle",
+      route: "/(app-protected)/albums",
+      count: albumsCount,
+      tag: "new",
+    },
+    {
+      name: "HearthChat",
+      icon: "message.fill",
+      route: "/(app-protected)/text-channels",
+      count: messagesCount,
+      tag: "unread",
+    },
+  ];
+
+  return (
+    <FlatList
+      data={features}
+      numColumns={2}
+      contentContainerStyle={dashboardStyles.grid}
+      columnWrapperStyle={dashboardStyles.row}
+      keyExtractor={(item) => item.name}
+      renderItem={({ item }) => <Tile {...item} />}
+    />
+  );
+}
 
 const Tile = ({ name, icon, route, count, tag }: Feature) => {
   const router = useRouter();
@@ -71,53 +123,6 @@ const Tile = ({ name, icon, route, count, tag }: Feature) => {
         />
       </View>
     </Pressable>
-  );
-};
-
-export const Dashboard = () => {
-  const { selectedGroup } = useGroupsProvider();
-  const { data: groupLists } = useGroupLists(selectedGroup || "");
-
-  const features: Feature[] = [
-    {
-      name: "Lists",
-      icon: "list.bullet",
-      route: "/(app-protected)/lists",
-      count: groupLists?.length ?? 0,
-      tag: "outstanding",
-    },
-    {
-      name: "Calendar",
-      icon: "calendar",
-      route: "/(app-protected)/calendar",
-      count: groupLists?.length ?? 0,
-      tag: "upcoming",
-    },
-    {
-      name: "Albums",
-      icon: "photo.on.rectangle",
-      route: "/(app-protected)/albums",
-      count: groupLists?.length ?? 0,
-      tag: "new",
-    },
-    {
-      name: "HearthChat",
-      icon: "message.fill",
-      route: "/(app-protected)/text-channels",
-      count: groupLists?.length ?? 0,
-      tag: "unread",
-    },
-  ];
-
-  return (
-    <FlatList
-      data={features}
-      numColumns={2}
-      contentContainerStyle={dashboardStyles.grid}
-      columnWrapperStyle={dashboardStyles.row}
-      keyExtractor={(item) => item.name}
-      renderItem={({ item }) => <Tile {...item} />}
-    />
   );
 };
 
