@@ -18,7 +18,7 @@ import { useListById } from "@/hooks/queries/useListById";
 import { Input } from "@/components/ui/input";
 import { useRef, useState } from "react";
 import { BackButton } from "@/components/ui/back-button";
-import { ListItem, ListType, ListWithItems } from "@/utils/types/T_Lists";
+import { List, ListItem, ListType } from "@/utils/types/T_Lists";
 
 const LIST_TYPE_ICONS: Record<string, string> = {
   shopping: "cart.fill",
@@ -42,8 +42,9 @@ export default function ListViewScreen() {
   const { mutate: createListItem } = useCreateListItem();
   const { mutate: toggleCompleteListItem } = useToggleCompleteListItem();
   const theme = useCurrentTheme();
-  const completedCount = list?.items?.filter((i: ListItem) => i.completed).length ?? 0;
-  const totalCount = list?.items?.length ?? 0;
+  const items = list?.items ?? [];
+  const completedCount = items.filter((i: ListItem) => i.completed).length;
+  const totalCount = items.length;
 
   const handleAddItemPress = () => {
     if (!newItem.trim()) return;
@@ -91,7 +92,7 @@ export default function ListViewScreen() {
         </View>
       ) : (
         <FlatList
-          data={list.items}
+          data={items}
           keyExtractor={(item: ListItem) => item.id}
           contentContainerStyle={styles.list}
           keyboardDismissMode="on-drag"
@@ -109,7 +110,7 @@ function Header({
   completedCount,
   totalCount,
 }: {
-  list: ListWithItems;
+  list: List;
   completedCount: number;
   totalCount: number;
 }) {

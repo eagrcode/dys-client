@@ -1,5 +1,5 @@
 import { apiCall } from "@/utils/apiCall";
-import { List, ListType, ListWithItems } from "@/utils/types/T_Lists";
+import { List, ListType } from "@/utils/types/T_Lists";
 
 const BASE_URL = `/groups`;
 
@@ -25,7 +25,7 @@ export const listsAPI = {
     });
   },
 
-  getListById: async (groupId: string, listId: string): Promise<ListWithItems> => {
+  getListById: async (groupId: string, listId: string): Promise<List> => {
     const response = await apiCall(`${BASE_URL}/${groupId}/lists/${listId}`, "GET");
     return response.data;
   },

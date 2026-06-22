@@ -23,7 +23,3 @@ export type List = {
   completed_at?: string | null;
   items?: ListItem[];
 };
-
-export type ListWithItems = List & {
-  items: ListItem[];
-};
