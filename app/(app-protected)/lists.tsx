@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { StyleSheet, SectionList, View, Pressable, ActivityIndicator, Alert } from "react-native";
+import { StyleSheet, SectionList, View, Pressable, Alert } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -8,17 +7,8 @@ import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { useGroupLists } from "@/hooks/queries/useGroupLists";
 import { useDeleteList } from "@/hooks/queries/useDeleteList";
 import { useRouter } from "expo-router";
-import { useCreateList } from "@/hooks/queries/useCreateList";
 import { BackButton } from "@/components/ui/back-button";
-
-type ListType = "shopping" | "todo" | "other";
-
-type List = {
-  id: string;
-  title: string;
-  list_type: ListType;
-  completed: boolean;
-};
+import { List, ListType } from "@/utils/types/T_Lists";
 
 type Section = {
   type: ListType;
@@ -34,12 +24,9 @@ const SECTION_CONFIG: Record<ListType, { label: string; icon: string }> = {
 };
 
 export default function ListsScreen() {
-  const theme = useCurrentTheme();
   const { selectedGroup } = useGroupsProvider();
-  const { data: lists = [], isLoading: listsLoading } = useGroupLists(selectedGroup || "");
-  const { isPending: isCreating } = useCreateList();
+  const { data: lists = [] } = useGroupLists(selectedGroup || "");
   const { mutate: deleteList } = useDeleteList(selectedGroup || "");
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
 
   const sections = (Object.keys(SECTION_CONFIG) as ListType[])
@@ -58,20 +45,11 @@ export default function ListsScreen() {
         text: "Delete",
         style: "destructive",
         onPress: () => {
-          setDeletingId(listId);
           deleteList(listId);
         },
       },
     ]);
   };
-
-  if (listsLoading || isCreating) {
-    return (
-      <ThemedView style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color={theme.colors.accent} />
-      </ThemedView>
-    );
-  }
 
   return (
     <ThemedView style={styles.container}>
@@ -88,7 +66,6 @@ export default function ListsScreen() {
           renderItem={({ item }: { item: List }) => (
             <ListRow
               item={item}
-              deletingId={deletingId}
               onPress={() => router.push(`/(app-protected)/list/${item.id}`)}
               onDelete={() => handleDelete(item.id, item.title)}
             />
@@ -99,7 +76,7 @@ export default function ListsScreen() {
   );
 }
 
-function Header() {
+const Header = () => {
   const router = useRouter();
   const theme = useCurrentTheme();
 
@@ -117,9 +94,9 @@ function Header() {
       </Pressable>
     </View>
   );
-}
+};
 
-function SectionHeader({ section }: { section: Section }) {
+const SectionHeader = ({ section }: { section: Section }) => {
   const theme = useCurrentTheme();
 
   return (
@@ -131,19 +108,17 @@ function SectionHeader({ section }: { section: Section }) {
       <ThemedText style={sectionHeaderStyles.sectionCount}>{section.data.length}</ThemedText>
     </View>
   );
-}
+};
 
-function ListRow({
+const ListRow = ({
   item,
-  deletingId,
   onPress,
   onDelete,
 }: {
   item: List;
-  deletingId: string | null;
   onPress: () => void;
   onDelete: () => void;
-}) {
+}) => {
   const theme = useCurrentTheme();
 
   return (
@@ -175,15 +150,11 @@ function ListRow({
         hitSlop={8}
         style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
       >
-        {deletingId === item.id ? (
-          <ActivityIndicator size="small" color={"#E11D48"} />
-        ) : (
-          <IconSymbol name="trash" size={18} color="#E11D48" />
-        )}
+        <IconSymbol name="trash" size={18} color="#E11D48" />
       </Pressable>
     </Pressable>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

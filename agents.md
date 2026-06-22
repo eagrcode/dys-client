@@ -5,6 +5,7 @@
 - Use UK English spelling in commit messages, documentation, comments, and user-facing copy.
 - Keep changes scoped to the requested behaviour and preserve unrelated user work.
 - This directory is its own Git repository. The sibling `server` directory is separate, so check and commit each repository independently.
+- When pushing commits, use the SSH remote form, for example `git@github.com:eagrcode/dys-client.git`, instead of HTTPS.
 
 ## Client Structure
 
@@ -32,6 +33,19 @@
 
 - Run `npx tsc --noEmit` for TypeScript changes.
 - Run `npm run lint` for routing, UI, and styling changes.
+
+## Lists Feature Todo
+
+- Add edit-list support from the list detail screen, including title and list type changes.
+- Add edit-item support for existing list items, including inline or modal editing and empty-value handling.
+- Move list deletion into the individual list screen so destructive list actions live with the list they affect.
+- Add item deletion from the list detail screen with confirmation or an undo-friendly interaction.
+- Add clear loading, pending, and error states for create, edit, toggle, and delete list item mutations.
+- Centralise list type labels, icons, and display order so list overview, list detail, and create/edit flows use the same source.
+- Tighten list query keys and cache updates so group list summaries and list detail views stay in sync after edits and deletes.
+- Add empty states for lists with no items and groups with no lists, with a direct create action where appropriate.
+- Add validation for list and item titles, including trimming whitespace and preventing blank submissions.
+- Check Android/web icon mappings for all list icons used by `IconSymbol`.
 
 ## Recent Changes
 

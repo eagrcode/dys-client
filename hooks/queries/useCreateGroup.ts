@@ -4,7 +4,11 @@ import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { useRouter } from "expo-router";
 import { useAuthProvider } from "@/lib/context/SessionProvider";
 import { ApiErrorResponse } from "@/utils/types/ApiError";
-import { CreateGroup } from "@/utils/types/CreateGroup";
+
+type CreateGroupResponse = {
+  success: boolean;
+  data: string;
+};
 
 export function useCreateGroup() {
   const queryClient = useQueryClient();
@@ -12,7 +16,7 @@ export function useCreateGroup() {
   const router = useRouter();
   const { user } = useAuthProvider();
 
-  return useMutation<CreateGroup, ApiErrorResponse, { name: string; description: string }>({
+  return useMutation<CreateGroupResponse, ApiErrorResponse, { name: string; description: string }>({
     mutationFn: ({ name, description }: { name: string; description: string }) =>
       groupsAPI.createGroup(name, description),
     onSuccess: async (res) => {

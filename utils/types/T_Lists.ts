@@ -21,6 +21,7 @@ export type List = {
   created_at: string;
   updated_at?: string | null;
   completed_at?: string | null;
+  items?: ListItem[];
 };
 
 export type ListWithItems = List & {
