@@ -1,11 +1,22 @@
 import { Platform } from "react-native";
 
 export const Accent = {
-  accent: "#0db9f2",
-  accentSoft: "#589d9c",
-  accentText: "#6ed5f7",
-  accentDeep: "#086f91",
-  accentGradient: ["#0db9f2", "#1991e6"] as const,
+  accent: "#FF8A4C",
+  accentSoft: "rgba(255, 138, 76, 0.16)",
+  accentText: "#6DD6FF",
+  accentDeep: "#0E7490",
+  accentGradient: ["#FF9A5F", "#FF6B3D"] as const,
+
+  violet: "#A879FF",
+  violetSoft: "rgba(168, 121, 255, 0.16)",
+  violetGradient: ["#A879FF", "#7C3AED"] as const,
+
+  cyan: "#6DD6FF",
+  cyanSoft: "rgba(109, 214, 255, 0.14)",
+
+  success: "#70E0A3",
+  warning: "#FFB86B",
+  danger: "#FF6B7A",
 };
 
 export const Styling = {
@@ -17,6 +28,7 @@ export const Styling = {
     xxl: 30, // modals, bottom sheets
     full: 9999, // pills, avatars, tab bar
   },
+
   shadow: {
     sm: {
       shadowColor: "#000000",
@@ -47,71 +59,103 @@ export const Styling = {
       elevation: 16,
     },
   },
+
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 24,
+    xxl: 32,
+  },
 };
 
 export const Colors = {
   light: {
     // Accents
-    accent: Accent.accent,
-    accentSoft: Accent.accentSoft,
-    accentText: Accent.accentText,
-    accentDeep: Accent.accentDeep,
-    accentGradient: Accent.accentGradient,
+    accent: "#E86F4A",
+    accentSoft: "rgba(232, 111, 74, 0.14)",
+    accentText: "#0EA5E9",
+    accentDeep: "#9A3F27",
+    accentGradient: ["#FF9A5F", "#E86F4A"] as const,
+
+    violet: "#7C3AED",
+    violetSoft: "rgba(124, 58, 237, 0.12)",
+    violetGradient: ["#A879FF", "#7C3AED"] as const,
+
+    cyan: "#0EA5E9",
+    cyanSoft: "rgba(14, 165, 233, 0.12)",
+
+    success: "#2FA66A",
+    warning: "#D9822B",
+    danger: "#D94A5D",
 
     // Text
-    text: "hsl(240, 10%, 94%)",
-    textMuted: "#797986b3",
-    errorText: "#ff6b6b",
+    text: "#171717",
+    textSoft: "#4F4A45",
+    textMuted: "#7A736B",
+    textDisabled: "#AAA39A",
+    errorText: "#D94A5D",
 
     // Backgrounds
-    background: "#02060a",
-    bgLayer1: "#0d1218",
-    bgLayer2: "#181f25",
+    background: "#F7F4EE",
+    bgLayer1: "#FFFFFF",
+    bgLayer2: "#F0ECE4",
+    bgLayer3: "#E8E1D7",
+
+    // Screen Gradients
+    screenGradient: ["#F7F4EE", "#EFEAE2", "#F7F4EE"] as const,
+    homeGradient: ["#FFF8EF", "#EFE8DF", "#F7F4EE"] as const,
+
+    // Ambient Glow
+    ambientGlowPrimary: "#E86F4A",
+    ambientGlowSecondary: "#7C3AED",
 
     // Icons
-    icon: "#c6c6d2",
-    iconAccent: Accent.accent,
+    icon: "#5E5A55",
+    iconAccent: "#E86F4A",
 
     // Tab Bar
-    tabBar: "#050a0f",
-    tabIconDefault: "#8e8ea4",
-    tabIconSelected: Accent.accent,
+    tabBar: "#FFFFFF",
+    tabIconDefault: "#8A8179",
+    tabIconSelected: "#E86F4A",
 
     // Header
-    header: "#050a0f",
+    header: "#FFFFFF",
 
     // Borders
-    border: "#ffffff14", // subtle separators, card outlines
-    borderStrong: "rgba(255, 255, 255, 0.14)", // input focus rings, emphasised dividers
+    border: "rgba(23, 23, 23, 0.08)",
+    borderStrong: "rgba(23, 23, 23, 0.16)",
 
     // Dashboard
     homeTileColors: {
       Lists: {
-        bg: "#4da6bc2e", // hsla(192,45%,52%,0.18) resolved
-        border: "#5dbfd640", // hsla(192,60%,60%,0.25) resolved
-        icon: "#00c1c4",
-        label: "#00c1c4",
+        bg: "rgba(14, 165, 233, 0.12)",
+        border: "rgba(14, 165, 233, 0.22)",
+        icon: "#0EA5E9",
+        label: "#0EA5E9",
       },
       Calendar: {
-        bg: "#ccb1582e", // hsla(46,55%,58%,0.18) resolved
-        border: "#e2c35d40", // hsla(46,70%,62%,0.25) resolved
-        icon: "#fa8b01",
-        label: "#fa8b01",
+        bg: "rgba(232, 111, 74, 0.12)",
+        border: "rgba(232, 111, 74, 0.22)",
+        icon: "#E86F4A",
+        label: "#E86F4A",
       },
       Albums: {
-        bg: "#a05ebd2e", // hsla(284,42%,55%,0.18) resolved
-        border: "#b361ce40", // hsla(284,55%,60%,0.25) resolved
-        icon: "#ac75ff",
-        label: "#ac75ff",
+        bg: "rgba(124, 58, 237, 0.12)",
+        border: "rgba(124, 58, 237, 0.22)",
+        icon: "#7C3AED",
+        label: "#7C3AED",
       },
       HearthChat: {
-        bg: "#49b67a2e", // hsla(148,42%,50%,0.18) resolved
-        border: "#51ca8b40", // hsla(148,55%,56%,0.25) resolved
-        icon: "#08af51",
-        label: "#08af51",
+        bg: "rgba(47, 166, 106, 0.12)",
+        border: "rgba(47, 166, 106, 0.22)",
+        icon: "#2FA66A",
+        label: "#2FA66A",
       },
     },
   },
+
   dark: {
     // Accents
     accent: Accent.accent,
@@ -120,57 +164,79 @@ export const Colors = {
     accentDeep: Accent.accentDeep,
     accentGradient: Accent.accentGradient,
 
+    violet: Accent.violet,
+    violetSoft: Accent.violetSoft,
+    violetGradient: Accent.violetGradient,
+
+    cyan: Accent.cyan,
+    cyanSoft: Accent.cyanSoft,
+
+    success: Accent.success,
+    warning: Accent.warning,
+    danger: Accent.danger,
+
     // Text
-    text: "hsl(240, 10%, 94%)",
-    textMuted: "#797986b3",
-    errorText: "#ff6b6b",
+    text: "#F4F6FA",
+    textSoft: "#B8BECC",
+    textMuted: "#7E8798",
+    textDisabled: "#565F70",
+    errorText: Accent.danger,
 
     // Backgrounds
-    background: "#02060a",
-    bgLayer1: "#0d1218",
-    bgLayer2: "#181f25",
+    background: "hsl(226, 55%, 6%)",
+    bgLayer1: "hsl(224, 33%, 10%)",
+    bgLayer2: "hsl(222, 30%, 14%)",
+    bgLayer3: "hsl(223, 28%, 16%)",
+
+    // Screen Gradients
+    screenGradient: ["#070B18", "#0B1020", "#070B18"] as const,
+    homeGradient: ["#090D1B", "#10172A", "#070B18"] as const,
+
+    // Ambient Glow
+    ambientGlowPrimary: "#7C3AED",
+    ambientGlowSecondary: "#FF6B3D",
 
     // Icons
-    icon: "#c6c6d2",
+    icon: "#C6CAD6",
     iconAccent: Accent.accent,
 
     // Tab Bar
-    tabBar: "#050a0f",
-    tabIconDefault: "#8e8ea4",
+    tabBar: "hsl(223, 33%, 10%)",
+    tabIconDefault: "#8E95A8",
     tabIconSelected: Accent.accent,
 
     // Header
-    header: "#050a0f",
+    header: "#070B18",
 
     // Borders
-    border: "#ffffff14", // subtle separators, card outlines
-    borderStrong: "rgba(255, 255, 255, 0.14)", // input focus rings, emphasised dividers
+    border: "rgba(255, 255, 255, 0.05)",
+    borderStrong: "rgba(255, 255, 255, 0.14)",
 
     // Dashboard
     homeTileColors: {
       Lists: {
-        bg: "#4da6bc2e", // hsla(192,45%,52%,0.18) resolved
-        border: "#5dbfd640", // hsla(192,60%,60%,0.25) resolved
-        icon: "#00c1c4",
-        label: "#00c1c4",
+        bg: "#171D2E",
+        border: "rgba(109, 214, 255, 0.24)",
+        icon: "#6DD6FF",
+        label: "#6DD6FF",
       },
       Calendar: {
-        bg: "#ccb1582e", // hsla(46,55%,58%,0.18) resolved
-        border: "#e2c35d40", // hsla(46,70%,62%,0.25) resolved
-        icon: "#fa8b01",
-        label: "#fa8b01",
+        bg: "rgba(255, 138, 76, 0.13)",
+        border: "rgba(255, 138, 76, 0.26)",
+        icon: "#FF8A4C",
+        label: "#FF8A4C",
       },
       Albums: {
-        bg: "#a05ebd2e", // hsla(284,42%,55%,0.18) resolved
-        border: "#b361ce40", // hsla(284,55%,60%,0.25) resolved
-        icon: "#ac75ff",
-        label: "#ac75ff",
+        bg: "rgba(168, 121, 255, 0.13)",
+        border: "rgba(168, 121, 255, 0.26)",
+        icon: "#A879FF",
+        label: "#A879FF",
       },
       HearthChat: {
-        bg: "#49b67a2e", // hsla(148,42%,50%,0.18) resolved
-        border: "#51ca8b40", // hsla(148,55%,56%,0.25) resolved
-        icon: "#08af51",
-        label: "#08af51",
+        bg: "rgba(112, 224, 163, 0.12)",
+        border: "rgba(112, 224, 163, 0.24)",
+        icon: "#70E0A3",
+        label: "#70E0A3",
       },
     },
   },

@@ -6,7 +6,7 @@ import { useAuthProvider } from "@/lib/context/SessionProvider";
 
 export default function HomeScreen() {
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView variant="home" style={styles.container}>
       <Header />
       <Dashboard />
     </ThemedView>

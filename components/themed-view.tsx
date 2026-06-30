@@ -2,12 +2,14 @@ import { type ViewProps } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useCurrentTheme } from "@/hooks/use-current-theme";
 
-const LIGHT_GRADIENT = ["#f4f0ec", "#ede9e3", "#f4f0ec"] as const;
-const DARK_GRADIENT = ["#02060a", "#0d1218", "#02060a"] as const;
+type ThemedViewProps = ViewProps & {
+  variant?: "default" | "home";
+};
 
-export function ThemedView({ style, ...otherProps }: ViewProps) {
+export function ThemedView({ style, variant = "default", ...otherProps }: ThemedViewProps) {
   const theme = useCurrentTheme();
-  const colors = theme.scheme === "light" ? LIGHT_GRADIENT : DARK_GRADIENT;
+
+  const colors = variant === "home" ? theme.colors.homeGradient : theme.colors.screenGradient;
 
   return (
     <LinearGradient

@@ -89,5 +89,6 @@ const styles = StyleSheet.create({
     fontFamily: "DMSans_400Regular",
     backgroundColor: "transparent",
     borderWidth: 1,
+    letterSpacing: 0.7,
   },
 });

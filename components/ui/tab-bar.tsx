@@ -11,16 +11,14 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   return (
     <View
       style={[
-        styles.container,
         {
           paddingBottom: insets.bottom ? insets.bottom : 16,
-          borderColor: theme.colors.border,
-          backgroundColor: theme.colors.header,
+          backgroundColor: theme.colors.tabBar,
         },
       ]}
       pointerEvents="box-none"
     >
-      <View style={[styles.tabs, { borderColor: theme.colors.border }]}>
+      <View style={styles.tabs}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const focused = state.index === index;
@@ -57,10 +55,6 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    borderTopWidth: 1,
-  },
-
   tabs: {
     flexDirection: "row",
     width: "100%",

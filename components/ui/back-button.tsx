@@ -18,7 +18,7 @@ export function BackButton({ type, size = 30, style }: Props) {
       style={({ pressed }) => [styles.closeBtn, { opacity: pressed ? 0.6 : 1 }, style]}
     >
       <IconSymbol
-        name={type === "down" ? "chevron.down" : type === "left" ? "chevron.left" : "xmark"}
+        name={type === "down" ? "chevron-down" : type === "left" ? "chevron-left" : "close"}
         size={size}
         color={theme.colors.icon}
       />

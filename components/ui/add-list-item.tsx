@@ -1,6 +1,6 @@
 import { View, StyleSheet, TextInput, ViewStyle, StyleProp } from "react-native";
 import { useCurrentTheme } from "@/hooks/use-current-theme";
-import { IconSymbol } from "./icon-symbol.ios";
+import { IconSymbol } from "./icon-symbol";
 import { useRef, useState } from "react";
 import { Input } from "./input";
 
