@@ -1,14 +1,13 @@
-import { StyleSheet, SectionList, View, Pressable, Alert } from "react-native";
+import { StyleSheet, SectionList, View, Pressable } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useCurrentTheme } from "@/hooks/use-current-theme";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { useGroupLists } from "@/hooks/queries/useGroupLists";
-import { useDeleteList } from "@/hooks/queries/useDeleteList";
 import { useRouter } from "expo-router";
 import { BackButton } from "@/components/ui/back-button";
-import { List, ListType } from "@/utils/types/T_Lists";
+import type { List, ListType } from "@/utils/types/T_Lists";
+import { LIST_TYPE_ICONS, LIST_TYPE_LABELS, LIST_TYPES } from "@/constants/list-types";
 
 type Section = {
   type: ListType;
@@ -17,39 +16,16 @@ type Section = {
   data: List[];
 };
 
-const SECTION_CONFIG: Record<ListType, { label: string; icon: string }> = {
-  todo: { label: "Todo", icon: "checkmark.circle.fill" },
-  shopping: { label: "Shopping", icon: "cart.fill" },
-  other: { label: "Other", icon: "list.bullet" },
-};
-
 export default function ListsScreen() {
-  const { selectedGroup } = useGroupsProvider();
-  const { data: lists = [] } = useGroupLists(selectedGroup || "");
-  const { mutate: deleteList } = useDeleteList(selectedGroup || "");
+  const { data: lists = [] } = useGroupLists();
   const router = useRouter();
 
-  const sections = (Object.keys(SECTION_CONFIG) as ListType[])
-    .map((type) => ({
-      type,
-      title: SECTION_CONFIG[type].label,
-      icon: SECTION_CONFIG[type].icon,
-      data: lists.filter((list: List) => list.list_type === type),
-    }))
-    .filter((section) => section.data.length > 0);
-
-  const handleDelete = (listId: string, title: string) => {
-    Alert.alert("Delete List", `Delete "${title}"?`, [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => {
-          deleteList(listId);
-        },
-      },
-    ]);
-  };
+  const sections: Section[] = LIST_TYPES.map((type) => ({
+    type,
+    title: LIST_TYPE_LABELS[type],
+    icon: LIST_TYPE_ICONS[type],
+    data: lists.filter((list) => list.list_type === type),
+  })).filter((section) => section.data.length > 0);
 
   return (
     <ThemedView style={styles.container}>
@@ -64,11 +40,7 @@ export default function ListsScreen() {
           keyExtractor={(item: List) => item.id}
           renderSectionHeader={({ section }) => <SectionHeader section={section} />}
           renderItem={({ item }: { item: List }) => (
-            <ListRow
-              item={item}
-              onPress={() => router.push(`/(app-protected)/list/${item.id}`)}
-              onDelete={() => handleDelete(item.id, item.title)}
-            />
+            <ListRow item={item} onPress={() => router.push(`/(app-protected)/list/${item.id}`)} />
           )}
         />
       )}
@@ -82,7 +54,7 @@ const Header = () => {
 
   return (
     <View style={headerStyles.header}>
-      <BackButton type="left" size={24} />
+      <BackButton type="left" size={30} />
       <ThemedText variant="title" style={headerStyles.title}>
         Lists
       </ThemedText>
@@ -110,15 +82,7 @@ const SectionHeader = ({ section }: { section: Section }) => {
   );
 };
 
-const ListRow = ({
-  item,
-  onPress,
-  onDelete,
-}: {
-  item: List;
-  onPress: () => void;
-  onDelete: () => void;
-}) => {
+const ListRow = ({ item, onPress }: { item: List; onPress: () => void }) => {
   const theme = useCurrentTheme();
 
   return (
@@ -131,8 +95,8 @@ const ListRow = ({
     >
       <View style={rowStyles.content}>
         <IconSymbol
-          name={item.completed ? "checkmark.circle.fill" : "circle"}
-          size={22}
+          name={item.completed ? "check-circle" : "circle"}
+          size={25}
           color={item.completed ? theme.colors.accent : theme.colors.icon}
         />
         <View style={rowStyles.text}>
@@ -145,13 +109,6 @@ const ListRow = ({
           </ThemedText>
         </View>
       </View>
-      <Pressable
-        onPress={onDelete}
-        hitSlop={8}
-        style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
-      >
-        <IconSymbol name="trash" size={18} color="#E11D48" />
-      </Pressable>
     </Pressable>
   );
 };

@@ -6,7 +6,7 @@ export type ListItem = {
   content: string;
   completed: boolean;
   created_at: string;
-  updated_at: string;
+  updated_at: string | null;
 };
 
 export type List = {
@@ -22,4 +22,10 @@ export type List = {
   updated_at?: string | null;
   completed_at?: string | null;
   items?: ListItem[];
+};
+
+export type ToggleCompleteListItemResponse = {
+  id: string;
+  completed: boolean;
+  updated_at: string;
 };

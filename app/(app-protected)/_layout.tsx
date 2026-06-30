@@ -35,6 +35,16 @@ export default function AppProtectedLayout() {
             title: "Create List",
           }}
         />
+        <Stack.Screen
+          name="modals/edit-list"
+          options={{
+            presentation: "modal",
+            headerShown: false,
+            title: "Edit List",
+            animation: "fade",
+            contentStyle: { backgroundColor: "transparent" },
+          }}
+        />
       </Stack>
     </GroupsProvider>
   );

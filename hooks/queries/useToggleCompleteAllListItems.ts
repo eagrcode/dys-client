@@ -3,11 +3,10 @@ import { listsAPI } from "@/services/api/lists";
 import { useAuthProvider } from "@/lib/context/SessionProvider";
 import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import type { ApiErrorResponse } from "@/utils/types/ApiError";
-import type { ToggleCompleteListItemResponse, List } from "@/utils/types/T_Lists";
+import type { ToggleCompleteListItemResponse, List, ListItem } from "@/utils/types/T_Lists";
 
 type ToggleCompleteListItemVars = {
   listId: string;
-  itemId: string;
   completed: boolean;
 };
 
@@ -18,7 +17,7 @@ type ToggleCompleteListItemContext = {
   prevList: List | undefined;
 };
 
-export function useToggleCompleteListItem() {
+export function useToggleCompleteAllListItems() {
   const queryClient = useQueryClient();
   const { user } = useAuthProvider();
   const { selectedGroup } = useGroupsProvider();
@@ -29,18 +28,22 @@ export function useToggleCompleteListItem() {
     ToggleCompleteListItemVars,
     ToggleCompleteListItemContext
   >({
-    mutationFn: ({ listId, itemId, completed }) => {
+    mutationFn: ({ listId, completed }) => {
       if (!selectedGroup) throw new Error("No group selected");
 
-      return listsAPI.toggleCompleteListItem({
+      console.log("useToggleCompleteAllListItems | Firing query", {
+        listId: listId,
+        completed: completed,
+      });
+
+      return listsAPI.toggleCompleteAllListItems({
         groupId: selectedGroup,
         listId,
-        itemId,
         completed,
       });
     },
 
-    onMutate: async ({ listId, itemId, completed }) => {
+    onMutate: async ({ listId, completed }) => {
       const listQueryKey = ["list", user?.id, selectedGroup, listId] as const;
       const groupListsQueryKey = ["groupLists", user?.id, selectedGroup] as const;
       const dashboardListsQueryKey = ["dashboardData", user?.id, selectedGroup, "lists"] as const;
@@ -50,11 +53,14 @@ export function useToggleCompleteListItem() {
       const prevList = queryClient.getQueryData<List>(listQueryKey);
 
       queryClient.setQueryData<List>(listQueryKey, (old) => {
-        if (!old) return old;
+        if (!old || !old.items) return old;
 
         return {
           ...old,
-          items: old.items?.map((item) => (item.id === itemId ? { ...item, completed } : item)),
+          items: old.items.map((item: ListItem) => ({
+            ...item,
+            completed,
+          })),
         };
       });
 

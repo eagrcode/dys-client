@@ -1,63 +1,35 @@
-import {
-  View,
-  StyleSheet,
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  type TextInput,
-} from "react-native";
+import { View, StyleSheet, ActivityIndicator, FlatList } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useCurrentTheme } from "@/hooks/use-current-theme";
-import { useCreateListItem } from "@/hooks/queries/useCreateListItem";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
-import { useToggleCompleteListItem } from "@/hooks/queries/useToggleCompleteListItem";
 import { useListById } from "@/hooks/queries/useListById";
-import { Input } from "@/components/ui/input";
-import { useRef, useState } from "react";
-import { BackButton } from "@/components/ui/back-button";
-import { List, ListItem, ListType } from "@/utils/types/T_Lists";
-
-const LIST_TYPE_ICONS: Record<string, string> = {
-  shopping: "cart.fill",
-  todo: "checkmark.circle.fill",
-  other: "list.bullet",
-};
-
-const LIST_TYPE_LABELS: Record<ListType, string> = {
-  shopping: "Shopping",
-  todo: "Todo",
-  other: "Other",
-};
+import { useState } from "react";
+import type { ListItem } from "@/utils/types/T_Lists";
+import EditListBottomSheet from "@/components/ui/edit-list";
+import { Header } from "./components/Header";
+import { NewItemInput } from "./components/NewItemInput";
+import { ItemRow } from "./components/ItemRow";
+import { DeleteItemsToolbar } from "./components/DeleteItemsToolbar";
 
 const SCREEN_PADDING = 16;
 
+export type ListMode = "default" | "edit-item" | "select-items";
+
 export default function ListViewScreen() {
-  const [newItem, setNewItem] = useState<string>("");
+  const [listMode, setListMode] = useState<ListMode>("default");
+  const [optionsShowing, setOptionsShowing] = useState<boolean>(false);
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const { listId } = useLocalSearchParams<{ listId: string }>();
-  const { selectedGroup } = useGroupsProvider();
-  const { data: list, isLoading } = useListById(selectedGroup || "", listId || "");
-  const { mutate: createListItem } = useCreateListItem();
-  const { mutate: toggleCompleteListItem } = useToggleCompleteListItem();
+  const { data: list, isLoading } = useListById(listId || "");
   const theme = useCurrentTheme();
   const items = list?.items ?? [];
-  const completedCount = items.filter((i: ListItem) => i.completed).length;
   const totalCount = items.length;
 
-  const handleAddItemPress = () => {
-    if (!newItem.trim()) return;
+  const isSelectMode = listMode === "select-items";
 
-    console.log("Adding item:", newItem);
-    createListItem({ listId: listId || "", content: newItem.trim() });
-    setNewItem("");
-  };
-
-  const handleToggleCompleteItem = (itemId: string, completed: boolean) => {
-    console.log("Toggling item:", itemId, "Completed:", completed);
-    toggleCompleteListItem({ listId: listId || "", itemId, completed: !completed });
-  };
+  console.log("List Mode: ", listMode);
 
   if (isLoading) {
     return (
@@ -77,172 +49,65 @@ export default function ListViewScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <Header list={list} completedCount={completedCount} totalCount={totalCount} />
-      <NewItemInput
-        newItem={newItem}
-        setNewItem={setNewItem}
-        handleAddItemPress={handleAddItemPress}
-      />
+      <Header setOptionsShowing={setOptionsShowing} />
+      {isSelectMode ? (
+        <DeleteItemsToolbar
+          selectedItemIds={selectedItemIds}
+          setSelectedItemIds={setSelectedItemIds}
+          setListMode={setListMode}
+        />
+      ) : (
+        <NewItemInput />
+      )}
 
-      {/* Placeholder for empty list */}
       {totalCount === 0 ? (
-        <View style={styles.centered}>
-          <IconSymbol name="tray" size={40} color={theme.colors.icon} />
-          <ThemedText style={{ opacity: 0.5, marginTop: 12 }}>No items yet</ThemedText>
-        </View>
+        <PlaceHolder />
       ) : (
         <FlatList
           data={items}
+          extraData={{ isSelectMode, selectedItemIds }}
           keyExtractor={(item: ListItem) => item.id}
           contentContainerStyle={styles.list}
           keyboardDismissMode="on-drag"
           renderItem={({ item }: { item: ListItem }) => (
-            <ItemRow item={item} handleToggleCompleteItem={handleToggleCompleteItem} />
+            <ItemRow
+              item={item}
+              listMode={listMode}
+              editingItemId={editingItemId}
+              setEditingItemId={setEditingItemId}
+              setListMode={setListMode}
+              selectedItemIds={selectedItemIds}
+              setSelectedItemIds={setSelectedItemIds}
+            />
           )}
+        />
+      )}
+      {optionsShowing && (
+        <EditListBottomSheet
+          listMode={listMode}
+          setListMode={setListMode}
+          setOptionsShowing={setOptionsShowing}
         />
       )}
     </ThemedView>
   );
 }
 
-function Header({
-  list,
-  completedCount,
-  totalCount,
-}: {
-  list: List;
-  completedCount: number;
-  totalCount: number;
-}) {
-  const theme = useCurrentTheme();
-
+const PlaceHolder = () => {
   return (
-    <View style={headerStyles.header}>
-      <View style={headerStyles.headerTop}>
-        <BackButton type="left" size={24} />
-        <ThemedText variant="title" style={headerStyles.title}>
-          {list.title}
-        </ThemedText>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <View style={[headerStyles.typeChip, { backgroundColor: theme.colors.bgLayer1 }]}>
-            <IconSymbol
-              name={LIST_TYPE_ICONS[list.list_type] as any}
-              size={14}
-              color={theme.colors.accent}
-            />
-            <ThemedText style={{ fontSize: 12, color: theme.colors.accent }}>
-              {LIST_TYPE_LABELS[list.list_type] || list.list_type}
-            </ThemedText>
-          </View>
-          <IconSymbol name="ellipsis" size={30} color={theme.colors.icon} />
-        </View>
-      </View>
-
-      {/* Progress Indicator */}
-      <View style={{ flexDirection: "row", gap: 8 }}>
-        {totalCount > 0 && (
-          <View style={headerStyles.progressRow}>
-            <View
-              style={[headerStyles.progressTrack, { backgroundColor: theme.colors.bgLayer1 }]}
-            >
-              <View
-                style={[
-                  headerStyles.progressFill,
-                  {
-                    backgroundColor: theme.colors.accent,
-                    width: `${(completedCount / totalCount) * 100}%`,
-                  },
-                ]}
-              />
-            </View>
-            <ThemedText style={headerStyles.progressText}>
-              {completedCount}/{totalCount}
-            </ThemedText>
-          </View>
-        )}
-      </View>
+    <View style={styles.centered}>
+      {/* <IconSymbol name="tray" size={40} color={theme.colors.icon} /> */}
+      <ThemedText style={{ opacity: 0.5, marginTop: 12 }}>No items yet</ThemedText>
     </View>
   );
-}
-
-function NewItemInput({
-  newItem,
-  setNewItem,
-  handleAddItemPress,
-}: {
-  newItem: string;
-  setNewItem: (content: string) => void;
-  handleAddItemPress: () => void;
-}) {
-  const theme = useCurrentTheme();
-  const inputRef = useRef<TextInput>(null);
-
-  return (
-    <View
-      style={[
-        newItemInputStyles.container,
-        {
-          backgroundColor: theme.colors.background,
-        },
-      ]}
-    >
-      <IconSymbol
-        name="plus"
-        size={30}
-        color={!newItem.trim() ? theme.colors.textMuted : theme.colors.icon}
-      />
-      <Input
-        ref={inputRef}
-        style={[newItemInputStyles.input]}
-        placeholder="New item"
-        value={newItem}
-        onChangeText={(content) => setNewItem(content)}
-        onSubmitEditing={handleAddItemPress}
-        submitBehavior="submit"
-      />
-    </View>
-  );
-}
-
-function ItemRow({
-  item,
-  handleToggleCompleteItem,
-}: {
-  item: ListItem;
-  handleToggleCompleteItem: (id: string, completed: boolean) => void;
-}) {
-  const theme = useCurrentTheme();
-
-  return (
-    <View style={[itemRowStyles.itemRow]}>
-      <Pressable onPress={() => handleToggleCompleteItem(item.id, item.completed)}>
-        <IconSymbol
-          name={item.completed ? "checkmark.circle.fill" : "circle"}
-          size={25}
-          color={item.completed ? theme.colors.accentSoft : theme.colors.icon}
-        />
-      </Pressable>
-
-      <ThemedText
-        style={[
-          itemRowStyles.itemText,
-          item.completed && {
-            textDecorationLine: "line-through",
-            opacity: 0.4,
-          },
-        ]}
-      >
-        {item.content}
-      </ThemedText>
-    </View>
-  );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 0,
     gap: 16,
+    position: "relative",
   },
   centered: {
     flex: 1,
@@ -252,85 +117,6 @@ const styles = StyleSheet.create({
   list: {
     flexGrow: 1,
     paddingHorizontal: SCREEN_PADDING,
-  },
-});
-
-const headerStyles = StyleSheet.create({
-  header: {
-    paddingTop: 60,
-    gap: 8,
-    paddingHorizontal: SCREEN_PADDING,
-  },
-  headerTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 16,
-  },
-  title: { fontSize: 20, letterSpacing: 2 },
-  typeChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-  },
-  progressRow: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 16,
-  },
-  progressTrack: {
-    flex: 1,
-    height: 4,
-    borderRadius: 2,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: 2,
-  },
-  progressText: {
-    fontSize: 14,
-    opacity: 0.5,
-  },
-});
-
-const newItemInputStyles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 8,
-    paddingHorizontal: SCREEN_PADDING,
-    // borderLeftWidth: 0,
-    // borderRightWidth: 0,
-    // borderTopWidth: 1,
-    // borderBottomWidth: 1,
-    borderWidth: 0,
-  },
-  input: {
-    flex: 1,
-    width: undefined,
-    borderWidth: 0,
-    paddingVertical: 16,
-    paddingHorizontal: 0,
-  },
-});
-
-const itemRowStyles = StyleSheet.create({
-  itemRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-    paddingVertical: 16,
-  },
-  itemText: {
-    flex: 1,
-    fontSize: 16,
+    gap: 24,
   },
 });
