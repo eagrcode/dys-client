@@ -1,11 +1,8 @@
 import { apiCall } from "@/utils/apiCall";
+import type { DashboardCount } from "@/utils/types/T_Dashboard";
 
 const BASE_URL = `/groups`;
 const DASHBOARD_URL = `dashboard`;
-
-type DashboardCount = {
-  count: number;
-};
 
 export const dashboardApi = {
   getLists: async (groupId: string): Promise<DashboardCount> => {

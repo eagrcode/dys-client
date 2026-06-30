@@ -9,7 +9,7 @@ import { useCurrentTheme } from "@/hooks/use-current-theme";
 import { BackButton } from "@/components/ui/back-button";
 
 export default function SelectGroupModal() {
-  const { data: groups } = useGroups();
+  const { data: groups = [] } = useGroups();
   const { selectedGroup, selectGroup } = useGroupsProvider();
   const router = useRouter();
   const isPresented = router.canGoBack();

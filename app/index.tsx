@@ -18,14 +18,18 @@ export default function Index() {
 }
 
 function AuthenticatedGate() {
-  const { data: userGroups = [], isLoading: userGroupsLoading } = useGroups();
+  const { data: userGroups, isLoading, isError, isSuccess } = useGroups();
 
   // Do nothing while Splash Screen is still in effect
-  if (userGroupsLoading) {
+  if (isLoading) {
     return null;
   }
 
-  if (userGroups.length === 0) {
+  if (isError) {
+    return null; // Add error state later
+  }
+
+  if (isSuccess && userGroups?.length === 0) {
     console.log("AuthenticatedGate | No groups, redirecting to onboarding...");
     return <Redirect href="/(onboarding)/create-group" />;
   }

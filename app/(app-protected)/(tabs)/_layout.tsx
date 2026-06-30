@@ -1,28 +1,24 @@
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { TabBar } from "@/components/ui/tab-bar";
 import { useGroupById } from "@/hooks/queries/useGroupById";
-import { useGroupLists } from "@/hooks/queries/useGroupLists";
 import { useCurrentTheme } from "@/hooks/use-current-theme";
 import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { useAuthProvider } from "@/lib/context/SessionProvider";
 import { Tabs, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useRef } from "react";
-import { ActivityIndicator, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 export default function TabLayout() {
   const theme = useCurrentTheme();
   const router = useRouter();
   const { user } = useAuthProvider();
-  const { selectedGroup, isLoading: groupsProviderLoading } = useGroupsProvider();
-  const { data: groupDetails, isLoading: groupDetailsLoading } = useGroupById(selectedGroup || "");
-  const { isLoading: groupListsLoading } = useGroupLists(selectedGroup || "");
-
+  const { selectedGroup, isLoading: groupsLoading } = useGroupsProvider();
+  const { data: groupDetails, isLoading: currentGroupLoading } = useGroupById();
   const splashHidden = useRef(false);
 
-  const isReady = !!user && !groupsProviderLoading && !groupDetailsLoading && !groupListsLoading;
+  const isReady = !!user && !groupsLoading && !!selectedGroup && !currentGroupLoading;
 
   useEffect(() => {
     if (isReady && !splashHidden.current) {
@@ -32,11 +28,7 @@ export default function TabLayout() {
   }, [isReady]);
 
   if (!isReady) {
-    return (
-      <ThemedView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color={theme.colors.accent} />
-      </ThemedView>
-    );
+    return null;
   }
 
   return (
@@ -44,14 +36,8 @@ export default function TabLayout() {
       safeAreaInsets={{ bottom: 0 }}
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
-        tabBarStyle: {
-          borderTopWidth: 1,
-          borderColor: theme.colors.border,
-        },
         headerStyle: {
           backgroundColor: theme.colors.header,
-          borderBottomWidth: 1,
-          borderColor: theme.colors.border,
           height: 120,
         },
         headerShadowVisible: false,

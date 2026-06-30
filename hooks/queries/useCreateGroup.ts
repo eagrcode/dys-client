@@ -4,10 +4,11 @@ import { useGroupsProvider } from "@/lib/context/GroupsProvider";
 import { useRouter } from "expo-router";
 import { useAuthProvider } from "@/lib/context/SessionProvider";
 import { ApiErrorResponse } from "@/utils/types/ApiError";
+import type { Group } from "@/utils/types/T_Groups";
 
-type CreateGroupResponse = {
-  success: boolean;
-  data: string;
+type Props = {
+  name: string;
+  description: string;
 };
 
 export function useCreateGroup() {
@@ -15,13 +16,14 @@ export function useCreateGroup() {
   const { selectGroup } = useGroupsProvider();
   const router = useRouter();
   const { user } = useAuthProvider();
+  const groupsQueryKey = ["groups", user?.id] as const;
 
-  return useMutation<CreateGroupResponse, ApiErrorResponse, { name: string; description: string }>({
-    mutationFn: ({ name, description }: { name: string; description: string }) =>
-      groupsAPI.createGroup(name, description),
-    onSuccess: async (res) => {
-      await queryClient.refetchQueries({ queryKey: ["groups", user?.id], type: "all" });
-      await selectGroup(res.data);
+  return useMutation<Group, ApiErrorResponse, Props>({
+    mutationFn: ({ name, description }) => groupsAPI.createGroup(name, description),
+    onSuccess: async (createdGroup) => {
+      queryClient.setQueryData<Group[]>(groupsQueryKey, (old = []) => [...old, createdGroup]);
+
+      await selectGroup(createdGroup.id);
 
       if (router.canDismiss()) {
         router.dismissAll();
