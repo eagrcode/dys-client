@@ -1,8 +1,8 @@
 import { StyleSheet } from "react-native";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Dashboard } from "@/components/ui/dashboard";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { ThemedView } from "@/_shared/components/themed-view";
+import { Dashboard } from "@/_shared/components/dashboard";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 
 export default function HomeScreen() {
   return (
@@ -16,11 +16,9 @@ export default function HomeScreen() {
 function Header() {
   const { user } = useAuthProvider();
 
-  const greeting = `Welcome back, ${user?.firstName || "User"}!`;
-
   return (
-    <ThemedText variant="subtitle" style={{ fontSize: 20 }}>
-      {greeting}
+    <ThemedText variant="subtitle" style={styles.greeting}>
+      Welcome back, {user?.firstName ?? "User"}!
     </ThemedText>
   );
 }
@@ -30,5 +28,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     gap: 16,
+  },
+  greeting: {
+    fontSize: 20,
   },
 });

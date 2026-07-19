@@ -1,28 +1,21 @@
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Button } from "@/components/ui/button";
-import { ErrorText } from "@/components/ui/error-text";
-import { Input } from "@/components/ui/input";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { apiCall } from "@/utils/apiCall";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { ThemedView } from "@/_shared/components/themed-view";
+import { Button } from "@/_shared/components/button";
+import { ErrorText } from "@/_shared/components/error-text";
+import { Input } from "@/_shared/components/input";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 import { useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
-
-type FormData = {
-  first_name: string;
-  last_name: string;
-  email: string;
-  password: string;
-};
+import type { RegistrationInput } from "@/_features/auth/providers/session-provider";
 
 export default function SignUp() {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<RegistrationInput>({
     first_name: "",
     last_name: "",
     email: "",
     password: "",
   });
-  const [fieldErrors, setFieldErrors] = useState<{ [key in keyof FormData]: string }>({
+  const [fieldErrors, setFieldErrors] = useState<{ [key in keyof RegistrationInput]: string }>({
     first_name: "",
     last_name: "",
     email: "",
@@ -31,7 +24,7 @@ export default function SignUp() {
   const [formError, setFormError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { signIn } = useAuthProvider();
+  const { registerUser } = useAuthProvider();
 
   const submitDisabled =
     isLoading ||
@@ -40,7 +33,7 @@ export default function SignUp() {
     !formData.email ||
     !formData.password;
 
-  const handleSetFormData = (key: keyof FormData, value: string) => {
+  const handleSetFormData = (key: keyof RegistrationInput, value: string) => {
     // Clear previous errors
     setFieldErrors((prev) => ({ ...prev, [key]: "" }));
     setFormError("");
@@ -49,16 +42,13 @@ export default function SignUp() {
   };
 
   const handleSignUpPress = async () => {
-    // Clear previous errors
-    setFieldErrors({ first_name: "", last_name: "", email: "", password: "" });
+    setFieldErrors((prev) => ({ ...prev, first_name: "", last_name: "", email: "", password: "" }));
     setFormError("");
 
     try {
       setIsLoading(true);
-      await apiCall("/auth/register", "POST", {
-        body: JSON.stringify(formData),
-      });
-      await signIn(formData.email, formData.password);
+
+      await registerUser(formData);
     } catch (error: any) {
       handleErrors(error);
     } finally {
@@ -69,23 +59,30 @@ export default function SignUp() {
   const handleErrors = (error: any) => {
     const code = error?.code;
 
-    if (code === "LIMIT_EXCEEDED") {
-      setFormError("Too many attempts. Please try again later.");
-    } else if (code === "VALIDATION_ERROR") {
-      const validationErrors = error?.errors;
-      validationErrors.forEach((fieldError: any) => {
-        const field = fieldError?.path;
-        const message = fieldError?.msg;
-        if (field && message) {
-          setFieldErrors((prev) => ({ ...prev, [field]: message }));
-        }
-      });
-    } else {
-      setFormError(error?.message || "An unexpected error occurred. Please try again.");
+    switch (code) {
+      case "EMAIL_ALREADY_EXISTS":
+        setFormError(
+          "An account with this email already exists. Please log in or use a different email.",
+        );
+        break;
+
+      case "VALIDATION_ERROR":
+        const validationErrors = error?.errors;
+        validationErrors.forEach((fieldError: any) => {
+          const field = fieldError?.path;
+          const message = fieldError?.msg;
+          if (field && message) {
+            setFieldErrors((prev) => ({ ...prev, [field]: message }));
+          }
+        });
+        break;
+
+      default:
+        setFormError(error?.message || "An unexpected error occurred. Please try again.");
     }
   };
 
-  const renderFieldError = (field: keyof FormData) => {
+  const renderFieldError = (field: keyof RegistrationInput) => {
     if (fieldErrors[field]) {
       return <ErrorText error={fieldErrors[field]} />;
     }

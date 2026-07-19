@@ -1,10 +1,10 @@
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Button } from "@/components/ui/button";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { useThemePreference } from "@/lib/context/ThemeModeProvider";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { ThemedView } from "@/_shared/components/themed-view";
+import { Button } from "@/_shared/components/button";
+import { IconSymbol } from "@/_shared/components/icon-symbol";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
+import { useThemePreference } from "@/_shared/providers/theme-mode-provider";
 import { StyleSheet, View } from "react-native";
 
 export default function YouScreen() {
@@ -12,7 +12,7 @@ export default function YouScreen() {
   const { toggleMode } = useThemePreference();
   const theme = useCurrentTheme();
 
-  const initials = user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "?";
+  const initials = user ? `${user.first_name[0]}${user.last_name[0]}`.toUpperCase() : "?";
 
   return (
     <ThemedView style={styles.container}>
@@ -22,7 +22,7 @@ export default function YouScreen() {
         </View>
 
         <ThemedText variant="title">
-          {user ? `${user.firstName} ${user.lastName}` : "Unknown"}
+          {user ? `${user.first_name} ${user.last_name}` : "Unknown"}
         </ThemedText>
         <ThemedText style={styles.email}>{user?.email}</ThemedText>
       </View>

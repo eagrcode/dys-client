@@ -1,6 +1,6 @@
 // import "../wdyr";
-import { AuthProvider } from "@/lib/context/SessionProvider";
-import { ThemePreferenceProvider } from "@/lib/context/ThemeModeProvider";
+import { AuthProvider } from "@/_features/auth/providers/session-provider";
+import { ThemePreferenceProvider } from "@/_shared/providers/theme-mode-provider";
 import {
   DMSans_400Regular,
   DMSans_500Medium,

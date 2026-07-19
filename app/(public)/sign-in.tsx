@@ -1,23 +1,19 @@
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Button } from "@/components/ui/button";
-import { ErrorText } from "@/components/ui/error-text";
-import { Input } from "@/components/ui/input";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { ThemedView } from "@/_shared/components/themed-view";
+import { Button } from "@/_shared/components/button";
+import { ErrorText } from "@/_shared/components/error-text";
+import { Input } from "@/_shared/components/input";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 import { useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
-
-type FormData = {
-  email: string;
-  password: string;
-};
+import type { SignInInput } from "@/_features/auth/providers/session-provider";
 
 export default function SignIn() {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<SignInInput>({
     email: "",
     password: "",
   });
-  const [fieldErrors, setFieldErrors] = useState<{ [key in keyof FormData]: string }>({
+  const [fieldErrors, setFieldErrors] = useState<{ [key in keyof SignInInput]: string }>({
     email: "",
     password: "",
   });
@@ -28,8 +24,7 @@ export default function SignIn() {
 
   const submitDisabled = isLoading || !formData.email || !formData.password;
 
-  const handleSetFormData = (key: keyof FormData, value: string) => {
-    // Clear previous errors
+  const handleSetFormData = (key: keyof SignInInput, value: string) => {
     setFieldErrors((prev) => ({ ...prev, [key]: "" }));
     setFormError("");
 
@@ -37,13 +32,12 @@ export default function SignIn() {
   };
 
   const handleSignInPress = async () => {
-    // Clear previous errors
     setFieldErrors({ email: "", password: "" });
     setFormError("");
 
     try {
       setIsLoading(true);
-      await signIn(formData.email, formData.password);
+      await signIn(formData);
     } catch (error: any) {
       handleErrors(error);
     } finally {
@@ -68,11 +62,12 @@ export default function SignIn() {
         }
       });
     } else {
+      console.log("SignIn | Unexpected error:", error);
       setFormError("An unexpected error occurred. Please try again.");
     }
   };
 
-  const renderFieldError = (field: keyof FormData) => {
+  const renderFieldError = (field: keyof SignInInput) => {
     if (fieldErrors[field]) {
       return <ErrorText error={fieldErrors[field]} />;
     }
