@@ -1,5 +1,5 @@
-import { apiCall } from "@/utils/apiCall";
-import type { Group, DeleteGroupResponse } from "@/utils/types/T_Groups";
+import { apiCall } from "@/_shared/utils/api-call";
+import type { Group, DeleteGroupResponse } from "@/_features/groups/groups-types";
 
 export const groupsAPI = {
   getUserGroups: async (): Promise<Group[]> => {

@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { GroupsProvider } from "@/lib/context/GroupsProvider";
+import { GroupsProvider } from "@/_features/groups/providers/groups-provider";
 
 export default function OnboardingLayout() {
   return (

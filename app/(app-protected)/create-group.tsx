@@ -1,7 +1,7 @@
 import { StyleSheet, View } from "react-native";
 import { useRouter } from "expo-router";
-import CreateGroup from "@/components/ui/create-group";
-import { BackButton } from "@/components/ui/back-button";
+import CreateGroup from "@/_shared/components/create-group";
+import { BackButton } from "@/_shared/components/back-button";
 
 export default function CreateGroupScreen() {
   const router = useRouter();

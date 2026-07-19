@@ -1,4 +1,4 @@
-import CreateGroup from "@/components/ui/create-group";
+import CreateGroup from "@/_shared/components/create-group";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 

@@ -1,12 +1,12 @@
 import { Pressable, StyleSheet, ScrollView, View } from "react-native";
-import { useGroups } from "@/hooks/queries/useGroups";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
+import { useGroups } from "@/_features/groups/hooks/use-groups";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { ThemedView } from "@/_shared/components/themed-view";
+import { IconSymbol } from "@/_shared/components/icon-symbol";
+import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
 import { useRouter } from "expo-router";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
-import { BackButton } from "@/components/ui/back-button";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
+import { BackButton } from "@/_shared/components/back-button";
 
 export default function SelectGroupModal() {
   const { data: groups = [] } = useGroups();

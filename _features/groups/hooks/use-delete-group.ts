@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { groupsAPI } from "@/services/api/groups";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
-import { useGroups } from "@/hooks/queries/useGroups";
+import { groupsAPI } from "@/_features/groups/groups-api";
+import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import { useGroups } from "@/_features/groups/hooks/use-groups";
 import { useRouter } from "expo-router";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
-import type { DeleteGroupResponse, Group } from "@/utils/types/T_Groups";
-import { ApiErrorResponse } from "@/utils/types/ApiError";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
+import type { DeleteGroupResponse, Group } from "@/_features/groups/groups-types";
+import { ApiErrorResponse } from "@/_shared/types/api-error";
 
 type Props = {
   groupId: string;

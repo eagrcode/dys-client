@@ -1,16 +1,18 @@
-import { ThemedText } from "@/components/themed-text";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { TabBar } from "@/components/ui/tab-bar";
-import { useGroupById } from "@/hooks/queries/useGroupById";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { IconSymbol } from "@/_shared/components/icon-symbol";
+import { TabBar } from "@/_shared/components/tab-bar";
+import { useGroupById } from "@/_features/groups/hooks/use-group-id";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
+import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 import { Tabs, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useRef } from "react";
 import { Pressable, View } from "react-native";
 
 export default function TabLayout() {
+  // const socket = io();
+
   const theme = useCurrentTheme();
   const router = useRouter();
   const { user } = useAuthProvider();
@@ -19,6 +21,10 @@ export default function TabLayout() {
   const splashHidden = useRef(false);
 
   const isReady = !!user && !groupsLoading && !!selectedGroup && !currentGroupLoading;
+
+  // socket.on("connect", () => {
+  //   console.log(socket.id);
+  // });
 
   useEffect(() => {
     if (isReady && !splashHidden.current) {

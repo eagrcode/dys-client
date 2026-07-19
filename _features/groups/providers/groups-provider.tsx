@@ -1,6 +1,6 @@
 import React, { createContext, use, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { useGroups } from "@/hooks/queries/useGroups";
+import { useGroups } from "@/_features/groups/hooks/use-groups";
 
 type GroupContext = {
   selectedGroup: string | null;

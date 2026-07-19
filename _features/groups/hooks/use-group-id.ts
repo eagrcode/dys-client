@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { groupsAPI } from "@/services/api/groups";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
-import type { Group } from "@/utils/types/T_Groups";
+import { groupsAPI } from "@/_features/groups/groups-api";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
+import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import type { Group } from "@/_features/groups/groups-types";
 
 export function useGroupById() {
   const { user } = useAuthProvider();

@@ -1,6 +1,7 @@
 import { Redirect } from "expo-router";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { useGroups } from "@/hooks/queries/useGroups";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
+import { useGroups } from "@/_features/groups/hooks/use-groups";
+import { log } from "@/_shared/logger/logger";
 
 export default function Index() {
   const { user, isLoading: authLoading } = useAuthProvider();
@@ -13,6 +14,8 @@ export default function Index() {
   if (!user) {
     return <Redirect href="/(public)/welcome" />;
   }
+
+  log.info("Index | User is authenticated, checking groups...");
 
   return <AuthenticatedGate />;
 }
@@ -30,10 +33,10 @@ function AuthenticatedGate() {
   }
 
   if (isSuccess && userGroups?.length === 0) {
-    console.log("AuthenticatedGate | No groups, redirecting to onboarding...");
+    log.info("AuthenticatedGate | No groups, redirecting to onboarding...");
     return <Redirect href="/(onboarding)/create-group" />;
   }
 
-  console.log("AuthenticatedGate | Has groups, redirecting to home...");
+  log.info("AuthenticatedGate | Has groups, redirecting to home...");
   return <Redirect href="/(app-protected)/(tabs)/home" />;
 }
