@@ -1,4 +1,4 @@
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { router } from "expo-router";
 import { Pressable, StyleProp, TextStyle, StyleSheet } from "react-native";
 import { IconSymbol } from "./icon-symbol";

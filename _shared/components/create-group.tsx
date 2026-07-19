@@ -1,12 +1,12 @@
 import { StyleSheet, View } from "react-native";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ErrorText } from "@/components/ui/error-text";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { ThemedView } from "@/_shared/components/themed-view";
+import { Button } from "@/_shared/components/button";
+import { Input } from "@/_shared/components/input";
+import { ErrorText } from "@/_shared/components/error-text";
 import React, { useState } from "react";
-import { useCreateGroup } from "@/hooks/queries/useCreateGroup";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { useCreateGroup } from "@/_features/groups/hooks/use-create-group";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
 
 type FormData = {

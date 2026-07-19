@@ -1,5 +1,5 @@
-import { apiCall } from "@/utils/apiCall";
-import type { DashboardCount } from "@/utils/types/T_Dashboard";
+import { apiCall } from "@/_shared/utils/api-call";
+import type { DashboardCount } from "@/_shared/types/dashboard-types";
 
 const BASE_URL = `/groups`;
 const DASHBOARD_URL = `dashboard`;

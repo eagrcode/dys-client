@@ -1,4 +1,4 @@
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { StyleProp, Text, type TextStyle } from "react-native";
 
 type Variant = "default" | "soft" | "title" | "defaultSemiBold" | "subtitle" | "link" | "button";

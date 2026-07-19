@@ -1,5 +1,5 @@
-import { ThemedView } from "@/components/themed-view";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { ThemedView } from "@/_shared/components/themed-view";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import type { PropsWithChildren, ReactElement } from "react";
 import { StyleSheet } from "react-native";
 import Animated, {
@@ -67,12 +67,12 @@ const styles = StyleSheet.create({
   },
   header: {
     height: HEADER_HEIGHT,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   content: {
     flex: 1,
     padding: 32,
     gap: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
 });

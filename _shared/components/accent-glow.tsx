@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 
 // Drop this inside your Welcome screen, as the first child
 export function AccentGlow() {

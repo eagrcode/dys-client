@@ -1,6 +1,6 @@
 import { type ViewProps } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 
 type ThemedViewProps = ViewProps & {
   variant?: "default" | "home";

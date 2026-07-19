@@ -1,4 +1,4 @@
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { type Ref } from "react";
 import {
   StyleSheet,

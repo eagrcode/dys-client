@@ -1,7 +1,8 @@
 import { useQueries } from "@tanstack/react-query";
-import { dashboardApi } from "@/services/api/dashboard";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
+import { dashboardApi } from "@/_shared/api/dashboard-api";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
+import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import { listKeys } from "@/_features/lists/qk.lists";
 
 const STALE_TIME = 5 * 60 * 1000;
 
@@ -23,7 +24,7 @@ export function useDashboardData() {
   const [lists, calendar, albums, messages] = useQueries({
     queries: [
       {
-        queryKey: ["dashboardData", userId, selectedGroup, "lists"],
+        queryKey: listKeys.dashboard(selectedGroup || ""),
         queryFn: () => dashboardApi.getLists(selectedGroup || ""),
         ...options,
       },

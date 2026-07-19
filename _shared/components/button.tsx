@@ -1,4 +1,4 @@
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   ActivityIndicator,

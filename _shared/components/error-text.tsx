@@ -1,5 +1,5 @@
-import { useCurrentTheme } from "@/hooks/use-current-theme";
-import { ThemedText } from "../themed-text";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
+import { ThemedText } from "./themed-text";
 
 export function ErrorText({ error }: { error: string }) {
   const theme = useCurrentTheme();

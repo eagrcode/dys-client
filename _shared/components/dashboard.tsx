@@ -1,11 +1,11 @@
-import { ThemedText } from "@/components/themed-text";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useDashboardData } from "@/hooks/queries/useDashboardData";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { IconSymbol } from "@/_shared/components/icon-symbol";
+import { useDashboardData } from "@/_shared/hooks/use-dashboard-data";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { useRouter, type Href } from "expo-router";
 import { FlatList, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 import type { UseQueryResult } from "@tanstack/react-query";
-import type { DashboardCount } from "@/utils/types/T_Dashboard";
+import type { DashboardCount } from "@/_shared/types/dashboard-types";
 
 type DashboardTileId = "lists" | "calendar" | "albums" | "messages";
 
@@ -34,27 +34,27 @@ const TILE_CONFIG = [
     route: "/(app-protected)/lists",
     tag: "Outstanding",
   },
-  {
-    id: "calendar",
-    name: "Calendar",
-    icon: "calendar",
-    route: "/(app-protected)/calendar",
-    tag: "Upcoming",
-  },
-  {
-    id: "albums",
-    name: "Albums",
-    icon: "photo",
-    route: "/(app-protected)/albums",
-    tag: "Albums",
-  },
-  {
-    id: "messages",
-    name: "HearthChat",
-    icon: "chat",
-    route: "/(app-protected)/text-channels",
-    tag: "Unread",
-  },
+  // {
+  //   id: "calendar",
+  //   name: "Calendar",
+  //   icon: "calendar",
+  //   route: "/(app-protected)/calendar",
+  //   tag: "Upcoming",
+  // },
+  // {
+  //   id: "albums",
+  //   name: "Albums",
+  //   icon: "photo",
+  //   route: "/(app-protected)/albums",
+  //   tag: "Albums",
+  // },
+  // {
+  //   id: "messages",
+  //   name: "HearthChat",
+  //   icon: "chat",
+  //   route: "/(app-protected)/text-channels",
+  //   tag: "Unread",
+  // },
 ] as const;
 
 const buildFeatures = (queries: DashboardQueries): Feature[] => {

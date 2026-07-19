@@ -1,5 +1,5 @@
-import { Colors, Fonts, Styling } from "@/constants/theme";
-import { useThemePreference } from "@/lib/context/ThemeModeProvider";
+import { Colors, Fonts, Styling } from "@/_shared/theme";
+import { useThemePreference } from "@/_shared/providers/theme-mode-provider";
 import { useMemo } from "react";
 
 export function useCurrentTheme() {

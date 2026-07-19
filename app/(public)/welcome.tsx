@@ -1,8 +1,8 @@
-import { AccentGlow } from "@/components/accent-glow";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Button } from "@/components/ui/button";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { AccentGlow } from "@/_shared/components/accent-glow";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { ThemedView } from "@/_shared/components/themed-view";
+import { Button } from "@/_shared/components/button";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
