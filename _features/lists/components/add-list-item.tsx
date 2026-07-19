@@ -1,8 +1,8 @@
 import { View, StyleSheet, TextInput, ViewStyle, StyleProp } from "react-native";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
-import { IconSymbol } from "./icon-symbol";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
+import { IconSymbol } from "@/_shared/components/icon-symbol";
 import { useRef, useState } from "react";
-import { Input } from "./input";
+import { Input } from "@/_shared/components/input";
 
 type Props = {
   handleAddItemPress: (item: string) => void;

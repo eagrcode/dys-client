@@ -1,12 +1,12 @@
-import { ThemedText } from "@/components/themed-text";
-import { BackButton } from "@/components/ui/back-button";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useListById } from "@/hooks/queries/useListById";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { BackButton } from "@/_shared/components/back-button";
+import { IconSymbol } from "@/_shared/components/icon-symbol";
+import { useListById } from "@/_features/lists/hooks/use-list-id";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { useLocalSearchParams } from "expo-router";
 import { View, Pressable, StyleSheet } from "react-native";
 import { LIST_TYPE_LABELS } from "@/constants/list-types";
-import type { ListItem } from "@/utils/types/T_Lists";
+import type { ListItem } from "@/_features/lists/lists-types";
 
 export function Header({
   setOptionsShowing,
@@ -29,17 +29,15 @@ export function Header({
     <View style={styles.header}>
       <View style={styles.headerTop}>
         <BackButton type="left" size={30} />
-        <ThemedText variant="title" style={styles.title}>
+        <ThemedText variant="title" style={styles.title} numberOfLines={2}>
           {list.title}
         </ThemedText>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          {list.list_type && (
-            <View style={[styles.typeChip, { backgroundColor: theme.colors.bgLayer1 }]}>
-              <ThemedText style={{ fontSize: 12, color: theme.colors.accent }}>
-                {LIST_TYPE_LABELS[list.list_type]}
-              </ThemedText>
-            </View>
-          )}
+          <View style={[styles.typeChip, { backgroundColor: theme.colors.bgLayer1 }]}>
+            <ThemedText style={{ fontSize: 12, color: theme.colors.accent }}>
+              {LIST_TYPE_LABELS[list.list_type]}
+            </ThemedText>
+          </View>
           <Pressable
             onPress={() => setOptionsShowing((prev) => !prev)}
             style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
@@ -86,7 +84,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 16,
   },
-  title: { fontSize: 20, letterSpacing: 2 },
+  title: {
+    flex: 1,
+    flexShrink: 1,
+    fontSize: 20,
+    letterSpacing: 2,
+  },
   typeChip: {
     flexDirection: "row",
     alignItems: "center",

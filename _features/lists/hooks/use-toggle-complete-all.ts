@@ -1,49 +1,49 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { listsAPI } from "@/services/api/lists";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
-import type { ApiErrorResponse } from "@/utils/types/ApiError";
-import type { List, ListItem } from "@/utils/types/T_Lists";
+import { listsAPI } from "@/_features/lists/lists-api";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
+import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import type { ApiErrorResponse } from "@/_shared/types/api-error";
+import type { ToggleCompleteListItemResponse, List, ListItem } from "@/_features/lists/lists-types";
 
-type DeleteListItemsVars = {
+type ToggleCompleteListItemVars = {
   listId: string;
-  itemIds: string[];
+  completed: boolean;
 };
 
-type DeleteListItemsContext = {
+type ToggleCompleteListItemContext = {
   listQueryKey: readonly unknown[];
   groupListsQueryKey: readonly unknown[];
   dashboardListsQueryKey: readonly unknown[];
   prevList: List | undefined;
 };
 
-export function useDeleteListItems() {
+export function useToggleCompleteAllListItems() {
   const queryClient = useQueryClient();
   const { user } = useAuthProvider();
   const { selectedGroup } = useGroupsProvider();
 
   return useMutation<
-    { deletedItemIds: string[] },
+    ToggleCompleteListItemResponse,
     ApiErrorResponse,
-    DeleteListItemsVars,
-    DeleteListItemsContext
+    ToggleCompleteListItemVars,
+    ToggleCompleteListItemContext
   >({
-    mutationFn: ({ listId, itemIds }) => {
+    mutationFn: ({ listId, completed }) => {
       if (!selectedGroup) throw new Error("No group selected");
 
-      console.log("useDeleteListItems | Firing query", {
+      console.log("useToggleCompleteAllListItems | Firing query", {
         listId: listId,
-        itemIds: itemIds,
+        completed: completed,
       });
 
-      return listsAPI.deleteListItems({
+      return listsAPI.toggleCompleteAllListItems({
         groupId: selectedGroup,
         listId,
-        itemIds,
+        completed,
       });
     },
 
-    onMutate: async ({ listId, itemIds }) => {
+    onMutate: async ({ listId, completed }) => {
       const listQueryKey = ["list", user?.id, selectedGroup, listId] as const;
       const groupListsQueryKey = ["groupLists", user?.id, selectedGroup] as const;
       const dashboardListsQueryKey = ["dashboardData", user?.id, selectedGroup, "lists"] as const;
@@ -57,9 +57,10 @@ export function useDeleteListItems() {
 
         return {
           ...old,
-          items: old.items.filter((item) => {
-            return !itemIds.includes(item.id);
-          }),
+          items: old.items.map((item: ListItem) => ({
+            ...item,
+            completed,
+          })),
         };
       });
 

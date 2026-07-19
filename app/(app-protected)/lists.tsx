@@ -1,12 +1,12 @@
 import { StyleSheet, SectionList, View, Pressable } from "react-native";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
-import { useGroupLists } from "@/hooks/queries/useGroupLists";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { ThemedView } from "@/_shared/components/themed-view";
+import { IconSymbol } from "@/_shared/components/icon-symbol";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
+import { useGroupLists } from "@/_features/lists/hooks/use-lists";
 import { useRouter } from "expo-router";
-import { BackButton } from "@/components/ui/back-button";
-import type { List, ListType } from "@/utils/types/T_Lists";
+import { BackButton } from "@/_shared/components/back-button";
+import type { List, ListType } from "@/_features/lists/lists-types";
 import { LIST_TYPE_ICONS, LIST_TYPE_LABELS, LIST_TYPES } from "@/constants/list-types";
 
 type Section = {

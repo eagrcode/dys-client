@@ -1,4 +1,4 @@
-import type { ListType } from "@/utils/types/T_Lists";
+import type { ListType } from "@/_features/lists/lists-types";
 
 export const LIST_TYPES = ["todo", "shopping", "other"] as const;
 

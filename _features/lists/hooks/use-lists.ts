@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { listsAPI } from "@/services/api/lists";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
+import { listsAPI } from "@/_features/lists/lists-api";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
+import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
 
 const STALE_TIME = 5 * 60 * 1000;
 
@@ -9,7 +9,7 @@ export function useGroupLists() {
   const { user } = useAuthProvider();
   const { selectedGroup } = useGroupsProvider();
   const userId = user?.id;
-  const queryKey = ["groupLists", userId, selectedGroup];
+  const queryKey = ["groups", selectedGroup, "lists"] as const;
   const enabled = !!user?.id && !!selectedGroup;
 
   return useQuery({

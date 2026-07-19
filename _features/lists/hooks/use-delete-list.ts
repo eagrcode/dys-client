@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { listsAPI } from "@/services/api/lists";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
-import type { ApiErrorResponse } from "@/utils/types/ApiError";
-import type { List } from "@/utils/types/T_Lists";
+import { listsAPI } from "@/_features/lists/lists-api";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
+import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import type { ApiErrorResponse } from "@/_shared/types/api-error";
+import type { List } from "@/_features/lists/lists-types";
 
 type DeleteListContext = {
   queryKey: readonly unknown[];

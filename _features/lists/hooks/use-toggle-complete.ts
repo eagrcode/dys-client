@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { listsAPI } from "@/services/api/lists";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
-import type { ApiErrorResponse } from "@/utils/types/ApiError";
-import type { ToggleCompleteListItemResponse, List, ListItem } from "@/utils/types/T_Lists";
+import { listsAPI } from "@/_features/lists/lists-api";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
+import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import type { ApiErrorResponse } from "@/_shared/types/api-error";
+import type { ToggleCompleteListItemResponse, List } from "@/_features/lists/lists-types";
 
 type ToggleCompleteListItemVars = {
   listId: string;
+  itemId: string;
   completed: boolean;
 };
 
@@ -17,7 +18,7 @@ type ToggleCompleteListItemContext = {
   prevList: List | undefined;
 };
 
-export function useToggleCompleteAllListItems() {
+export function useToggleCompleteListItem() {
   const queryClient = useQueryClient();
   const { user } = useAuthProvider();
   const { selectedGroup } = useGroupsProvider();
@@ -28,22 +29,18 @@ export function useToggleCompleteAllListItems() {
     ToggleCompleteListItemVars,
     ToggleCompleteListItemContext
   >({
-    mutationFn: ({ listId, completed }) => {
+    mutationFn: ({ listId, itemId, completed }) => {
       if (!selectedGroup) throw new Error("No group selected");
 
-      console.log("useToggleCompleteAllListItems | Firing query", {
-        listId: listId,
-        completed: completed,
-      });
-
-      return listsAPI.toggleCompleteAllListItems({
+      return listsAPI.toggleCompleteListItem({
         groupId: selectedGroup,
         listId,
+        itemId,
         completed,
       });
     },
 
-    onMutate: async ({ listId, completed }) => {
+    onMutate: async ({ listId, itemId, completed }) => {
       const listQueryKey = ["list", user?.id, selectedGroup, listId] as const;
       const groupListsQueryKey = ["groupLists", user?.id, selectedGroup] as const;
       const dashboardListsQueryKey = ["dashboardData", user?.id, selectedGroup, "lists"] as const;
@@ -53,14 +50,11 @@ export function useToggleCompleteAllListItems() {
       const prevList = queryClient.getQueryData<List>(listQueryKey);
 
       queryClient.setQueryData<List>(listQueryKey, (old) => {
-        if (!old || !old.items) return old;
+        if (!old) return old;
 
         return {
           ...old,
-          items: old.items.map((item: ListItem) => ({
-            ...item,
-            completed,
-          })),
+          items: old.items?.map((item) => (item.id === itemId ? { ...item, completed } : item)),
         };
       });
 

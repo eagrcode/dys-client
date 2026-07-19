@@ -1,16 +1,16 @@
 import { View, StyleSheet, ActivityIndicator, FlatList } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
-import { useListById } from "@/hooks/queries/useListById";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { ThemedView } from "@/_shared/components/themed-view";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
+import { useListById } from "@/_features/lists/hooks/use-list-id";
 import { useState } from "react";
-import type { ListItem } from "@/utils/types/T_Lists";
-import EditListBottomSheet from "@/components/ui/edit-list";
-import { Header } from "./components/Header";
-import { NewItemInput } from "./components/NewItemInput";
-import { ItemRow } from "./components/ItemRow";
-import { DeleteItemsToolbar } from "./components/DeleteItemsToolbar";
+import type { ListItem } from "@/_features/lists/lists-types";
+import EditListBottomSheet from "@/_features/lists/components/edit-list";
+import { Header } from "@/_features/lists/components/header";
+import { NewItemInput } from "@/_features/lists/components/new-item-input";
+import { ItemRow } from "@/_features/lists/components/item-row";
+import { DeleteItemsToolbar } from "@/_features/lists/components/delete-items-toolbar";
 
 const SCREEN_PADDING = 16;
 

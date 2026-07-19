@@ -1,14 +1,14 @@
-import { ThemedText } from "@/components/themed-text";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Input } from "@/components/ui/input";
-import { useToggleCompleteListItem } from "@/hooks/queries/useToggleCompleteListItem";
-import { useUpdateListItem } from "@/hooks/queries/useUpdateListItem";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
-import { ListItem } from "@/utils/types/T_Lists";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { IconSymbol } from "@/_shared/components/icon-symbol";
+import { Input } from "@/_shared/components/input";
+import { useToggleCompleteListItem } from "@/_features/lists/hooks/use-toggle-complete";
+import { useUpdateListItem } from "@/_features/lists/hooks/use-update-list-item";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
+import { ListItem } from "@/_features/lists/lists-types";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
-import type { ListMode } from "../[listId]";
+import type { ListMode } from "@/app/(app-protected)/list/[listId]";
 
 type ItemRowProps = {
   item: ListItem;

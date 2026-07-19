@@ -1,33 +1,34 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { listsAPI } from "@/services/api/lists";
-import { useAuthProvider } from "@/lib/context/SessionProvider";
-import { useGroupsProvider } from "@/lib/context/GroupsProvider";
-import type { ListItem, List } from "@/utils/types/T_Lists";
-import type { ApiErrorResponse } from "@/utils/types/ApiError";
+import { listsAPI } from "@/_features/lists/lists-api";
+import { useAuthProvider } from "@/_features/auth/providers/session-provider";
+import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import type { ListItem, List } from "@/_features/lists/lists-types";
+import type { ApiErrorResponse } from "@/_shared/types/api-error";
 
 type Props = {
   listId: string;
+  itemId: string;
   content: string;
 };
 
-type CreateListItemContext = {
+type UpdateListItemContext = {
   queryKey: readonly unknown[];
   prevList: List | undefined;
 };
 
-export function useCreateListItem() {
+export function useUpdateListItem() {
   const queryClient = useQueryClient();
   const { user } = useAuthProvider();
   const { selectedGroup } = useGroupsProvider();
   const userId = user?.id;
 
-  return useMutation<any, ApiErrorResponse, Props, CreateListItemContext>({
-    mutationFn: ({ listId, content }) => {
+  return useMutation<any, ApiErrorResponse, Props, UpdateListItemContext>({
+    mutationFn: ({ listId, itemId, content }) => {
       if (!selectedGroup) throw new Error("No group selected");
-      return listsAPI.createListItem(selectedGroup, listId, content);
+      return listsAPI.updateListItem(selectedGroup, listId, itemId, content);
     },
 
-    onMutate: async ({ listId, content }) => {
+    onMutate: async ({ listId, itemId, content }) => {
       const queryKey = ["list", userId, selectedGroup, listId] as const;
 
       await queryClient.cancelQueries({ queryKey });
@@ -38,18 +39,11 @@ export function useCreateListItem() {
       queryClient.setQueryData<List>(queryKey, (old) => {
         if (!old) return old;
 
-        const optimisticItem: ListItem = {
-          id: `temp-${Date.now()}`,
-          list_id: listId,
-          content,
-          completed: false,
-          created_at: new Date().toISOString(),
-          updated_at: null,
-        };
-
         return {
           ...old,
-          items: [optimisticItem, ...(old.items ?? [])],
+          items: old.items?.map((item) =>
+            item.id === itemId ? { ...item, content, updated_at: new Date().toISOString() } : item,
+          ),
         };
       });
 

@@ -1,8 +1,8 @@
-import { ThemedText } from "@/components/themed-text";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { View, Pressable, StyleSheet } from "react-native";
-import { useDeleteListItems } from "@/hooks/queries/useDeleteListItems";
-import type { ListMode } from "../[listId]";
+import { useDeleteListItems } from "@/_features/lists/hooks/use-delete-list-items";
+import type { ListMode } from "../../../app/(app-protected)/list/[listId]";
 import { useLocalSearchParams } from "expo-router";
 
 type Props = {

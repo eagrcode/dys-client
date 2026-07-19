@@ -1,7 +1,7 @@
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Input } from "@/components/ui/input";
-import { useCreateListItem } from "@/hooks/queries/useCreateListItem";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
+import { IconSymbol } from "@/_shared/components/icon-symbol";
+import { Input } from "@/_shared/components/input";
+import { useCreateListItem } from "@/_features/lists/hooks/use-create-list-item";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";

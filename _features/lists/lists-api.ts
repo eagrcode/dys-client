@@ -1,10 +1,10 @@
-import { apiCall } from "@/utils/apiCall";
+import { apiCall } from "@/_shared/utils/api-call";
 import type {
   List,
   ListType,
   ListItem,
   ToggleCompleteListItemResponse,
-} from "@/utils/types/T_Lists";
+} from "@/_features/lists/lists-types";
 
 const BASE_URL = `/groups`;
 
@@ -69,6 +69,18 @@ export const listsAPI = {
     );
 
     return respnse.data;
+  },
+
+  renameList: async (
+    groupId: string,
+    listId: string,
+    newTitle: string,
+  ): Promise<{ title: string }> => {
+    const response = await apiCall(`${BASE_URL}/${groupId}/lists/${listId}`, "PATCH", {
+      body: JSON.stringify({ newTitle }),
+    });
+
+    return response.data;
   },
 
   deleteListItems: async ({

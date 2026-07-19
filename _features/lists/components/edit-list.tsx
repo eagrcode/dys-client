@@ -1,19 +1,24 @@
-import { ThemedText } from "@/components/themed-text";
-import { Button } from "@/components/ui/button";
-import { useCurrentTheme } from "@/hooks/use-current-theme";
-import { Pressable, StyleSheet, Alert } from "react-native";
-import { useListById } from "@/hooks/queries/useListById";
+import { ThemedText } from "@/_shared/components/themed-text";
+import { Button } from "@/_shared/components/button";
+import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
+import { Pressable, StyleSheet, Alert, View } from "react-native";
+import { useListById } from "@/_features/lists/hooks/use-list-id";
+import { useRenameList } from "@/_features/lists/hooks/use-rename-list";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown } from "react-native-reanimated";
-import { useDeleteList } from "@/hooks/queries/useDeleteList";
-import { useToggleCompleteAllListItems } from "@/hooks/queries/useToggleCompleteAllListItems";
+import { useDeleteList } from "@/_features/lists/hooks/use-delete-list";
+import { useToggleCompleteAllListItems } from "@/_features/lists/hooks/use-toggle-complete-all";
 import type { ListMode } from "@/app/(app-protected)/list/[listId]";
+import { useState } from "react";
+import { Input } from "@/_shared/components/input";
 
 type Props = {
   listMode: ListMode;
   setListMode: React.Dispatch<React.SetStateAction<ListMode>>;
   setOptionsShowing: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
+type OptionsMode = "options" | "rename";
 
 type BuildEditOptions = {
   onRename: () => void;
@@ -68,12 +73,17 @@ const buildEditOptions = ({
 };
 
 export default function EditListBottomSheet({ listMode, setListMode, setOptionsShowing }: Props) {
+  const [optionsMode, setOptionsMode] = useState<OptionsMode>("options");
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const { data: list } = useListById(listId || "");
+  const [newTitle, setNewTitle] = useState<string>(list?.title ?? "");
   const { mutate: toggleCompleteAllListItems } = useToggleCompleteAllListItems();
   const { mutate: deleteList, isError } = useDeleteList();
+  const { mutate: renameList } = useRenameList();
   const theme = useCurrentTheme();
   const router = useRouter();
+
+  console.log("Options Mode:", optionsMode);
 
   if (isError) {
     console.log(isError);
@@ -129,40 +139,82 @@ export default function EditListBottomSheet({ listMode, setListMode, setOptionsS
     ]);
   };
 
+  const handleRename = () => {
+    setOptionsMode("rename");
+  };
+
+  const handleSaveRename = () => {
+    renameList({ listId, newTitle });
+    setOptionsShowing(false);
+  };
+
   const options: Options[] = buildEditOptions({
     isCompleted: list?.completed ?? false,
-    onRename: () => {},
+    onRename: handleRename,
     onToggleSelectMode: handleToggleSelectMode,
     onToggleComplete: handleToggleComplete,
     onDelete: handleDelete,
     disabled: (list?.items && list.items.length === 0) ?? false,
   });
 
+  const renderOptions = () => {
+    return options.map((option) => (
+      <Button
+        key={option.id}
+        variant="secondaryFill2"
+        onPress={option.onPress}
+        style={{ width: "100%" }}
+        disabled={option.disabled}
+      >
+        <ThemedText style={{ color: option.destructive ? "red" : theme.colors.text }}>
+          {option.title}
+        </ThemedText>
+      </Button>
+    ));
+  };
+
+  const renderRename = () => {
+    return (
+      <View>
+        <Input
+          style={{ borderWidth: 2, padding: 12 }}
+          placeholder="New list name"
+          value={newTitle}
+          onChangeText={(text) => setNewTitle(text)}
+          autoFocus
+        />
+        <View style={{ height: 16 }} />
+        <View style={{ width: "100%", flexDirection: "row", gap: 8 }}>
+          <Button
+            variant="secondaryFill2"
+            onPress={handleSaveRename}
+            style={{ flex: 1, padding: 12 }}
+          >
+            <ThemedText style={{ color: theme.colors.accent }}>Save</ThemedText>
+          </Button>
+          <Button
+            variant="secondary"
+            onPress={() => {
+              setOptionsMode("options");
+              setOptionsShowing(false);
+            }}
+            style={{ flex: 1, padding: 12 }}
+          >
+            <ThemedText style={{ color: theme.colors.text }}>Cancel</ThemedText>
+          </Button>
+        </View>
+      </View>
+    );
+  };
+
   return (
-    <Animated.View
-      entering={FadeIn.duration(120)}
-      exiting={FadeOut.duration(120)}
-      style={styles.backdrop}
-    >
+    <Animated.View entering={FadeIn.duration(120)} style={styles.backdrop}>
       <Pressable style={StyleSheet.absoluteFill} onPress={() => setOptionsShowing(false)} />
       <Animated.View
-        entering={SlideInDown.duration(220)}
-        exiting={SlideOutDown.duration(180)}
+        entering={SlideInDown.duration(200)}
         style={[styles.container, { backgroundColor: theme.colors.bgLayer1 }]}
       >
-        {options.map((option) => (
-          <Button
-            key={option.id}
-            variant="secondaryFill2"
-            onPress={option.onPress}
-            style={{ width: "100%" }}
-            disabled={option.disabled}
-          >
-            <ThemedText style={{ color: option.destructive ? "red" : theme.colors.text }}>
-              {option.title}
-            </ThemedText>
-          </Button>
-        ))}
+        {optionsMode === "options" ? renderOptions() : renderRename()}
       </Animated.View>
     </Animated.View>
   );
