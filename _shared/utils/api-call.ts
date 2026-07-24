@@ -1,47 +1,58 @@
 import { getToken, getRefreshToken, saveTokens } from "@/_shared/utils/token-manager";
+import { log } from "../logger/logger";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+type SessionExpiredHandler = (sessionError: SessionError) => void | Promise<void>;
+export type SessionError = {
+  endpoint: string;
+  method: HttpMethod;
+  status: number;
+  success: false;
+  message: string;
+  code: "SESSION_EXPIRED";
+};
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:3000";
 
 let refreshPromise: Promise<boolean> | null = null;
+let sessionExpiredHandler: SessionExpiredHandler | null = null;
+
+export function setSessionExpiredHandler(handler: SessionExpiredHandler | null) {
+  sessionExpiredHandler = handler;
+}
 
 async function refreshTokens(): Promise<boolean> {
   try {
     const refreshToken = await getRefreshToken();
 
     if (!refreshToken) {
-      console.error("Token refresh failed: no refresh token in cache");
+      log.warn("api-call | Token refresh failed: no refresh token in cache");
       return false;
     }
 
-    const refreshResponse = await fetch(`${BASE_URL}/auth/refresh`, {
+    const res = await fetch(`${BASE_URL}/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
     });
 
-    if (!refreshResponse.ok) {
-      const errorData = await refreshResponse.json();
-      console.error("Token refresh rejected:", refreshResponse.status, errorData);
+    const resData = await res.json();
+
+    if (!res.ok) {
+      log.error("api-call | Token refresh rejected:", { status: res.status, ...resData });
       return false;
     }
 
-    const refreshData = await refreshResponse.json();
-
-    if (
-      typeof refreshData.accessToken !== "string" ||
-      typeof refreshData.refreshToken !== "string"
-    ) {
-      console.error("Token refresh returned malformed token data");
+    if (typeof resData.accessToken !== "string" || typeof resData.refreshToken !== "string") {
+      log.error("api-call | Token refresh rejected:", { status: res.status, ...resData });
       return false;
     }
 
-    await saveTokens(refreshData.accessToken, refreshData.refreshToken);
-    console.log("Token refresh successful.");
+    await saveTokens(resData.accessToken, resData.refreshToken);
+    log.info("api-call | Token refresh successful.");
     return true;
   } catch (error) {
-    console.error("Token refresh failed:", error);
+    log.error("api-call | Token refresh failed:", error);
     return false;
   }
 }
@@ -86,37 +97,10 @@ export async function apiCall(
 
   // Attempt token refresh on 401, but only once
   if (response.status === 401 && parsedResponse?.code === "ACCESS_TOKEN_EXPIRED" && !isRetry) {
-    console.log("Access token expired, checking session...");
+    log.info("api-call | Access token expired, checking session...");
 
     const currentToken = await getToken();
-
-    // This 401 may have arrived after another request already refreshed.
-    if (currentToken && currentToken !== token) {
-      return apiCall(endpoint, method, options, true);
-    }
-
-    if (!currentToken) {
-      throw {
-        endpoint,
-        method,
-        status: 401,
-        success: false,
-        message: "Session expired",
-        code: "SESSION_EXPIRED",
-      };
-    }
-
-    // All concurrent 401 responses share one refresh request.
-    const refreshSucceeded = await refreshTokensOnce();
-
-    if (refreshSucceeded) {
-      return apiCall(endpoint, method, options, true);
-    }
-
-    // Refresh failed or returned non-ok — session is dead
-    console.error("Session expired, signing out...");
-
-    const sessionError = {
+    const sessionError: SessionError = {
       endpoint,
       method,
       status: 401,
@@ -124,7 +108,29 @@ export async function apiCall(
       message: "Session expired",
       code: "SESSION_EXPIRED",
     };
-    throw sessionError;
+    const handleSessionExpired = async () => {
+      log.warn("api-call | Session expired, signing out...");
+      await sessionExpiredHandler?.(sessionError);
+      throw sessionError;
+    };
+
+    // This 401 may have arrived after another request already refreshed.
+    if (currentToken && currentToken !== token) {
+      return apiCall(endpoint, method, options, true);
+    }
+
+    if (!currentToken) {
+      return handleSessionExpired();
+    }
+
+    // All concurrent 401 responses share one refresh request.
+    const refreshSucceeded = await refreshTokensOnce();
+
+    if (refreshSucceeded) {
+      return apiCall(endpoint, method, options, true);
+    } else {
+      return handleSessionExpired();
+    }
   }
 
   // API error
@@ -143,25 +149,24 @@ export async function apiCall(
       code: errorData.code,
       ...(errorData.errors && { errors: errorData.errors }),
     };
-    console.warn("API Error:", JSON.stringify(apiError, null, 2));
+    log.error("api-call | API Error:", JSON.stringify(apiError, null, 2));
     throw apiError;
   }
 
   const isBodySensitive = config.body && config.body.toString().includes("password");
-
   const isParsedResponseSensitive =
     parsedResponse?.data && Object.keys(parsedResponse.data).some((key) => key.includes("tokens"));
 
-  console.log(
-    "API Call:",
+  log.info(
+    "api-call | API Call:",
     JSON.stringify(
       { endpoint, method, body: isBodySensitive ? "[REDACTED]" : config.body },
       null,
       2,
     ),
   );
-  console.log(
-    "Response:",
+  log.info(
+    "api-call | Response:",
     JSON.stringify(
       {
         status: response.status,

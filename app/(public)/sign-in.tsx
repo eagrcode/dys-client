@@ -4,8 +4,9 @@ import { Button } from "@/_shared/components/button";
 import { ErrorText } from "@/_shared/components/error-text";
 import { Input } from "@/_shared/components/input";
 import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { useState, useRef, useEffect } from "react";
+import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
+import type { TextInput } from "react-native";
 import type { SignInInput } from "@/_features/auth/providers/session-provider";
 
 export default function SignIn() {
@@ -19,10 +20,28 @@ export default function SignIn() {
   });
   const [formError, setFormError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const { signIn } = useAuthProvider();
+  const inputRef = useRef<TextInput>(null);
+  const { signIn, sessionErrorMsg, clearSessionErrorMsg } = useAuthProvider();
 
   const submitDisabled = isLoading || !formData.email || !formData.password;
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (sessionErrorMsg) {
+      Alert.alert("Session Expired", sessionErrorMsg, [
+        {
+          text: "OK",
+          onPress: () => clearSessionErrorMsg(),
+        },
+      ]);
+    }
+    return () => {
+      clearSessionErrorMsg();
+    };
+  }, [sessionErrorMsg, clearSessionErrorMsg]);
 
   const handleSetFormData = (key: keyof SignInInput, value: string) => {
     setFieldErrors((prev) => ({ ...prev, [key]: "" }));
@@ -93,6 +112,7 @@ export default function SignIn() {
             inputMode="email"
             autoComplete="email"
             textContentType="emailAddress"
+            ref={inputRef}
           />
           {renderFieldError("email")}
           <Input

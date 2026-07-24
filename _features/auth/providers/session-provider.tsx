@@ -1,9 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { useRouter } from "expo-router";
 import { authAPI } from "@/_features/auth/auth-api";
 import { saveTokens, clearTokens, getToken } from "@/_shared/utils/token-manager";
 import { log } from "@/_shared/logger/logger";
+import { setSessionExpiredHandler } from "@/_shared/utils/api-call";
+import type { SessionError } from "@/_shared/utils/api-call";
 
 type AuthResponse = {
   user: User;
@@ -40,6 +42,9 @@ type AuthContextType = {
   registerUser: (formData: RegistrationInput) => Promise<void>;
   signIn: (formData: SignInInput) => Promise<void>;
   signOut: () => Promise<void>;
+  sessionErrorMsg: string | null;
+  setSessionErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
+  clearSessionErrorMsg: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,6 +52,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [user, setUser] = useState<User | null>(null);
+  const [sessionErrorMsg, setSessionErrorMsg] = useState<string | null>(null);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -54,6 +61,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const loadUser = async () => {
+    //  clearTokens(),
+
     log.info("AuthProvider | Loading user...");
     try {
       log.info("AuthProvider | Checking for stored user data and tokens...");
@@ -70,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (incompleteSession) {
         log.warn("AuthProvider | Incomplete session data found, clearing storage...");
-        await Promise.allSettled([clearTokens(), SecureStore.deleteItemAsync("user")]);
+        await signOut();
         return;
       }
 
@@ -83,7 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       log.error("AuthProvider | Failed to restore session:", error);
 
-      await Promise.allSettled([clearTokens(), SecureStore.deleteItemAsync("user")]);
+      await signOut();
     } finally {
       setIsLoading(false);
       log.info("AuthProvider | Finished loading user");
@@ -188,16 +197,69 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     log.info("AuthProvider | Session established for user:", JSON.stringify(user, null, 2));
   };
 
-  const signOut = async () => {
-    await clearTokens();
-    await SecureStore.deleteItemAsync("user");
-    await SecureStore.deleteItemAsync("selectedGroup");
-    setUser(null);
-    router.replace("/");
+  const endSession = async () => {
+    try {
+      const results = await Promise.allSettled([
+        clearTokens(),
+        SecureStore.deleteItemAsync("user"),
+        SecureStore.deleteItemAsync("selectedGroup"),
+      ]);
+
+      const rejectedResults = results.filter((result) => result.status === "rejected");
+
+      if (rejectedResults.length > 0) {
+        const errors: string[] = rejectedResults.map((result) => result.reason.message);
+        log.error("AuthProvider - endSession | Failed to clear session data:", errors);
+      }
+
+      log.info("AuthProvider - endSession | Session data cleared successfully");
+    } catch (error) {
+      log.error("AuthProvider - endSession | Error during session cleanup:", error);
+    } finally {
+      setUser(null);
+      router.replace("/sign-in");
+    }
   };
 
+  const signOut = async () => {
+    log.info("AuthProvider - signOut | Signing out user...");
+    await endSession();
+  };
+
+  const forceSignOut = useCallback(
+    async (sessionError: SessionError) => {
+      log.info("AuthProvider - forceSignOut | Signing out user...");
+      setSessionErrorMsg(sessionError.message);
+      await endSession();
+    },
+    [router],
+  );
+
+  const clearSessionErrorMsg = () => {
+    setSessionErrorMsg(null);
+  };
+
+  useEffect(() => {
+    setSessionExpiredHandler(forceSignOut);
+
+    return () => {
+      setSessionExpiredHandler(null);
+    };
+  }, [forceSignOut]);
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, registerUser, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        registerUser,
+        signIn,
+        signOut,
+        sessionErrorMsg,
+        setSessionErrorMsg,
+        clearSessionErrorMsg,
+      }}
+    >
       {isLoading ? null : children}
     </AuthContext.Provider>
   );
