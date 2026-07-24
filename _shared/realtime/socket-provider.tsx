@@ -5,6 +5,7 @@ import { getToken } from "../utils/token-manager";
 import { groupEventDispatch } from "./group-event-dispatch";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Socket } from "socket.io-client";
+import { log } from "../logger/logger";
 
 type SocketContextValue = {
   socket: Socket | null;
@@ -32,45 +33,31 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     }
 
     function onConnect() {
-      console.log(
-        "/socket-provider.tsx - onConnect | Socket connected:",
-        JSON.stringify(
-          {
-            connected: socket.connected,
-            socketId: socket.id,
-            userId: userId,
-          },
-          null,
-          2,
-        ),
-      );
+      log.info("/socket-provider.tsx - onConnect | Socket connected:", {
+        connected: socket.connected,
+        socketId: socket.id,
+        userId: userId,
+      });
     }
 
     function onDisconnect(reason: string) {
-      console.log("Socket disconnected:", {
+      log.info("Socket disconnected:", {
         reason,
       });
     }
 
     function onConnectError(error: Error) {
-      console.error("Socket connection error:", {
+      log.error("Socket connection error:", {
         message: error.message,
       });
     }
 
     function onGroupEvent(event: GroupEvent) {
-      console.log(
-        "/socket-provider.tsx - onGroupEvent | Group Event:",
-        JSON.stringify(
-          {
-            groupId: event.groupId,
-            type: event.type,
-            data: event.data,
-          },
-          null,
-          2,
-        ),
-      );
+      log.info("/socket-provider.tsx - onGroupEvent | Group Event:", {
+        groupId: event.groupId,
+        type: event.type,
+        data: event.data,
+      });
 
       groupEventDispatch(event, queryClient);
     }
