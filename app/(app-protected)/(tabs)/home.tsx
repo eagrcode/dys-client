@@ -18,7 +18,7 @@ function Header() {
 
   return (
     <ThemedText variant="subtitle" style={styles.greeting}>
-      Welcome back, {user?.firstName ?? "User"}!
+      Welcome back, {user?.first_name ?? "User"}!
     </ThemedText>
   );
 }

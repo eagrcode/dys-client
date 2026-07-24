@@ -1,5 +1,6 @@
 // import "../wdyr";
 import { AuthProvider } from "@/_features/auth/providers/session-provider";
+import { GroupsProvider } from "@/_features/groups/providers/groups-provider";
 import { ThemePreferenceProvider } from "@/_shared/providers/theme-mode-provider";
 import {
   DMSans_400Regular,
@@ -53,8 +54,10 @@ export default function RootLayout() {
     <ThemePreferenceProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <StatusBar style="auto" />
-          <Slot />
+          <GroupsProvider>
+            <StatusBar style="auto" />
+            <Slot />
+          </GroupsProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ThemePreferenceProvider>

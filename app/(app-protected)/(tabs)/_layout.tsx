@@ -3,7 +3,6 @@ import { IconSymbol } from "@/_shared/components/icon-symbol";
 import { TabBar } from "@/_shared/components/tab-bar";
 import { useGroupById } from "@/_features/groups/hooks/use-group-id";
 import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
-import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
 import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 import { Tabs, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -11,20 +10,13 @@ import React, { useEffect, useRef } from "react";
 import { Pressable, View } from "react-native";
 
 export default function TabLayout() {
-  // const socket = io();
-
   const theme = useCurrentTheme();
   const router = useRouter();
   const { user } = useAuthProvider();
-  const { selectedGroup, isLoading: groupsLoading } = useGroupsProvider();
   const { data: groupDetails, isLoading: currentGroupLoading } = useGroupById();
   const splashHidden = useRef(false);
 
-  const isReady = !!user && !groupsLoading && !!selectedGroup && !currentGroupLoading;
-
-  // socket.on("connect", () => {
-  //   console.log(socket.id);
-  // });
+  const isReady = !!user && !currentGroupLoading;
 
   useEffect(() => {
     if (isReady && !splashHidden.current) {

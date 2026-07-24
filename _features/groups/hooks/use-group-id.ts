@@ -3,6 +3,7 @@ import { groupsAPI } from "@/_features/groups/groups-api";
 import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
 import type { Group } from "@/_features/groups/groups-types";
+import { log } from "@/_shared/logger/logger";
 
 export function useGroupById() {
   const { user } = useAuthProvider();
@@ -17,7 +18,7 @@ export function useGroupById() {
   return useQuery<Group>({
     queryKey: queryKey,
     queryFn: async () => {
-      console.log("useGroupById | Firing query", { userId: user?.id, selectedGroup });
+      log.info("useGroupById | Firing query", { userId: user?.id, selectedGroup });
       return await groupsAPI.getGroupById(selectedGroup || "");
     },
     ...options,
