@@ -5,20 +5,32 @@ import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
+import { ErrorAlert } from "@/_shared/components/alert";
 
 export function NewItemInput() {
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const [newItem, setNewItem] = useState<string>("");
-  const { mutate: createListItem } = useCreateListItem();
-
+  const { mutate: createListItem, isPending: isCreatePending } = useCreateListItem();
   const theme = useCurrentTheme();
   const inputRef = useRef<TextInput>(null);
 
   const handleAddItemPress = () => {
     if (!newItem.trim()) return;
 
-    createListItem({ listId: listId, content: newItem.trim() });
-    setNewItem("");
+    createListItem(
+      { listId: listId, content: newItem.trim() },
+      {
+        onSuccess: () => {
+          setNewItem("");
+        },
+        onError: (error) => {
+          ErrorAlert({
+            title: "Failed to create item",
+            error,
+          });
+        },
+      },
+    );
   };
 
   return (
@@ -26,8 +38,8 @@ export function NewItemInput() {
       style={[
         styles.container,
         {
-          backgroundColor: theme.colors.bgLayer2,
-          borderRadius: theme.radius.lg,
+          borderColor: theme.colors.border,
+          borderRadius: theme.radius.md,
         },
       ]}
     >
@@ -54,16 +66,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 16,
-    marginHorizontal: 16,
-    borderWidth: 0,
+    paddingHorizontal: 8,
+    borderWidth: 1,
   },
   input: {
     flex: 1,
     width: undefined,
     borderWidth: 0,
     paddingVertical: 12,
-    paddingHorizontal: 0,
+    paddingHorizontal: 8,
   },
 });

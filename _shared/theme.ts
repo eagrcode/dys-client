@@ -32,10 +32,11 @@ export const Styling = {
   shadow: {
     sm: {
       shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.07,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.15,
       shadowRadius: 3,
       elevation: 2,
+      // shadowBlur: 20,
     },
     md: {
       shadowColor: "#000000",
@@ -45,11 +46,12 @@ export const Styling = {
       elevation: 4,
     },
     lg: {
-      shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.13,
-      shadowRadius: 32,
-      elevation: 8,
+      shadowColor: "hsl(0, 84%, 34%)",
+      shadowOffset: { width: 1, height: 3 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+      elevation: 10,
+      shadowBlur: 10,
     },
     xl: {
       shadowColor: "#000000",

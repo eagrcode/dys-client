@@ -1,29 +1,23 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { listsAPI } from "@/_features/lists/lists-api";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
-import type { ApiErrorResponse } from "@/_shared/types/api-error";
+import { listKeys } from "@/_features/lists/qk.lists";
+import { useSelectedGroup } from "@/_shared/hooks/use-selected-group";
 import type { List, ListType } from "@/_features/lists/lists-types";
+import type { ApiError } from "@/_shared/types/api-error";
 
-type CreateListVars = {
+type Vars = {
   title: string;
   listType: ListType;
 };
 
 export function useCreateList() {
   const queryClient = useQueryClient();
-  const { user } = useAuthProvider();
-  const { selectedGroup } = useGroupsProvider();
+  const selectedGroup = useSelectedGroup();
   const router = useRouter();
-  const userId = user?.id;
 
-  return useMutation<List, ApiErrorResponse, CreateListVars>({
+  return useMutation<List, ApiError, Vars>({
     mutationFn: ({ title, listType }) => {
-      if (!selectedGroup) {
-        throw new Error("No group selected");
-      }
-
       return listsAPI.createList(selectedGroup, {
         title,
         listType,
@@ -31,17 +25,15 @@ export function useCreateList() {
     },
 
     onSuccess: async () => {
-      if (!selectedGroup) return;
-
-      const groupListsQueryKey = ["groups", selectedGroup, "lists"] as const;
-      const dashboardListsQueryKey = ["dashboardData", userId, selectedGroup, "lists"] as const;
+      const listQK = listKeys.group(selectedGroup);
+      const dashboardQK = listKeys.dashboard(selectedGroup);
 
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: groupListsQueryKey,
+          queryKey: listQK,
         }),
         queryClient.invalidateQueries({
-          queryKey: dashboardListsQueryKey,
+          queryKey: dashboardQK,
         }),
       ]);
 

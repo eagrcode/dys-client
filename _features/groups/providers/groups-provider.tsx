@@ -22,7 +22,7 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectedGroup, setSelectedGroup] = useState<SelectedGroup>(null);
   const queryClient = useQueryClient();
   const groupKeys = useGroupKeys();
-  const { user } = useAuthProvider();
+  const { user, isLoading: authLoading } = useAuthProvider();
   const {
     data: userGroups = [],
     isLoading: groupsLoading,
@@ -88,8 +88,13 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
   }, [groupsLoading, userGroups, isUserGroupsError, isUserGroupsSuccess, firstGroup]);
 
   const reconcileSelectedGroup = async () => {
+    if (authLoading) {
+      return;
+    }
+
     if (!user) {
-      log.warn("GroupsProvider | No authenticated user found, cannot reconcile selected group");
+      setSelectedGroup(null);
+      setIsReconciling(false);
       return;
     }
 
@@ -212,7 +217,7 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <GroupsContext.Provider value={{ selectedGroup, selectGroup, isLoading: isProviderLoading }}>
-      {children}
+      {isReconciling ? null : children}
     </GroupsContext.Provider>
   );
 };

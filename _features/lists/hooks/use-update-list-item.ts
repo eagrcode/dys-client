@@ -1,40 +1,36 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
-import type { ListItem, List } from "@/_features/lists/lists-types";
-import type { ApiErrorResponse } from "@/_shared/types/api-error";
+import { useSelectedGroup } from "@/_shared/hooks/use-selected-group";
+import { listKeys } from "../qk.lists";
+import type { List, UpdateListItemResponse } from "@/_features/lists/lists-types";
+import type { ApiError } from "@/_shared/types/api-error";
 
-type Props = {
+type Vars = {
   listId: string;
   itemId: string;
   content: string;
 };
 
-type UpdateListItemContext = {
+type Context = {
   queryKey: readonly unknown[];
   prevList: List | undefined;
 };
 
 export function useUpdateListItem() {
   const queryClient = useQueryClient();
-  const { user } = useAuthProvider();
-  const { selectedGroup } = useGroupsProvider();
-  const userId = user?.id;
+  const selectedGroup = useSelectedGroup();
 
-  return useMutation<any, ApiErrorResponse, Props, UpdateListItemContext>({
+  return useMutation<UpdateListItemResponse, ApiError, Vars, Context>({
     mutationFn: ({ listId, itemId, content }) => {
-      if (!selectedGroup) throw new Error("No group selected");
       return listsAPI.updateListItem(selectedGroup, listId, itemId, content);
     },
 
     onMutate: async ({ listId, itemId, content }) => {
-      const queryKey = ["list", userId, selectedGroup, listId] as const;
+      const queryKey = listKeys.detail(selectedGroup, listId);
 
       await queryClient.cancelQueries({ queryKey });
 
       const prevList = queryClient.getQueryData<List>(queryKey);
-      console.log("prevList exists:", !!prevList);
 
       queryClient.setQueryData<List>(queryKey, (old) => {
         if (!old) return old;

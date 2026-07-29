@@ -1,47 +1,50 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import { listKeys } from "@/_features/lists/qk.lists";
+import { useSelectedGroup } from "@/_shared/hooks/use-selected-group";
 import type { ListItem, List } from "@/_features/lists/lists-types";
-import type { ApiErrorResponse } from "@/_shared/types/api-error";
+import type { ApiError } from "@/_shared/types/api-error";
+import type { QueryKey } from "@tanstack/react-query";
 
-type Props = {
+type Vars = {
   listId: string;
   content: string;
 };
 
-type CreateListItemContext = {
-  queryKey: readonly unknown[];
+type Context = {
+  listDetailQK: QueryKey;
+  groupListsQK: QueryKey;
+  dashboardQK: QueryKey;
   prevList: List | undefined;
+  optimisticItemId: string;
 };
 
 export function useCreateListItem() {
   const queryClient = useQueryClient();
-  const { user } = useAuthProvider();
-  const { selectedGroup } = useGroupsProvider();
-  const userId = user?.id;
+  const selectedGroup = useSelectedGroup();
 
-  return useMutation<any, ApiErrorResponse, Props, CreateListItemContext>({
+  return useMutation<ListItem, ApiError, Vars, Context>({
     mutationFn: ({ listId, content }) => {
-      if (!selectedGroup) throw new Error("No group selected");
       return listsAPI.createListItem(selectedGroup, listId, content);
     },
 
     onMutate: async ({ listId, content }) => {
-      const queryKey = ["list", userId, selectedGroup, listId] as const;
+      const listDetailQK = listKeys.detail(selectedGroup, listId);
+      const groupListsQK = listKeys.group(selectedGroup);
+      const dashboardQK = listKeys.dashboard(selectedGroup);
+      const optimisticItemId = `temp-${Date.now()}-${Math.random()}`;
 
-      await queryClient.cancelQueries({ queryKey });
+      await queryClient.cancelQueries({ queryKey: listDetailQK });
 
-      const prevList = queryClient.getQueryData<List>(queryKey);
-      console.log("prevList exists:", !!prevList);
+      const prevList = queryClient.getQueryData<List>(listDetailQK);
 
-      queryClient.setQueryData<List>(queryKey, (old) => {
+      queryClient.setQueryData<List>(listDetailQK, (old) => {
         if (!old) return old;
 
         const optimisticItem: ListItem = {
-          id: `temp-${Date.now()}`,
+          id: optimisticItemId,
           list_id: listId,
-          content,
+          content: content,
           completed: false,
           created_at: new Date().toISOString(),
           updated_at: null,
@@ -53,17 +56,32 @@ export function useCreateListItem() {
         };
       });
 
-      return { queryKey, prevList };
+      return { listDetailQK, groupListsQK, dashboardQK, prevList, optimisticItemId };
+    },
+
+    onSuccess: (data, _vars, context) => {
+      queryClient.setQueryData<List>(context.listDetailQK, (old) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          items: old.items?.map((item) => (item.id === context.optimisticItemId ? data : item)),
+        };
+      });
     },
 
     onError: (_err, _vars, context) => {
       if (!context) return;
-      queryClient.setQueryData(context.queryKey, context.prevList);
+      queryClient.setQueryData(context.listDetailQK, context.prevList);
     },
 
     onSettled: (_data, _error, _vars, context) => {
       if (!context) return;
-      queryClient.invalidateQueries({ queryKey: context.queryKey });
+      return Promise.all([
+        queryClient.invalidateQueries({ queryKey: context.listDetailQK }),
+        queryClient.invalidateQueries({ queryKey: context.groupListsQK }),
+        queryClient.invalidateQueries({ queryKey: context.dashboardQK }),
+      ]);
     },
   });
 }

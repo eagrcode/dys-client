@@ -7,8 +7,9 @@ import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { ListItem } from "@/_features/lists/lists-types";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
-import { View, Pressable, StyleSheet } from "react-native";
-import type { ListMode } from "@/app/(app-protected)/list/[listId]";
+import { View, Pressable, StyleSheet, Alert } from "react-native";
+import type { ListMode } from "@/_features/lists/lists-types";
+import { ErrorAlert } from "@/_shared/components/alert";
 
 type ItemRowProps = {
   item: ListItem;
@@ -30,9 +31,21 @@ export function ItemRow({
   setEditingItemId,
 }: ItemRowProps) {
   const isEditingThisItem = editingItemId === item.id;
+  const theme = useCurrentTheme();
 
   return (
-    <View style={itemRowStyles.itemRow}>
+    <View
+      style={[
+        itemRowStyles.itemRow,
+        {
+          backgroundColor: theme.colors.bgLayer2,
+          borderRadius: theme.radius.md,
+          borderWidth: 1,
+          borderColor: theme.colors.border,
+          ...theme.shadow.sm,
+        },
+      ]}
+    >
       <ToggleComplete item={item} listMode={listMode} />
       {listMode === "edit-item" && isEditingThisItem ? (
         <EditMode item={item} setListMode={setListMode} setEditingItemId={setEditingItemId} />
@@ -100,7 +113,7 @@ const DefaultMode = ({
     <Pressable
       onPress={handleSelectItemsToDelete}
       onLongPress={handleOnLongPress}
-      style={itemRowStyles.itemContainer}
+      style={[itemRowStyles.itemContainer]}
     >
       <ThemedText
         style={[
@@ -163,8 +176,10 @@ type EditModeProps = {
 const EditMode = ({ item, setListMode, setEditingItemId }: EditModeProps) => {
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const [newItemContent, setNewItemContent] = useState<string>(item.content);
-  const { mutate: updateListItem } = useUpdateListItem();
+  const { mutate: updateListItem, isPending: isUpdatePending } = useUpdateListItem();
   const theme = useCurrentTheme();
+  const isSubmitDisabled =
+    newItemContent.trim() === "" || newItemContent.trim() === item.content || isUpdatePending;
 
   const resetEditingState = () => {
     setListMode("default");
@@ -172,13 +187,17 @@ const EditMode = ({ item, setListMode, setEditingItemId }: EditModeProps) => {
   };
 
   const handleSubmit = () => {
-    if (item.content === newItemContent.trim()) {
-      resetEditingState();
-      return;
-    }
-
-    updateListItem({ listId, itemId: item.id, content: newItemContent.trim() });
-    resetEditingState();
+    updateListItem(
+      { listId, itemId: item.id, content: newItemContent.trim() },
+      {
+        onSuccess: () => {
+          resetEditingState();
+        },
+        onError: (error) => {
+          ErrorAlert({ title: "Failed to update item", error });
+        },
+      },
+    );
   };
 
   const handleCancel = () => {
@@ -197,7 +216,12 @@ const EditMode = ({ item, setListMode, setEditingItemId }: EditModeProps) => {
       />
       {/* Submit/Cancel Buttons */}
       <View style={{ flexDirection: "row", gap: 16 }}>
-        <Pressable onPress={handleSubmit} hitSlop={15}>
+        <Pressable
+          style={{ opacity: isSubmitDisabled ? 0.4 : 1 }}
+          disabled={isSubmitDisabled}
+          onPress={handleSubmit}
+          hitSlop={15}
+        >
           <IconSymbol name="check" size={20} color={theme.colors.icon} />
         </Pressable>
         <Pressable onPress={handleCancel} hitSlop={15}>
@@ -214,6 +238,8 @@ const itemRowStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    width: "100%",
+    padding: 12,
   },
   itemContainer: {
     flex: 1,

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { groupsAPI } from "@/_features/groups/groups-api";
 import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
 import { useRouter } from "expo-router";
-import { ApiErrorResponse } from "@/_shared/types/api-error";
+import type { ApiError } from "@/_shared/types/api-error";
 import type { Group } from "@/_features/groups/groups-types";
 import { log } from "@/_shared/logger/logger";
 import { useGroupKeys } from "../qk.groups";
@@ -18,7 +18,7 @@ export function useCreateGroup() {
   const router = useRouter();
   const groupKeys = useGroupKeys();
 
-  return useMutation<Group, ApiErrorResponse, Props>({
+  return useMutation<Group, ApiError, Props>({
     mutationFn: ({ name, description }) => groupsAPI.createGroup(name, description),
     onSuccess: async (createdGroup) => {
       log.info("useCreateGroup | Group created successfully:", createdGroup);

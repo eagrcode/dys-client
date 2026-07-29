@@ -1,9 +1,10 @@
 import { ThemedText } from "@/_shared/components/themed-text";
 import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
-import { View, Pressable, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet, Alert } from "react-native";
 import { useDeleteListItems } from "@/_features/lists/hooks/use-delete-list-items";
-import type { ListMode } from "../../../app/(app-protected)/list/[listId]";
 import { useLocalSearchParams } from "expo-router";
+import type { ListMode } from "@/_features/lists/lists-types";
+import { ErrorAlert } from "@/_shared/components/alert";
 
 type Props = {
   selectedItemIds: Set<string>;
@@ -40,7 +41,7 @@ const buildBtnOptions = ({ onDeletePress, onCancelPress }: BuildBtnOptions): Btn
 export function DeleteItemsToolbar({ selectedItemIds, setSelectedItemIds, setListMode }: Props) {
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const theme = useCurrentTheme();
-  const deleteListItems = useDeleteListItems();
+  const { mutate: deleteListItems, isPending: isDeletePending } = useDeleteListItems();
 
   const resetSelectedItemIds = () => {
     setSelectedItemIds((prev) => {
@@ -64,8 +65,20 @@ export function DeleteItemsToolbar({ selectedItemIds, setSelectedItemIds, setLis
       selectedItemIds: [...selectedItemIds],
     });
 
-    deleteListItems.mutate({ listId, itemIds: [...selectedItemIds] });
-    resetDeleteState();
+    deleteListItems(
+      { listId, itemIds: [...selectedItemIds] },
+      {
+        onSuccess: () => {
+          resetDeleteState();
+        },
+        onError: (error) => {
+          ErrorAlert({
+            title: "Failed to delete items",
+            error,
+          });
+        },
+      },
+    );
   };
 
   const btnOptions: BtnOptions[] = buildBtnOptions({ onDeletePress, onCancelPress });
@@ -84,6 +97,7 @@ export function DeleteItemsToolbar({ selectedItemIds, setSelectedItemIds, setLis
             },
           ]}
           onPress={btn.onPress}
+          disabled={btn.isDestructive && (selectedItemIds.size === 0 || isDeletePending)}
         >
           <ThemedText
             style={{ color: btn.isDestructive ? theme.colors.danger : theme.colors.text }}

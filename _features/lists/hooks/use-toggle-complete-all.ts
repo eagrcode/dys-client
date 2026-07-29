@@ -1,41 +1,33 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
-import type { ApiErrorResponse } from "@/_shared/types/api-error";
-import type { ToggleCompleteListItemResponse, List, ListItem } from "@/_features/lists/lists-types";
+import { listKeys } from "@/_features/lists/qk.lists";
+import { useSelectedGroup } from "@/_shared/hooks/use-selected-group";
+import type { QueryKey } from "@tanstack/react-query";
+import type { ApiError } from "@/_shared/types/api-error";
+import type {
+  ToggleCompleteAllListItemsResponse,
+  List,
+  ListItem,
+} from "@/_features/lists/lists-types";
 
-type ToggleCompleteListItemVars = {
+type Vars = {
   listId: string;
   completed: boolean;
 };
 
-type ToggleCompleteListItemContext = {
-  listQueryKey: readonly unknown[];
-  groupListsQueryKey: readonly unknown[];
-  dashboardListsQueryKey: readonly unknown[];
+type Context = {
+  listDetailQK: QueryKey;
+  listsQK: QueryKey;
+  dashboardQK: QueryKey;
   prevList: List | undefined;
 };
 
 export function useToggleCompleteAllListItems() {
   const queryClient = useQueryClient();
-  const { user } = useAuthProvider();
-  const { selectedGroup } = useGroupsProvider();
+  const selectedGroup = useSelectedGroup();
 
-  return useMutation<
-    ToggleCompleteListItemResponse,
-    ApiErrorResponse,
-    ToggleCompleteListItemVars,
-    ToggleCompleteListItemContext
-  >({
+  return useMutation<ToggleCompleteAllListItemsResponse, ApiError, Vars, Context>({
     mutationFn: ({ listId, completed }) => {
-      if (!selectedGroup) throw new Error("No group selected");
-
-      console.log("useToggleCompleteAllListItems | Firing query", {
-        listId: listId,
-        completed: completed,
-      });
-
       return listsAPI.toggleCompleteAllListItems({
         groupId: selectedGroup,
         listId,
@@ -44,15 +36,15 @@ export function useToggleCompleteAllListItems() {
     },
 
     onMutate: async ({ listId, completed }) => {
-      const listQueryKey = ["list", user?.id, selectedGroup, listId] as const;
-      const groupListsQueryKey = ["groupLists", user?.id, selectedGroup] as const;
-      const dashboardListsQueryKey = ["dashboardData", user?.id, selectedGroup, "lists"] as const;
+      const listDetailQK = listKeys.detail(selectedGroup, listId);
+      const listsQK = listKeys.group(selectedGroup);
+      const dashboardQK = listKeys.dashboard(selectedGroup);
 
-      await queryClient.cancelQueries({ queryKey: listQueryKey });
+      await queryClient.cancelQueries({ queryKey: listDetailQK });
 
-      const prevList = queryClient.getQueryData<List>(listQueryKey);
+      const prevList = queryClient.getQueryData<List>(listDetailQK);
 
-      queryClient.setQueryData<List>(listQueryKey, (old) => {
+      queryClient.setQueryData<List>(listDetailQK, (old) => {
         if (!old || !old.items) return old;
 
         return {
@@ -65,24 +57,24 @@ export function useToggleCompleteAllListItems() {
       });
 
       return {
-        listQueryKey,
-        groupListsQueryKey,
-        dashboardListsQueryKey,
+        listDetailQK,
+        listsQK,
+        dashboardQK,
         prevList,
       };
     },
 
     onError: (_err, _vars, context) => {
       if (!context) return;
-      queryClient.setQueryData(context.listQueryKey, context.prevList);
+      queryClient.setQueryData(context.listDetailQK, context.prevList);
     },
 
     onSettled: (_data, _error, _vars, context) => {
       if (!context) return;
 
-      queryClient.invalidateQueries({ queryKey: context.listQueryKey });
-      queryClient.invalidateQueries({ queryKey: context.groupListsQueryKey });
-      queryClient.invalidateQueries({ queryKey: context.dashboardListsQueryKey });
+      queryClient.invalidateQueries({ queryKey: context.listDetailQK });
+      queryClient.invalidateQueries({ queryKey: context.listsQK });
+      queryClient.invalidateQueries({ queryKey: context.dashboardQK });
     },
   });
 }

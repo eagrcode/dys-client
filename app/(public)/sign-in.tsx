@@ -8,6 +8,7 @@ import { useState, useRef, useEffect } from "react";
 import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
 import type { TextInput } from "react-native";
 import type { SignInInput } from "@/_features/auth/providers/session-provider";
+import { isApiError } from "@/_shared/types/api-error";
 
 export default function SignIn() {
   const [formData, setFormData] = useState<SignInInput>({
@@ -57,32 +58,33 @@ export default function SignIn() {
     try {
       setIsLoading(true);
       await signIn(formData);
-    } catch (error: any) {
+    } catch (error: unknown) {
       handleErrors(error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleErrors = (error: any) => {
-    const code = error?.code;
+  const handleErrors = (error: unknown) => {
+    if (!isApiError(error)) {
+      console.log("SignIn | Unexpected error:", error);
+      setFormError("An unexpected error occurred. Please try again.");
+      return;
+    }
 
-    if (code === "LIMIT_EXCEEDED") {
+    if (error.code === "LIMIT_EXCEEDED") {
       setFormError("Too many failed attempts. Please try again later.");
-    } else if (code === "UNAUTHORISED") {
+    } else if (error.code === "UNAUTHORISED") {
       setFormError("Invalid email or password.");
-    } else if (code === "VALIDATION_ERROR") {
-      const validationErrors = error?.errors;
-      validationErrors.forEach((fieldError: any) => {
-        const field = fieldError?.path;
-        const message = fieldError?.msg;
-        if (field && message) {
+    } else if (error.code === "VALIDATION_ERROR") {
+      error.errors?.forEach(({ field, message }) => {
+        if (field === "email" || field === "password") {
           setFieldErrors((prev) => ({ ...prev, [field]: message }));
         }
       });
     } else {
       console.log("SignIn | Unexpected error:", error);
-      setFormError("An unexpected error occurred. Please try again.");
+      setFormError(error.message || "An unexpected error occurred. Please try again.");
     }
   };
 

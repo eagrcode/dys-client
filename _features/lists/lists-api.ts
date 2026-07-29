@@ -4,6 +4,9 @@ import type {
   ListType,
   ListItem,
   ToggleCompleteListItemResponse,
+  DeleteListItemsResponse,
+  ToggleCompleteAllListItemsResponse,
+  UpdateListItemResponse,
 } from "@/_features/lists/lists-types";
 
 const BASE_URL = `/groups`;
@@ -23,7 +26,7 @@ type ToggleCompleteAllListItems = {
 
 export const listsAPI = {
   getGroupLists: async (groupId: string): Promise<List[]> => {
-    const response = await apiCall(`${BASE_URL}/${groupId}/lists`, "GET");
+    const response = await apiCall<List[]>(`${BASE_URL}/${groupId}/lists`, "GET");
     return response.data;
   },
 
@@ -31,26 +34,30 @@ export const listsAPI = {
     groupId: string,
     data: { title: string; listType: ListType },
   ): Promise<List> => {
-    const response = await apiCall(`${BASE_URL}/${groupId}/lists`, "POST", {
+    const response = await apiCall<List>(`${BASE_URL}/${groupId}/lists`, "POST", {
       body: JSON.stringify(data),
     });
     return response.data;
   },
 
   getListById: async (groupId: string, listId: string): Promise<List> => {
-    const response = await apiCall(`${BASE_URL}/${groupId}/lists/${listId}`, "GET");
+    const response = await apiCall<List>(`${BASE_URL}/${groupId}/lists/${listId}`, "GET");
     return response.data;
   },
 
-  deleteList: async (groupId: string, listId: string) => {
-    const response = await apiCall(`${BASE_URL}/${groupId}/lists/${listId}`, "DELETE");
+  deleteList: async (groupId: string, listId: string): Promise<List> => {
+    const response = await apiCall<List>(`${BASE_URL}/${groupId}/lists/${listId}`, "DELETE");
     return response.data;
   },
 
   createListItem: async (groupId: string, listId: string, content: string): Promise<ListItem> => {
-    const response = await apiCall(`${BASE_URL}/${groupId}/lists/${listId}/items`, "POST", {
-      body: JSON.stringify({ content }),
-    });
+    const response = await apiCall<ListItem>(
+      `${BASE_URL}/${groupId}/lists/${listId}/items`,
+      "POST",
+      {
+        body: JSON.stringify({ content }),
+      },
+    );
     return response.data;
   },
 
@@ -59,8 +66,8 @@ export const listsAPI = {
     listId: string,
     itemId: string,
     content: string,
-  ): Promise<ListItem> => {
-    const respnse = await apiCall(
+  ): Promise<UpdateListItemResponse> => {
+    const response = await apiCall<UpdateListItemResponse>(
       `${BASE_URL}/${groupId}/lists/${listId}/items/${itemId}`,
       "PATCH",
       {
@@ -68,7 +75,7 @@ export const listsAPI = {
       },
     );
 
-    return respnse.data;
+    return response.data;
   },
 
   renameList: async (
@@ -76,9 +83,13 @@ export const listsAPI = {
     listId: string,
     newTitle: string,
   ): Promise<{ title: string }> => {
-    const response = await apiCall(`${BASE_URL}/${groupId}/lists/${listId}`, "PATCH", {
-      body: JSON.stringify({ newTitle }),
-    });
+    const response = await apiCall<{ title: string }>(
+      `${BASE_URL}/${groupId}/lists/${listId}`,
+      "PATCH",
+      {
+        body: JSON.stringify({ newTitle }),
+      },
+    );
 
     return response.data;
   },
@@ -91,8 +102,8 @@ export const listsAPI = {
     groupId: string;
     listId: string;
     itemIds: string[];
-  }): Promise<{ deletedItemIds: string[] }> => {
-    const response = await apiCall(
+  }): Promise<DeleteListItemsResponse> => {
+    const response = await apiCall<DeleteListItemsResponse>(
       `${BASE_URL}/${groupId}/lists/${listId}/items/delete`,
       "DELETE",
       {
@@ -109,7 +120,7 @@ export const listsAPI = {
     itemId,
     completed,
   }: ToggleCompleteListItem): Promise<ToggleCompleteListItemResponse> => {
-    const response = await apiCall(
+    const response = await apiCall<ToggleCompleteListItemResponse>(
       `${BASE_URL}/${groupId}/lists/${listId}/items/${itemId}/toggle`,
       "PATCH",
       {
@@ -124,8 +135,8 @@ export const listsAPI = {
     groupId,
     listId,
     completed,
-  }: ToggleCompleteAllListItems): Promise<ToggleCompleteListItemResponse> => {
-    const response = await apiCall(
+  }: ToggleCompleteAllListItems): Promise<ToggleCompleteAllListItemsResponse> => {
+    const response = await apiCall<ToggleCompleteAllListItemsResponse>(
       `${BASE_URL}/${groupId}/lists/${listId}/items/toggle-all`,
       "PATCH",
       {

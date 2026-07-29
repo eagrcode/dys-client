@@ -5,7 +5,6 @@ import { useListById } from "@/_features/lists/hooks/use-list-id";
 import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { useLocalSearchParams } from "expo-router";
 import { View, Pressable, StyleSheet } from "react-native";
-import { LIST_TYPE_LABELS } from "@/constants/list-types";
 import type { ListItem } from "@/_features/lists/lists-types";
 
 export function Header({
@@ -33,11 +32,6 @@ export function Header({
           {list.title}
         </ThemedText>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <View style={[styles.typeChip, { backgroundColor: theme.colors.bgLayer1 }]}>
-            <ThemedText style={{ fontSize: 12, color: theme.colors.accent }}>
-              {LIST_TYPE_LABELS[list.list_type]}
-            </ThemedText>
-          </View>
           <Pressable
             onPress={() => setOptionsShowing((prev) => !prev)}
             style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
@@ -76,7 +70,6 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 60,
     gap: 8,
-    paddingHorizontal: 16,
   },
   headerTop: {
     flexDirection: "row",

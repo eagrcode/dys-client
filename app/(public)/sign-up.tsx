@@ -7,6 +7,7 @@ import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 import { useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import type { RegistrationInput } from "@/_features/auth/providers/session-provider";
+import { isApiError } from "@/_shared/types/api-error";
 
 export default function SignUp() {
   const [formData, setFormData] = useState<RegistrationInput>({
@@ -49,17 +50,20 @@ export default function SignUp() {
       setIsLoading(true);
 
       await registerUser(formData);
-    } catch (error: any) {
+    } catch (error: unknown) {
       handleErrors(error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleErrors = (error: any) => {
-    const code = error?.code;
+  const handleErrors = (error: unknown) => {
+    if (!isApiError(error)) {
+      setFormError("An unexpected error occurred. Please try again.");
+      return;
+    }
 
-    switch (code) {
+    switch (error.code) {
       case "EMAIL_ALREADY_EXISTS":
         setFormError(
           "An account with this email already exists. Please log in or use a different email.",
@@ -67,18 +71,20 @@ export default function SignUp() {
         break;
 
       case "VALIDATION_ERROR":
-        const validationErrors = error?.errors;
-        validationErrors.forEach((fieldError: any) => {
-          const field = fieldError?.path;
-          const message = fieldError?.msg;
-          if (field && message) {
+        error.errors?.forEach(({ field, message }) => {
+          if (
+            field === "first_name" ||
+            field === "last_name" ||
+            field === "email" ||
+            field === "password"
+          ) {
             setFieldErrors((prev) => ({ ...prev, [field]: message }));
           }
         });
         break;
 
       default:
-        setFormError(error?.message || "An unexpected error occurred. Please try again.");
+        setFormError(error.message || "An unexpected error occurred. Please try again.");
     }
   };
 

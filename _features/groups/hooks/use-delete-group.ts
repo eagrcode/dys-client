@@ -5,7 +5,7 @@ import { useGroups } from "@/_features/groups/hooks/use-groups";
 import { useRouter } from "expo-router";
 import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 import type { DeleteGroupResponse, Group } from "@/_features/groups/groups-types";
-import { ApiErrorResponse } from "@/_shared/types/api-error";
+import type { ApiError } from "@/_shared/types/api-error";
 
 type Props = {
   groupId: string;
@@ -19,7 +19,7 @@ export function useDeleteGroup() {
   const { user } = useAuthProvider();
   const groupsQueryKey = ["groups", user?.id] as const;
 
-  return useMutation<DeleteGroupResponse, ApiErrorResponse, Props>({
+  return useMutation<DeleteGroupResponse, ApiError, Props>({
     mutationFn: ({ groupId }) => groupsAPI.deleteGroup(groupId),
     onSuccess: async (res) => {
       const deletedGroupId = res.id;

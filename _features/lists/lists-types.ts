@@ -29,3 +29,22 @@ export type ToggleCompleteListItemResponse = {
   completed: boolean;
   updated_at: string;
 };
+
+export type DeleteListItemsResponse = {
+  listId: string;
+  deletedItemIds: string[];
+  deletedCount: number;
+};
+
+export type ToggleCompleteAllListItemsResponse = {
+  listId: string;
+  completed: boolean;
+  updatedItemCount: number;
+};
+
+export type UpdateListItemResponse = {
+  id: string;
+  content: string;
+};
+
+export type ListMode = "default" | "edit-item" | "select-items";

@@ -5,9 +5,9 @@ import { authAPI } from "@/_features/auth/auth-api";
 import { saveTokens, clearTokens, getToken } from "@/_shared/utils/token-manager";
 import { log } from "@/_shared/logger/logger";
 import { setSessionExpiredHandler } from "@/_shared/utils/api-call";
-import type { SessionError } from "@/_shared/utils/api-call";
+import type { ApiError } from "@/_shared/types/api-error";
 
-type AuthResponse = {
+export type AuthResponse = {
   user: User;
   tokens: Tokens;
 };
@@ -227,7 +227,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const forceSignOut = useCallback(
-    async (sessionError: SessionError) => {
+    async (sessionError: ApiError) => {
       log.info("AuthProvider - forceSignOut | Signing out user...");
       setSessionErrorMsg(sessionError.message);
       await endSession();

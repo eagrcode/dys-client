@@ -3,11 +3,12 @@ import { groupsAPI } from "@/_features/groups/groups-api";
 import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 import type { Group } from "@/_features/groups/groups-types";
 import { log } from "@/_shared/logger/logger";
+import type { ApiError } from "@/_shared/types/api-error";
 
 export function useGroups() {
   const { user, isLoading: authLoading } = useAuthProvider();
 
-  return useQuery<Group[]>({
+  return useQuery<Group[], ApiError>({
     queryKey: ["groups", user?.id],
     queryFn: async () => {
       log.info("useGroups | Firing query", { userId: user?.id });

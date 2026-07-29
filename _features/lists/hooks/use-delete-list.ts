@@ -1,52 +1,58 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
-import type { ApiErrorResponse } from "@/_shared/types/api-error";
+import { listKeys } from "@/_features/lists/qk.lists";
+import { useRouter } from "expo-router";
+import { useSelectedGroup } from "@/_shared/hooks/use-selected-group";
+import type { ApiError } from "@/_shared/types/api-error";
 import type { List } from "@/_features/lists/lists-types";
 
-type DeleteListContext = {
-  queryKey: readonly unknown[];
-  dashboardListsQueryKey: readonly unknown[];
+type Vars = string;
+
+type Context = {
+  listsQK: readonly unknown[];
+  dashboardQK: readonly unknown[];
   prevGroupLists: List[] | undefined;
 };
 
 export function useDeleteList() {
   const queryClient = useQueryClient();
-  const { user } = useAuthProvider();
-  const { selectedGroup } = useGroupsProvider();
+  const selectedGroup = useSelectedGroup();
+  const router = useRouter();
 
-  return useMutation<List, ApiErrorResponse, string, DeleteListContext>({
+  return useMutation<List, ApiError, Vars, Context>({
     mutationFn: (listId) => {
-      if (!selectedGroup) throw new Error("No group selected");
       return listsAPI.deleteList(selectedGroup, listId);
     },
 
     onMutate: async (listId) => {
-      const queryKey = ["groupLists", user?.id, selectedGroup] as const;
-      const dashboardListsQueryKey = ["dashboardData", user?.id, selectedGroup, "lists"] as const;
+      const listsQK = listKeys.group(selectedGroup!);
+      const dashboardQK = listKeys.dashboard(selectedGroup!);
 
-      await queryClient.cancelQueries({ queryKey });
+      await queryClient.cancelQueries({ queryKey: listsQK });
+      await queryClient.cancelQueries({ queryKey: dashboardQK });
 
-      const prevGroupLists = queryClient.getQueryData<List[]>(queryKey);
+      const prevGroupLists = queryClient.getQueryData<List[]>(listsQK);
 
-      queryClient.setQueryData<List[]>(queryKey, (old = []) =>
+      queryClient.setQueryData<List[]>(listsQK, (old = []) =>
         old.filter((list) => list.id !== listId),
       );
 
-      return { queryKey, dashboardListsQueryKey, prevGroupLists };
+      return { listsQK, dashboardQK, prevGroupLists };
     },
 
-    onError: (_err, _listId, context) => {
+    onError: (_err, _vars, context) => {
       if (!context) return;
-      queryClient.setQueryData(context.queryKey, context.prevGroupLists);
+      queryClient.setQueryData(context.listsQK, context.prevGroupLists);
     },
 
-    onSuccess: (_deletedList, _listId, context) => {
-      if (!context) return;
+    onSuccess: () => {
+      router.back();
+    },
 
-      queryClient.invalidateQueries({ queryKey: context.queryKey });
-      queryClient.invalidateQueries({ queryKey: context.dashboardListsQueryKey });
+    onSettled: (_data, _error, _vars, context) => {
+      if (!context) return;
+      queryClient.invalidateQueries({ queryKey: context.listsQK });
+      queryClient.invalidateQueries({ queryKey: context.dashboardQK });
     },
   });
 }

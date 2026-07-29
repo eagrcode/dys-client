@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import { useSelectedGroup } from "@/_shared/hooks/use-selected-group";
+import { listKeys } from "@/_features/lists/qk.lists";
 import type { List } from "@/_features/lists/lists-types";
-import type { ApiErrorResponse } from "@/_shared/types/api-error";
-import type { QueryKey, MutationFunctionContext } from "@tanstack/react-query";
+import type { ApiError } from "@/_shared/types/api-error";
+import type { QueryKey } from "@tanstack/react-query";
 
 type Vars = {
   listId: string;
@@ -12,30 +12,29 @@ type Vars = {
 };
 
 type Context = {
-  queryKey: QueryKey;
+  listDetailQK: QueryKey;
+  groupListsQK: QueryKey;
   prevList: List | undefined;
 };
 
 export function useRenameList() {
   const queryClient = useQueryClient();
-  const { user } = useAuthProvider();
-  const { selectedGroup } = useGroupsProvider();
-  const userId = user?.id;
+  const selectedGroup = useSelectedGroup();
 
-  return useMutation<{ title: string }, ApiErrorResponse | Error, Vars, Context>({
+  return useMutation<{ title: string }, ApiError, Vars, Context>({
     mutationFn: ({ listId, newTitle }) => {
-      if (!selectedGroup) throw new Error("No group selected");
       return listsAPI.renameList(selectedGroup, listId, newTitle);
     },
 
     onMutate: async ({ listId, newTitle }) => {
-      const queryKey = ["list", userId, selectedGroup, listId] as const;
+      const groupListsQK = listKeys.group(selectedGroup);
+      const listDetailQK = listKeys.detail(selectedGroup, listId);
 
-      await queryClient.cancelQueries({ queryKey });
+      await queryClient.cancelQueries({ queryKey: listDetailQK });
 
-      const prevList = queryClient.getQueryData<List>(queryKey);
+      const prevList = queryClient.getQueryData<List>(listDetailQK);
 
-      queryClient.setQueryData<List>(queryKey, (old) => {
+      queryClient.setQueryData<List>(listDetailQK, (old) => {
         if (!old) return old;
 
         return {
@@ -44,21 +43,18 @@ export function useRenameList() {
         };
       });
 
-      return { queryKey, prevList };
+      return { listDetailQK, groupListsQK, prevList };
     },
 
     onError: (_err, _vars, context) => {
       if (!context) return;
-      queryClient.setQueryData(context.queryKey, context.prevList);
+      queryClient.setQueryData(context.listDetailQK, context.prevList);
     },
 
     onSettled: (_data, _error, _vars, context) => {
       if (!context) return;
-      return queryClient.invalidateQueries({ queryKey: context.queryKey });
-    },
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["groupLists", userId, selectedGroup] });
+      queryClient.invalidateQueries({ queryKey: context.listDetailQK });
+      queryClient.invalidateQueries({ queryKey: context.groupListsQK });
     },
   });
 }

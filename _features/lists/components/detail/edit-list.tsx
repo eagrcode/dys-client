@@ -8,9 +8,10 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown } from "react-native-reanimated";
 import { useDeleteList } from "@/_features/lists/hooks/use-delete-list";
 import { useToggleCompleteAllListItems } from "@/_features/lists/hooks/use-toggle-complete-all";
-import type { ListMode } from "@/app/(app-protected)/list/[listId]";
+import type { ListMode } from "@/_features/lists/lists-types";
 import { useState } from "react";
 import { Input } from "@/_shared/components/input";
+import { ErrorAlert } from "@/_shared/components/alert";
 
 type Props = {
   listMode: ListMode;
@@ -77,20 +78,20 @@ export default function EditListBottomSheet({ listMode, setListMode, setOptionsS
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const { data: list } = useListById(listId || "");
   const [newTitle, setNewTitle] = useState<string>(list?.title ?? "");
-  const { mutate: toggleCompleteAllListItems } = useToggleCompleteAllListItems();
+  const { mutate: toggleCompleteAllListItems, isPending: isToggleCompletePending } =
+    useToggleCompleteAllListItems();
   const { mutate: deleteList, isError } = useDeleteList();
-  const { mutate: renameList } = useRenameList();
+  const { mutate: renameList, isPending: isRenamePending } = useRenameList();
   const theme = useCurrentTheme();
-  const router = useRouter();
-
-  console.log("Options Mode:", optionsMode);
+  const isSubmitRenameDisabled =
+    newTitle.trim() === "" || newTitle.trim() === list?.title || isRenamePending;
 
   if (isError) {
     console.log(isError);
   }
 
   const handleToggleComplete = () => {
-    if (!list) return;
+    if (!list || isToggleCompletePending) return;
 
     const completed = !list.completed;
 
@@ -99,7 +100,17 @@ export default function EditListBottomSheet({ listMode, setListMode, setOptionsS
       `Set all items as completed = ${completed}`,
     );
 
-    toggleCompleteAllListItems({ listId, completed });
+    toggleCompleteAllListItems(
+      { listId, completed },
+      {
+        onError: (error) => {
+          ErrorAlert({
+            title: "Failed to toggle completion of items",
+            error,
+          });
+        },
+      },
+    );
   };
 
   const handleToggleSelectMode = () => {
@@ -119,19 +130,11 @@ export default function EditListBottomSheet({ listMode, setListMode, setOptionsS
         style: "destructive",
         onPress: () => {
           deleteList(listId, {
-            onSuccess: () => {
-              router.back();
-            },
             onError: (error) => {
-              Alert.alert("Could not delete list", "Something went wrong. Please try again.", [
-                {
-                  text: "Ok",
-                  style: "default",
-                  onPress: () => {
-                    setOptionsShowing(false);
-                  },
-                },
-              ]);
+              ErrorAlert({
+                title: "Failed to delete list",
+                error,
+              });
             },
           });
         },
@@ -144,8 +147,17 @@ export default function EditListBottomSheet({ listMode, setListMode, setOptionsS
   };
 
   const handleSaveRename = () => {
-    renameList({ listId, newTitle });
-    setOptionsShowing(false);
+    renameList(
+      { listId, newTitle: newTitle.trim() },
+      {
+        onSuccess: () => {
+          setOptionsShowing(false);
+        },
+        onError: (error) => {
+          ErrorAlert({ title: "Failed to rename list", error });
+        },
+      },
+    );
   };
 
   const options: Options[] = buildEditOptions({
@@ -186,9 +198,10 @@ export default function EditListBottomSheet({ listMode, setListMode, setOptionsS
         <View style={{ height: 16 }} />
         <View style={{ width: "100%", flexDirection: "row", gap: 8 }}>
           <Button
+            disabled={isSubmitRenameDisabled}
             variant="secondaryFill2"
             onPress={handleSaveRename}
-            style={{ flex: 1, padding: 12 }}
+            style={[{ flex: 1, padding: 12 }, isSubmitRenameDisabled && { opacity: 0.5 }]}
           >
             <ThemedText style={{ color: theme.colors.accent }}>Save</ThemedText>
           </Button>

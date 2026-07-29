@@ -17,6 +17,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/syne";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { shouldRetryApiError } from "@/_shared/types/api-error";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -27,10 +28,7 @@ SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: (failureCount, error: any) => {
-        if (error?.code === "SESSION_EXPIRED") return false;
-        return failureCount < 3;
-      },
+      retry: shouldRetryApiError,
     },
   },
 });

@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import { useCreateGroup } from "@/_features/groups/hooks/use-create-group";
 import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
+import { isApiError } from "@/_shared/types/api-error";
 
 type FormData = {
   name: string;
@@ -51,27 +52,27 @@ const CreateGroup = () => {
 
     try {
       await createGroup({ name: formData.name, description: formData.description });
-    } catch (error: any) {
+    } catch (error: unknown) {
       handleErrors(error);
     }
   };
 
-  const handleErrors = (error: any) => {
-    const code = error?.code;
+  const handleErrors = (error: unknown) => {
+    if (!isApiError(error)) {
+      setFormError("An unexpected error occurred. Please try again.");
+      return;
+    }
 
-    if (code === "LIMIT_EXCEEDED") {
+    if (error.code === "LIMIT_EXCEEDED") {
       setFormError("Too many attempts. Please try again later.");
-    } else if (code === "VALIDATION_ERROR") {
-      const validationErrors = error?.errors;
-      validationErrors.forEach((fieldError: any) => {
-        const field = fieldError?.path;
-        const message = fieldError?.msg;
-        if (field && message) {
+    } else if (error.code === "VALIDATION_ERROR") {
+      error.errors?.forEach(({ field, message }) => {
+        if (field === "name" || field === "description") {
           setFieldErrors((prev) => ({ ...prev, [field]: message }));
         }
       });
     } else {
-      setFormError(error?.message || "An unexpected error occurred. Please try again.");
+      setFormError(error.message || "An unexpected error occurred. Please try again.");
     }
   };
 
