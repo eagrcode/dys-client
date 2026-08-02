@@ -1,21 +1,22 @@
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
+    "name": "Dys",
+    "slug": "dys",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "dys",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.eagrcode.myapp",
+      "bundleIdentifier": "com.eagrcode.dys",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
+      "package": "com.eagrcode.dys",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -43,7 +44,9 @@
           }
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -52,8 +55,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "210ab3c3-b436-42bc-ad2c-d0cdc32efc55"
+        "projectId": "1c0abf0e-417e-4703-aac8-a22251212975"
       }
-    }
+    },
+    "owner": "eagrcode"
   }
 }
