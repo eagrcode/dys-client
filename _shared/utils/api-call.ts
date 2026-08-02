@@ -5,6 +5,7 @@ import {
   type ApiValidationError,
   type HttpMethod,
 } from "@/_shared/types/api-error";
+import { API_BASE_URL } from "@/_shared/config/environment";
 import { log } from "../logger/logger";
 
 type SessionExpiredHandler = (sessionError: ApiError) => void | Promise<void>;
@@ -14,7 +15,6 @@ type ApiSuccessResponse<T> = {
   data: T;
 };
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:3000";
 const REFRESH_ENDPOINT = "/auth/refresh";
 
 let refreshPromise: Promise<boolean> | null = null;
@@ -122,7 +122,7 @@ async function refreshTokens(): Promise<boolean> {
   }
 
   const res = await fetchResponse(
-    `${BASE_URL}${REFRESH_ENDPOINT}`,
+    `${API_BASE_URL}${REFRESH_ENDPOINT}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -207,7 +207,7 @@ async function executeApiCall<T>(
   isRetry: boolean,
 ): Promise<ApiSuccessResponse<T>> {
   const token = await getToken();
-  const url = `${BASE_URL}${endpoint}`;
+  const url = `${API_BASE_URL}${endpoint}`;
   const headers = new Headers(options.headers);
 
   headers.set("Content-Type", "application/json");
