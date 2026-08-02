@@ -56,6 +56,8 @@ export function NewItemInput() {
         onChangeText={(content) => setNewItem(content)}
         onSubmitEditing={handleAddItemPress}
         submitBehavior="submit"
+        editable={!isCreatePending}
+        maxLength={100}
       />
     </View>
   );

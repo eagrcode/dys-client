@@ -80,7 +80,7 @@ export default function EditListBottomSheet({ listMode, setListMode, setOptionsS
   const [newTitle, setNewTitle] = useState<string>(list?.title ?? "");
   const { mutate: toggleCompleteAllListItems, isPending: isToggleCompletePending } =
     useToggleCompleteAllListItems();
-  const { mutate: deleteList, isError } = useDeleteList();
+  const { mutate: deleteList, isError, isPending: isDeletePending } = useDeleteList();
   const { mutate: renameList, isPending: isRenamePending } = useRenameList();
   const theme = useCurrentTheme();
   const isSubmitRenameDisabled =
@@ -129,14 +129,16 @@ export default function EditListBottomSheet({ listMode, setListMode, setOptionsS
         text: "Delete",
         style: "destructive",
         onPress: () => {
-          deleteList(listId, {
-            onError: (error) => {
-              ErrorAlert({
-                title: "Failed to delete list",
-                error,
-              });
-            },
-          });
+          if (!isDeletePending) {
+            deleteList(listId, {
+              onError: (error) => {
+                ErrorAlert({
+                  title: "Failed to delete list",
+                  error,
+                });
+              },
+            });
+          }
         },
       },
     ]);
@@ -194,6 +196,7 @@ export default function EditListBottomSheet({ listMode, setListMode, setOptionsS
           value={newTitle}
           onChangeText={(text) => setNewTitle(text)}
           autoFocus
+          maxLength={100}
         />
         <View style={{ height: 16 }} />
         <View style={{ width: "100%", flexDirection: "row", gap: 8 }}>

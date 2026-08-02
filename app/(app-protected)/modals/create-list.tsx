@@ -9,6 +9,7 @@ import Animated, { useAnimatedKeyboard, useAnimatedStyle } from "react-native-re
 import { useCreateList } from "@/_features/lists/hooks/use-create-list";
 import { BackButton } from "@/_shared/components/back-button";
 import { IconSymbol } from "@/_shared/components/icon-symbol";
+import { ErrorAlert } from "@/_shared/components/alert";
 
 type ListType = "shopping" | "todo" | "other";
 
@@ -29,13 +30,11 @@ const LIST_TYPE_ARR: ListType[] = ["shopping", "todo", "other"];
 export default function CreateListModal() {
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState<ListType>("todo");
-
   const theme = useCurrentTheme();
-
-  const { mutate: createList, isPending: isCreating } = useCreateList();
+  const { mutate: createList, isPending: isCreatePending } = useCreateList();
 
   const canSubmit = newTitle.trim().length > 0;
-  const buttonDisabled = !canSubmit || isCreating;
+  const buttonDisabled = !canSubmit || isCreatePending;
   const titleText = `New ${LIST_TYPE_LABELS[newType]} List`;
 
   const keyboard = useAnimatedKeyboard();
@@ -45,7 +44,17 @@ export default function CreateListModal() {
 
   const handleCreate = () => {
     if (!newTitle.trim()) return;
-    createList({ title: newTitle.trim(), listType: newType });
+    createList(
+      { title: newTitle.trim(), listType: newType },
+      {
+        onError: (error) => {
+          ErrorAlert({
+            title: "Failed to create list",
+            error: error,
+          });
+        },
+      },
+    );
   };
 
   return (
@@ -71,10 +80,11 @@ export default function CreateListModal() {
             <Input
               value={newTitle}
               onChangeText={setNewTitle}
-              editable={!isCreating}
+              editable={!isCreatePending}
               autoFocus={true}
               placeholder={`Title`}
               style={{ padding: 12 }}
+              maxLength={100}
             />
 
             {/* List Type Selector */}
@@ -101,7 +111,7 @@ export default function CreateListModal() {
           <Button
             variant="primary"
             onPress={handleCreate}
-            loading={isCreating}
+            loading={isCreatePending}
             disabled={buttonDisabled}
             style={{ borderRadius: 15 }}
           >

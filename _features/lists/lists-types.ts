@@ -25,24 +25,26 @@ export type List = {
 };
 
 export type ToggleCompleteListItemResponse = {
+  list_id: string;
   id: string;
   completed: boolean;
   updated_at: string;
 };
 
 export type DeleteListItemsResponse = {
-  listId: string;
+  list_id: string;
   deletedItemIds: string[];
   deletedCount: number;
 };
 
 export type ToggleCompleteAllListItemsResponse = {
-  listId: string;
+  list_id: string;
   completed: boolean;
   updatedItemCount: number;
 };
 
 export type UpdateListItemResponse = {
+  list_id: string;
   id: string;
   content: string;
 };

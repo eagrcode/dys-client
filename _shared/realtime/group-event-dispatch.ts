@@ -1,42 +1,144 @@
 import { Alert } from "react-native";
 import { listKeys } from "@/_features/lists/qk.lists";
+import type { CacheIdentifier } from "@/_features/lists/qk.lists";
 import type { GroupEvent } from "./socket-provider";
 import type { QueryClient } from "@tanstack/react-query";
+import { log } from "../logger/logger";
 
 export async function groupEventDispatch(event: GroupEvent, queryClient: QueryClient) {
   switch (event.type) {
+    // Lists
     case "list.created":
-      console.log("List created");
-      Alert.alert(
-        "Group Event Received",
-        JSON.stringify(
-          {
-            groupId: event.groupId,
-            type: event.type,
-            data: event.data,
-          },
-          null,
-          2,
-        ),
-      );
+      log.info("Group Event Received", {
+        groupId: event.groupId,
+        type: event.type,
+        data: event.data,
+      });
 
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: listKeys.group(event.groupId),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: listKeys.dashboard(event.groupId),
-        }),
-      ]);
-
+      await invalidateCache(["group", "dashboard"], queryClient, event.groupId);
       break;
 
     case "list.deleted":
-      console.log("List deleted");
+      log.info("Group Event Received", {
+        groupId: event.groupId,
+        type: event.type,
+        data: event.data,
+      });
+
+      Alert.alert("List Deleted", "A list has been deleted in this group. Refreshing your lists.");
+      await invalidateCache(["group", "dashboard"], queryClient, event.groupId);
       break;
 
-    case "list.updated":
-      console.log("List updated");
+    case "list.renamed":
+      log.info("Group Event Received", {
+        groupId: event.groupId,
+        type: event.type,
+        data: event.data,
+      });
+
+      await invalidateCache(["group"], queryClient, event.groupId);
+      break;
+
+    // List Items
+    case "listItem.created":
+      log.info("Group Event Received", {
+        groupId: event.groupId,
+        type: event.type,
+        data: event.data,
+      });
+
+      await invalidateCache(["group", "dashboard"], queryClient, event.groupId);
+      break;
+
+    case "listItem.deleted":
+      log.info("Group Event Received", {
+        groupId: event.groupId,
+        type: event.type,
+        data: event.data,
+      });
+
+      await invalidateCache(["group", "dashboard"], queryClient, event.groupId);
+      break;
+
+    case "listItem.updated":
+      log.info("Group Event Received", {
+        groupId: event.groupId,
+        type: event.type,
+        data: event.data,
+      });
+
+      await invalidateCache(["detail"], queryClient, event.groupId, event.data.list_id);
+      break;
+
+    case "listItem.toggled":
+      log.info("Group Event Received", {
+        groupId: event.groupId,
+        type: event.type,
+        data: event.data,
+      });
+
+      await invalidateCache(["group", "dashboard"], queryClient, event.groupId);
+      break;
+
+    case "listItem.toggledAll":
+      log.info("Group Event Received", {
+        groupId: event.groupId,
+        type: event.type,
+        data: event.data,
+      });
+
+      await invalidateCache(["group", "dashboard"], queryClient, event.groupId);
+      break;
+
+    default:
+      log.warn("Unhandled Group Event", {
+        groupId: event.groupId,
+        type: event.type,
+        data: event.data,
+      });
       break;
   }
+}
+
+async function invalidateCache(
+  cacheIdentifiers: CacheIdentifier[],
+  queryClient: QueryClient,
+  groupId: string,
+  listId?: string,
+) {
+  const promises: Promise<void>[] = [];
+
+  for (const key of cacheIdentifiers) {
+    switch (key) {
+      case "group":
+        promises.push(
+          queryClient.invalidateQueries({
+            queryKey: listKeys.group(groupId),
+          }),
+        );
+        break;
+      case "detail":
+        if (listId) {
+          promises.push(
+            queryClient.invalidateQueries({
+              queryKey: listKeys.detail(groupId, listId),
+            }),
+          );
+        } else {
+          log.warn("List ID is required for 'detail' cache invalidation", {
+            groupId,
+            listId,
+          });
+        }
+        break;
+      case "dashboard":
+        promises.push(
+          queryClient.invalidateQueries({
+            queryKey: listKeys.dashboard(groupId),
+          }),
+        );
+        break;
+    }
+  }
+  await Promise.all(promises);
 }

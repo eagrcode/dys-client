@@ -144,12 +144,24 @@ type ToggleCompleteProps = {
 
 const ToggleComplete = ({ item, listMode }: ToggleCompleteProps) => {
   const { listId } = useLocalSearchParams<{ listId: string }>();
-  const { mutate: toggleCompleteListItem } = useToggleCompleteListItem();
+  const { mutate: toggleCompleteListItem, isPending: isTogglePending } =
+    useToggleCompleteListItem();
   const theme = useCurrentTheme();
-  const isDisabled = listMode !== "default";
+
+  const isDisabled = listMode !== "default" || isTogglePending;
 
   const handleToggleCompleteItem = (itemId: string, completed: boolean) => {
-    toggleCompleteListItem({ listId: listId, itemId, completed: !completed });
+    toggleCompleteListItem(
+      { listId: listId, itemId, completed: !completed },
+      {
+        onError: (error) => {
+          ErrorAlert({
+            title: "Failed to toggle item completion",
+            error,
+          });
+        },
+      },
+    );
   };
 
   return (
@@ -213,6 +225,7 @@ const EditMode = ({ item, setListMode, setEditingItemId }: EditModeProps) => {
         keyboardType="default"
         autoFocus
         style={editModeStyles.input}
+        maxLength={100}
       />
       {/* Submit/Cancel Buttons */}
       <View style={{ flexDirection: "row", gap: 16 }}>

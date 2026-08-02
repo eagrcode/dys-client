@@ -30,6 +30,7 @@ type InputProps = {
     | "name"
     | "givenName"
     | "familyName";
+  maxLength?: number;
 };
 
 export function Input({
@@ -47,6 +48,7 @@ export function Input({
   style,
   onSubmitEditing,
   submitBehavior,
+  maxLength,
 }: InputProps) {
   const theme = useCurrentTheme();
   const colors = theme.colors;
@@ -77,6 +79,7 @@ export function Input({
       onSubmitEditing={onSubmitEditing}
       submitBehavior={submitBehavior}
       autoCapitalize="none"
+      maxLength={maxLength}
     />
   );
 }

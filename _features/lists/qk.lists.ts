@@ -1,3 +1,5 @@
+export type CacheIdentifier = keyof typeof listKeys;
+
 export const listKeys = {
   group: (groupId: string) => ["groups", groupId, "lists"] as const,
 
