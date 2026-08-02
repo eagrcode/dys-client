@@ -31,8 +31,6 @@ export function useDeleteGroup() {
 
       if (remaining.length > 0) {
         selectGroup(remaining[0].id);
-      } else {
-        selectGroup(null);
       }
       router.replace("/");
     },
