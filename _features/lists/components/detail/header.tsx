@@ -68,7 +68,6 @@ export function Header({
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: 60,
     gap: 8,
   },
   headerTop: {

@@ -5,10 +5,17 @@ import { ErrorText } from "@/_shared/components/error-text";
 import { Input } from "@/_shared/components/input";
 import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 import { useState, useRef, useEffect } from "react";
-import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Keyboard,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { isApiError } from "@/_shared/types/api-error";
 import type { TextInput } from "react-native";
 import type { SignInInput } from "@/_features/auth/providers/session-provider";
-import { isApiError } from "@/_shared/types/api-error";
 
 function SignInScreen() {
   const [formData, setFormData] = useState<SignInInput>({
@@ -103,46 +110,51 @@ function SignInScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.form}>
-        <View style={styles.inputs}>
-          <Input
-            placeholder="Email"
-            value={formData.email}
-            onChangeText={(content) => handleSetFormData("email", content)}
-            keyboardType="email-address"
-            inputMode="email"
-            autoComplete="email"
-            textContentType="emailAddress"
-            ref={inputRef}
-          />
-          {renderFieldError("email")}
-          <Input
-            placeholder="Password"
-            value={formData.password}
-            onChangeText={(content) => handleSetFormData("password", content)}
-            secureTextEntry
-            inputMode="text"
-            autoComplete="password"
-            textContentType="password"
-          />
-          {renderFieldError("password")}
+    <TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss} accessible={false}>
+      <ThemedView style={styles.container}>
+        <ThemedText variant="title" style={{ marginBottom: 16, fontSize: 22 }}>
+          Welcome back! 👋
+        </ThemedText>
+        <View style={styles.form}>
+          <View style={styles.inputs}>
+            <Input
+              placeholder="Email"
+              value={formData.email}
+              onChangeText={(content) => handleSetFormData("email", content)}
+              keyboardType="email-address"
+              inputMode="email"
+              autoComplete="email"
+              textContentType="emailAddress"
+              ref={inputRef}
+            />
+            {renderFieldError("email")}
+            <Input
+              placeholder="Password"
+              value={formData.password}
+              onChangeText={(content) => handleSetFormData("password", content)}
+              secureTextEntry
+              inputMode="text"
+              autoComplete="password"
+              textContentType="password"
+            />
+            {renderFieldError("password")}
+          </View>
+          {renderFormError()}
+          <Button variant="primary" onPress={handleSignInPress} disabled={submitDisabled}>
+            <ThemedText variant="button">
+              {isLoading ? <ActivityIndicator size="small" color="#fff" /> : "Sign In"}
+            </ThemedText>
+          </Button>
         </View>
-        {renderFormError()}
-        <Button variant="primary" onPress={handleSignInPress} disabled={submitDisabled}>
-          <ThemedText>
-            {isLoading ? <ActivityIndicator size="small" color="#fff" /> : "Sign In"}
-          </ThemedText>
-        </Button>
-      </View>
-    </ThemedView>
+      </ThemedView>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
     padding: 16,
   },

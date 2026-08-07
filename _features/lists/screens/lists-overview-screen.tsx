@@ -64,7 +64,10 @@ function ListsOverviewScreen() {
       keyExtractor={(item: List) => item.id}
       renderSectionHeader={({ section }) => <SectionHeader section={section} />}
       renderItem={({ item }: { item: List }) => (
-        <ListRow item={item} onPress={() => router.push(`/(app-protected)/list/${item.id}`)} />
+        <ListRow
+          item={item}
+          onPress={() => router.push(`/(app-protected)/lists/${item.id}/detail`)}
+        />
       )}
     />
   );
@@ -104,7 +107,6 @@ const SectionHeader = ({ section }: { section: Section }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   centered: {
     flex: 1,

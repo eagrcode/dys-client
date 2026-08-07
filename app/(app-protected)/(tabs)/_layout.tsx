@@ -1,74 +1,51 @@
-import { ThemedText } from "@/_shared/components/themed-text";
 import { IconSymbol } from "@/_shared/components/icon-symbol";
 import { TabBar } from "@/_shared/components/tab-bar";
-import { useGroupById } from "@/_features/groups/hooks/use-group-id";
-import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { Tabs, useRouter } from "expo-router";
+import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import { Tabs } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useRef } from "react";
-import { Pressable, View } from "react-native";
 
 export default function TabLayout() {
-  const theme = useCurrentTheme();
-  const router = useRouter();
   const { user } = useAuthProvider();
-  const { data: groupDetails, isLoading: currentGroupLoading } = useGroupById();
+  const { isLoading: selectedGroupLoading } = useGroupsProvider();
   const splashHidden = useRef(false);
 
-  const isReady = !!user && !currentGroupLoading;
+  const isInitiallyReady = !!user && !selectedGroupLoading;
 
   useEffect(() => {
-    if (isReady && !splashHidden.current) {
+    if (isInitiallyReady && !splashHidden.current) {
       splashHidden.current = true;
       SplashScreen.hideAsync();
     }
-  }, [isReady]);
+  }, [isInitiallyReady]);
 
-  if (!isReady) {
+  if (!user || (selectedGroupLoading && !splashHidden.current)) {
     return null;
   }
 
   return (
     <Tabs
-      safeAreaInsets={{ bottom: 0 }}
-      tabBar={(props) => <TabBar {...props} />}
+      detachInactiveScreens={false}
       screenOptions={{
-        headerStyle: {
-          backgroundColor: theme.colors.header,
-          height: 120,
-        },
-        headerShadowVisible: false,
-        headerLeft: () => (
-          <Pressable
-            onPress={() => router.push("/(app-protected)/modals/select-group")}
-            style={({ pressed }) => ({ marginLeft: 16, opacity: pressed ? 0.6 : 1 })}
-          >
-            <ThemedText style={{ fontSize: 18, letterSpacing: 2 }} variant="title">
-              {groupDetails ? groupDetails.name : "No Group Selected"}
-            </ThemedText>
-            <ThemedText
-              style={{ fontSize: 14, opacity: 0.6, width: 200 }}
-              variant="subtitle"
-              numberOfLines={2}
-            >
-              {groupDetails ? groupDetails.description : "No Group Selected"}
-            </ThemedText>
-          </Pressable>
-        ),
-        headerRight: () => (
-          <View style={{ marginRight: 16 }}>
-            <IconSymbol name="gearshape.fill" size={24} color={theme.colors.icon} />
-          </View>
-        ),
-        headerTitle: "",
+        animation: "none",
+        lazy: false,
       }}
+      tabBar={(props) => <TabBar {...props} />}
     >
       <Tabs.Screen
         name="home"
         options={{
-          title: "Home",
+          headerShown: false,
           tabBarIcon: ({ color }) => <IconSymbol size={30} name="house.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="groups"
+        options={{
+          title: "Groups",
+          headerShown: false,
+          tabBarIcon: ({ color }) => <IconSymbol size={30} name="groups" color={color} />,
         }}
       />
       <Tabs.Screen

@@ -38,9 +38,8 @@ export default function YouScreen() {
             <ThemedText>{theme.scheme === "light" ? "Dark Mode" : "Light Mode"}</ThemedText>
           </View>
         </Button>
-
         <Button variant="secondary" onPress={signOut}>
-          <ThemedText style={styles.signOutText}>Sign Out</ThemedText>
+          <ThemedText style={{ color: theme.colors.danger }}>Sign Out</ThemedText>
         </Button>
       </View>
     </ThemedView>
@@ -51,41 +50,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "space-between",
-    paddingTop: 80,
-    paddingBottom: 100,
-    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   profile: {
     alignItems: "center",
     gap: 16,
   },
   avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: 100,
+    height: 100,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 8,
   },
   initials: {
     fontSize: 36,
-    fontWeight: "700",
-    color: "#fff",
   },
   email: {
-    fontSize: 14,
+    fontSize: 16,
     opacity: 0.6,
   },
   actions: {
-    gap: 12,
+    gap: 8,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-  },
-  signOutText: {
-    color: "#E11D48",
-    fontWeight: "600",
   },
 });

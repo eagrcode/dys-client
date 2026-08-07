@@ -31,9 +31,11 @@ type IconConfig =
 
 const ICONS = {
   edit: { family: "feather", name: "edit" },
+  flag: { family: "feather", name: "flag" },
   calendar: { family: "material", name: "calendar-month" },
   chat: { family: "material-design", name: "chat" },
   home: { family: "material", name: "home" },
+  groups: { family: "material", name: "groups" },
   notifications: { family: "material", name: "notifications" },
   person: { family: "material", name: "person" },
   "chevron-left": { family: "feather", name: "chevron-left" },

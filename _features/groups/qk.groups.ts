@@ -1,12 +1,6 @@
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
+// qk.groups.ts
+export const groupKeys = {
+  all: (userId: string) => ["groups", userId] as const,
 
-export function useGroupKeys() {
-  const { user } = useAuthProvider();
-
-  const groupKeys = {
-    all: () => ["groups", user?.id] as const,
-    detail: (groupId: string) => ["groups", user?.id, groupId] as const,
-  };
-
-  return groupKeys;
-}
+  detail: (userId: string, groupId: string) => [...groupKeys.all(userId), groupId] as const,
+};

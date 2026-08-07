@@ -34,7 +34,7 @@ const CreateGroup = () => {
 
   const keyboard = useAnimatedKeyboard();
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: -keyboard.height.value / 5 }],
+    transform: [{ translateY: -keyboard.height.value / 10 }],
   }));
 
   const handleSetFormData = (key: keyof FormData, value: string) => {
@@ -46,7 +46,6 @@ const CreateGroup = () => {
   };
 
   const handleCreateGroupPress = async () => {
-    // Clear previous errors
     setFieldErrors({ name: "", description: "" });
     setFormError("");
 
@@ -137,16 +136,11 @@ const styles = StyleSheet.create({
   container: {
     position: "relative",
     flex: 1,
-    padding: 16,
-    paddingTop: 60,
-    paddingBottom: 60,
     gap: 16,
     justifyContent: "center",
   },
   form: {
     gap: 16,
-    padding: 16,
-    borderRadius: 8,
   },
   inputs: {
     gap: 8,

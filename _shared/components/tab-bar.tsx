@@ -14,6 +14,8 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         {
           paddingBottom: insets.bottom ? insets.bottom : 16,
           backgroundColor: theme.colors.tabBar,
+          borderTopColor: theme.colors.border,
+          borderTopWidth: StyleSheet.hairlineWidth,
         },
       ]}
       pointerEvents="box-none"

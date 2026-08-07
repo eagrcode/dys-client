@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
-import { useSelectedGroup } from "@/_shared/hooks/use-selected-group";
+import { useStoredGroupId } from "@/_shared/hooks/use-stored-group-id";
 import { listKeys } from "@/_features/lists/qk.lists";
 import type { ApiError } from "@/_shared/types/api-error";
 import type { ToggleCompleteListItemResponse, List } from "@/_features/lists/lists-types";
@@ -21,12 +21,12 @@ type Context = {
 
 export function useToggleCompleteListItem() {
   const queryClient = useQueryClient();
-  const selectedGroup = useSelectedGroup();
+  const storedGroupId = useStoredGroupId();
 
   return useMutation<ToggleCompleteListItemResponse, ApiError, Vars, Context>({
     mutationFn: ({ listId, itemId, completed }) => {
       return listsAPI.toggleCompleteListItem({
-        groupId: selectedGroup,
+        groupId: storedGroupId,
         listId,
         itemId,
         completed,
@@ -34,9 +34,9 @@ export function useToggleCompleteListItem() {
     },
 
     onMutate: async ({ listId, itemId, completed }) => {
-      const listDetailQK = listKeys.detail(selectedGroup, listId);
-      const listsQK = listKeys.group(selectedGroup);
-      const dashboardQK = listKeys.dashboard(selectedGroup);
+      const listDetailQK = listKeys.detail(storedGroupId, listId);
+      const listsQK = listKeys.group(storedGroupId);
+      const dashboardQK = listKeys.dashboard(storedGroupId);
 
       await queryClient.cancelQueries({ queryKey: listDetailQK });
 

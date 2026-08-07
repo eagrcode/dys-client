@@ -31,7 +31,7 @@ const TILE_CONFIG = [
     id: "lists",
     name: "Lists",
     icon: "list",
-    route: "/(app-protected)/lists",
+    route: "/(app-protected)/lists/overview",
     tag: "Outstanding",
   },
   // {
@@ -62,7 +62,7 @@ const buildFeatures = (queries: DashboardQueries): Feature[] => {
     const query = queries[tile.id];
     const count = query.data?.count ?? 0;
     const label = query.isPending
-      ? "Loading"
+      ? `— ${tile.tag}`
       : query.isError
         ? "Unavailable"
         : `${count} ${tile.tag}`;
@@ -75,7 +75,7 @@ const buildFeatures = (queries: DashboardQueries): Feature[] => {
   });
 };
 
-export function Dashboard() {
+const Summary = () => {
   const { lists, calendar, albums, messages } = useDashboardData();
 
   const queries = { lists, calendar, albums, messages };
@@ -83,16 +83,13 @@ export function Dashboard() {
   const features = buildFeatures(queries);
 
   return (
-    <FlatList
-      data={features}
-      numColumns={2}
-      contentContainerStyle={dashboardStyles.grid}
-      columnWrapperStyle={dashboardStyles.row}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => <Tile {...item} />}
-    />
+    <View style={dashboardStyles.grid}>
+      {features.map((item) => (
+        <Tile key={item.id} {...item} />
+      ))}
+    </View>
   );
-}
+};
 
 const Tile = ({ name, icon, route, label }: Feature) => {
   const router = useRouter();
@@ -110,16 +107,17 @@ const Tile = ({ name, icon, route, label }: Feature) => {
           tileStyles.tile,
           {
             width: tileWidth,
-            borderRadius: theme.radius.lg,
+            borderRadius: theme.radius.xl,
             backgroundColor: theme.colors.bgLayer1,
             borderColor: theme.colors.border,
+            borderBottomColor: theme.colors.cyanSoft,
+            ...theme.shadow.tile,
           },
-          theme.shadow.xl,
         ]}
       >
         <View>
           <ThemedText variant="defaultSemiBold">{name}</ThemedText>
-          <ThemedText style={{ fontSize: 14, opacity: 0.7 }}>{label}</ThemedText>
+          <ThemedText style={tileStyles.label}>{label}</ThemedText>
         </View>
 
         <IconSymbol
@@ -157,6 +155,14 @@ const tileStyles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: 1,
+  },
+  label: {
+    minHeight: 20,
+    fontSize: 14,
+    opacity: 0.7,
   },
 });
+
+export { Summary };

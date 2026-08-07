@@ -17,7 +17,7 @@ const Header = ({ isLoading, isFetching }: { isLoading: boolean; isFetching: boo
       </ThemedText>
       <Pressable
         disabled={isLoading || isFetching}
-        onPress={() => router.push("/(app-protected)/modals/create-list")}
+        onPress={() => router.push("/(app-protected)/lists/create-list")}
         style={({ pressed }) => [{ opacity: pressed || isLoading || isFetching ? 0.6 : 1 }]}
       >
         <IconSymbol name={"plus"} size={28} color={theme.colors.accent} />
@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
-    paddingTop: 60,
   },
   title: {
     fontSize: 20,

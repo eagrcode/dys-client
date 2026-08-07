@@ -6,17 +6,11 @@ import { saveTokens, clearTokens, getToken } from "@/_shared/utils/token-manager
 import { log } from "@/_shared/logger/logger";
 import { setSessionExpiredHandler } from "@/_shared/utils/api-call";
 import type { ApiError } from "@/_shared/types/api-error";
+import type { User } from "@/_features/auth/auth-types";
 
 export type AuthResponse = {
   user: User;
   tokens: Tokens;
-};
-
-type User = {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
 };
 
 type Tokens = {

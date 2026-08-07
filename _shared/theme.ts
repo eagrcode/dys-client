@@ -30,6 +30,13 @@ export const Styling = {
   },
 
   shadow: {
+    tile: {
+      shadowColor: "hsl(0, 0%, 0%)",
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.2,
+      shadowRadius: 10,
+      elevation: 4,
+    },
     sm: {
       shadowColor: "#000000",
       shadowOffset: { width: 0, height: 2 },
@@ -39,26 +46,27 @@ export const Styling = {
       // shadowBlur: 20,
     },
     md: {
-      shadowColor: "#000000",
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.1,
-      shadowRadius: 16,
-      elevation: 4,
+      shadowOpacity: 0.09,
+      shadowRadius: 10,
+      elevation: 3,
     },
     lg: {
-      shadowColor: "hsl(0, 84%, 34%)",
-      shadowOffset: { width: 1, height: 3 },
-      shadowOpacity: 0.2,
-      shadowRadius: 2,
+      shadowColor: "hsl(0, 0%, 0%)",
+      shadowOffset: { width: 1, height: 1 },
+      shadowOpacity: 1,
+      shadowRadius: 10,
       elevation: 10,
       shadowBlur: 10,
     },
     xl: {
-      shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 16 },
-      shadowOpacity: 0.18,
-      shadowRadius: 48,
-      elevation: 16,
+      shadowColor: "hsl(0, 84%, 34%)",
+      shadowOffset: { width: 1, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+      elevation: 10,
+      shadowBlur: 10,
     },
   },
 
@@ -186,8 +194,8 @@ export const Colors = {
 
     // Backgrounds
     background: "hsl(226, 55%, 6%)",
-    bgLayer1: "hsl(224, 33%, 10%)",
-    bgLayer2: "hsl(222, 30%, 14%)",
+    bgLayer1: "hsl(224, 33%, 11%)",
+    bgLayer2: "hsl(222, 30%, 13%)",
     bgLayer3: "hsl(223, 28%, 16%)",
 
     // Screen Gradients
@@ -211,7 +219,7 @@ export const Colors = {
     header: "#070B18",
 
     // Borders
-    border: "rgba(255, 255, 255, 0.05)",
+    border: "rgba(255, 255, 255, 0.1)",
     borderStrong: "rgba(255, 255, 255, 0.14)",
 
     // Dashboard

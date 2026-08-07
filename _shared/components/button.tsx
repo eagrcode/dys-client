@@ -47,7 +47,7 @@ export function Button({
         variantStyles[variant],
         {
           opacity: pressed ? 0.85 : isDisabled ? 0.5 : 1,
-          borderRadius: theme.radius.md,
+          borderRadius: theme.radius.xl,
           overflow: "hidden",
         },
         style,

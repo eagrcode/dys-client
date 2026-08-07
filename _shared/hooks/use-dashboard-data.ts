@@ -8,9 +8,9 @@ const STALE_TIME = 5 * 60 * 1000;
 
 export function useDashboardData() {
   const { user } = useAuthProvider();
-  const { selectedGroup } = useGroupsProvider();
+  const { storedGroupId } = useGroupsProvider();
   const userId = user?.id;
-  const enabled = !!userId && !!selectedGroup;
+  const enabled = !!userId && !!storedGroupId;
 
   const options = {
     enabled,
@@ -24,23 +24,23 @@ export function useDashboardData() {
   const [lists, calendar, albums, messages] = useQueries({
     queries: [
       {
-        queryKey: listKeys.dashboard(selectedGroup || ""),
-        queryFn: () => dashboardApi.getLists(selectedGroup || ""),
+        queryKey: listKeys.dashboard(storedGroupId || ""),
+        queryFn: () => dashboardApi.getLists(storedGroupId || ""),
         ...options,
       },
       {
-        queryKey: ["dashboardData", userId, selectedGroup, "calendar"],
-        queryFn: () => dashboardApi.getCalendar(selectedGroup || ""),
+        queryKey: ["dashboardData", userId, storedGroupId, "calendar"],
+        queryFn: () => dashboardApi.getCalendar(storedGroupId || ""),
         ...options,
       },
       {
-        queryKey: ["dashboardData", userId, selectedGroup, "albums"],
-        queryFn: () => dashboardApi.getAlbums(selectedGroup || ""),
+        queryKey: ["dashboardData", userId, storedGroupId, "albums"],
+        queryFn: () => dashboardApi.getAlbums(storedGroupId || ""),
         ...options,
       },
       {
-        queryKey: ["dashboardData", userId, selectedGroup, "messages"],
-        queryFn: () => dashboardApi.getMessages(selectedGroup || ""),
+        queryKey: ["dashboardData", userId, storedGroupId, "messages"],
+        queryFn: () => dashboardApi.getMessages(storedGroupId || ""),
         ...options,
       },
     ],

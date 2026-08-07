@@ -1,5 +1,6 @@
 import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
-import { StyleProp, Text, type TextStyle } from "react-native";
+import { StyleProp, Text } from "react-native";
+import type { TextStyle } from "react-native";
 
 type Variant = "default" | "soft" | "title" | "defaultSemiBold" | "subtitle" | "link" | "button";
 
@@ -39,7 +40,7 @@ export function ThemedText({
       color: theme.colors.text,
     },
     button: {
-      fontFamily: "DMSans_600SemiBold",
+      fontFamily: "DMSans_700Bold",
       fontSize: 16,
       letterSpacing: 0.7,
       color: theme.colors.text,
@@ -47,7 +48,7 @@ export function ThemedText({
     title: {
       fontFamily: "Syne_500Medium",
       fontSize: 32,
-      letterSpacing: 5,
+      letterSpacing: 1.2,
       color: theme.colors.text,
     },
     subtitle: {

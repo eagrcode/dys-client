@@ -1,35 +1,25 @@
 import { StyleSheet } from "react-native";
-import { ThemedText } from "@/_shared/components/themed-text";
 import { ThemedView } from "@/_shared/components/themed-view";
-import { Dashboard } from "@/_shared/components/dashboard";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
+import { Summary } from "@/_features/dashboard/components/summary";
+import { Header } from "@/_features/dashboard/components/header";
+import { useGroupById } from "@/_features/groups/hooks/use-group-id";
 
-export default function HomeScreen() {
+function HomeScreen() {
+  useGroupById();
+
   return (
-    <ThemedView variant="home" style={styles.container}>
+    <ThemedView style={styles.container}>
       <Header />
-      <Dashboard />
+      <Summary />
     </ThemedView>
-  );
-}
-
-function Header() {
-  const { user } = useAuthProvider();
-
-  return (
-    <ThemedText variant="subtitle" style={styles.greeting}>
-      Welcome back, {user?.first_name ?? "User"}!
-    </ThemedText>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     gap: 16,
   },
-  greeting: {
-    fontSize: 20,
-  },
 });
+
+export default HomeScreen;

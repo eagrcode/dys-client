@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
 import { listKeys } from "@/_features/lists/qk.lists";
-import { useSelectedGroup } from "@/_shared/hooks/use-selected-group";
+import { useStoredGroupId } from "@/_shared/hooks/use-stored-group-id";
 import type { ListItem, List } from "@/_features/lists/lists-types";
 import type { ApiError } from "@/_shared/types/api-error";
 import type { QueryKey } from "@tanstack/react-query";
@@ -21,17 +21,17 @@ type Context = {
 
 export function useCreateListItem() {
   const queryClient = useQueryClient();
-  const selectedGroup = useSelectedGroup();
+  const storedGroupId = useStoredGroupId();
 
   return useMutation<ListItem, ApiError, Vars, Context>({
     mutationFn: ({ listId, content }) => {
-      return listsAPI.createListItem(selectedGroup, listId, content);
+      return listsAPI.createListItem(storedGroupId, listId, content);
     },
 
     onMutate: async ({ listId, content }) => {
-      const listDetailQK = listKeys.detail(selectedGroup, listId);
-      const groupListsQK = listKeys.group(selectedGroup);
-      const dashboardQK = listKeys.dashboard(selectedGroup);
+      const listDetailQK = listKeys.detail(storedGroupId, listId);
+      const groupListsQK = listKeys.group(storedGroupId);
+      const dashboardQK = listKeys.dashboard(storedGroupId);
       const optimisticItemId = `temp-${Date.now()}-${Math.random()}`;
 
       await queryClient.cancelQueries({ queryKey: listDetailQK });

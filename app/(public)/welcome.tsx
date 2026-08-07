@@ -1,4 +1,3 @@
-import { AccentGlow } from "@/_shared/components/accent-glow";
 import { ThemedText } from "@/_shared/components/themed-text";
 import { ThemedView } from "@/_shared/components/themed-view";
 import { Button } from "@/_shared/components/button";
@@ -20,7 +19,6 @@ export default function Welcome() {
 
   return (
     <ThemedView style={styles.container}>
-      <AccentGlow />
       <View style={styles.content}>
         <ThemedText variant="title" style={[styles.title, { color: theme.colors.accent }]}>
           HearthLink
@@ -48,7 +46,7 @@ export default function Welcome() {
   );
 }
 
-function Pills() {
+const Pills = () => {
   const theme = useCurrentTheme();
 
   return (
@@ -69,7 +67,7 @@ function Pills() {
       ))}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -95,7 +93,6 @@ const styles = StyleSheet.create({
   },
   buttons: {
     gap: 16,
-    marginBottom: 40,
   },
 });
 

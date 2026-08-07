@@ -4,13 +4,14 @@ import { useGroups } from "@/_features/groups/hooks/use-groups";
 import { log } from "@/_shared/logger/logger";
 import type { Group } from "../groups-types";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGroupKeys } from "../qk.groups";
+import { groupKeys } from "../qk.groups";
 import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 
-type SelectedGroup = string | null;
+type StoredGroupId = string | null;
 
 type GroupContext = {
-  selectedGroup: SelectedGroup;
+  storedGroupId: StoredGroupId;
+  selectedGroup: Group | null;
   selectGroup: (groupId: string) => Promise<void>;
   isLoading: boolean;
 };
@@ -19,9 +20,8 @@ const GroupsContext = createContext<GroupContext | undefined>(undefined);
 
 export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
   const [isReconciling, setIsReconciling] = useState<boolean>(true);
-  const [selectedGroup, setSelectedGroup] = useState<SelectedGroup>(null);
+  const [storedGroupId, setStoredGroupId] = useState<StoredGroupId>(null);
   const queryClient = useQueryClient();
-  const groupKeys = useGroupKeys();
   const { user, isLoading: authLoading } = useAuthProvider();
   const {
     data: userGroups = [],
@@ -37,7 +37,7 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
   const selectGroup = async (groupId: string) => {
     log.info("GroupsProvider | selectGroup - called with ID:", groupId);
 
-    const latestGroups = queryClient.getQueryData<Group[]>(groupKeys.all()) || [];
+    const latestGroups = queryClient.getQueryData<Group[]>(groupKeys.all(user?.id ?? "")) || [];
     const groupExists = latestGroups.some((group) => group.id === groupId);
 
     if (!groupExists) {
@@ -55,28 +55,33 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
       throw new Error("Group does not exist in user groups");
     }
 
+    const previousStoredGroupId = storedGroupId;
+    setStoredGroupId(groupId);
+
     try {
       await SecureStore.setItemAsync("selectedGroup", groupId);
-      setSelectedGroup(groupId);
 
       log.info(
         "GroupsProvider | selectGroup - group selected successfully:",
         JSON.stringify(groupId, null, 2),
       );
     } catch (error) {
+      setStoredGroupId(previousStoredGroupId);
       log.error("GroupsProvider | selectGroup - error persisting selected group:", error);
       throw new Error("Failed to persist selected group", { cause: error });
     }
   };
 
+  const selectedGroup = userGroups.find((group) => group.id === storedGroupId) ?? null;
+
   // Determine if the selected group matches an existing entry in the user groups
-  const selectedGroupIsValid = userHasGroup(selectedGroup);
+  const storedGroupIdIsValid = userHasGroup(storedGroupId);
 
   // Determine if the user has no groups
   const userHasNoGroups = userGroups.length === 0;
 
   // Determine if the selected group matches an existing entry in the user groups or is null when the user has no groups
-  const selectionMatchesGroups = userHasNoGroups ? selectedGroup === null : selectedGroupIsValid;
+  const selectionMatchesGroups = userHasNoGroups ? storedGroupId === null : storedGroupIdIsValid;
 
   const isProviderReady = isUserGroupsSuccess && !isReconciling && selectionMatchesGroups;
   const isProviderLoading = !isProviderReady && !isUserGroupsError;
@@ -93,7 +98,7 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     if (!user) {
-      setSelectedGroup(null);
+      setStoredGroupId(null);
       setIsReconciling(false);
       return;
     }
@@ -126,7 +131,7 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
       } catch (error) {
         log.error("GroupsProvider | Failed to clean up selected group:", error);
       } finally {
-        setSelectedGroup(null);
+        setStoredGroupId(null);
         setIsReconciling(false);
       }
 
@@ -135,7 +140,7 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
         JSON.stringify(
           {
             userGroups,
-            selectedGroup: null,
+            storedGroupId: null,
           },
           null,
           2,
@@ -145,7 +150,7 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     // If the selected group is valid, no reconciliation is needed
-    if (selectedGroupIsValid) {
+    if (storedGroupIdIsValid) {
       log.info("GroupsProvider | Current selected group is valid, no reconciliation required.");
       setIsReconciling(false);
       return;
@@ -155,22 +160,22 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setIsReconciling(true);
 
-      const storedGroup = await SecureStore.getItemAsync("selectedGroup");
+      const persistedGroupId = await SecureStore.getItemAsync("selectedGroup");
 
-      if (storedGroup) {
+      if (persistedGroupId) {
         log.info(
           "GroupsProvider | Found stored group in secure storage:",
-          JSON.stringify(storedGroup, null, 2),
+          JSON.stringify(persistedGroupId, null, 2),
         );
 
         // Does the stored group exist in the user's groups?
-        const groupExists = userHasGroup(storedGroup);
+        const groupExists = userHasGroup(persistedGroupId);
 
         // If not, select the first available group and update secure storage
         if (!groupExists) {
           log.warn(
             "GroupsProvider | Stored group does not exist in user groups, setting first available group...",
-            JSON.stringify(storedGroup, null, 2),
+            JSON.stringify(persistedGroupId, null, 2),
           );
 
           await selectGroup(firstGroup);
@@ -180,7 +185,7 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
             JSON.stringify(
               {
                 userGroups,
-                selectedGroup: firstGroup,
+                storedGroupId: firstGroup,
               },
               null,
               2,
@@ -190,9 +195,9 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
           // If it does exist, select the stored group
           log.info(
             "GroupsProvider | Stored group exists in user groups, selecting stored group...",
-            JSON.stringify(storedGroup, null, 2),
+            JSON.stringify(persistedGroupId, null, 2),
           );
-          setSelectedGroup(storedGroup);
+          setStoredGroupId(persistedGroupId);
         }
       } else {
         // If no stored group is found, select the first available group
@@ -208,7 +213,7 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
         "GroupsProvider | Failed to load selected group, fallback to first available group without persisting:",
         error,
       );
-      setSelectedGroup(firstGroup);
+      setStoredGroupId(firstGroup);
     } finally {
       setIsReconciling(false);
       log.info("GroupsProvider | Finished initialising current group");
@@ -216,7 +221,9 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <GroupsContext.Provider value={{ selectedGroup, selectGroup, isLoading: isProviderLoading }}>
+    <GroupsContext.Provider
+      value={{ storedGroupId, selectedGroup, selectGroup, isLoading: isProviderLoading }}
+    >
       {isReconciling ? null : children}
     </GroupsContext.Provider>
   );

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
-import { useSelectedGroup } from "@/_shared/hooks/use-selected-group";
+import { useStoredGroupId } from "@/_shared/hooks/use-stored-group-id";
 import { listKeys } from "@/_features/lists/qk.lists";
 import type { List } from "@/_features/lists/lists-types";
 import type { ApiError } from "@/_shared/types/api-error";
@@ -19,16 +19,16 @@ type Context = {
 
 export function useRenameList() {
   const queryClient = useQueryClient();
-  const selectedGroup = useSelectedGroup();
+  const storedGroupId = useStoredGroupId();
 
   return useMutation<{ title: string }, ApiError, Vars, Context>({
     mutationFn: ({ listId, newTitle }) => {
-      return listsAPI.renameList(selectedGroup, listId, newTitle);
+      return listsAPI.renameList(storedGroupId, listId, newTitle);
     },
 
     onMutate: async ({ listId, newTitle }) => {
-      const groupListsQK = listKeys.group(selectedGroup);
-      const listDetailQK = listKeys.detail(selectedGroup, listId);
+      const groupListsQK = listKeys.group(storedGroupId);
+      const listDetailQK = listKeys.detail(storedGroupId, listId);
 
       await queryClient.cancelQueries({ queryKey: listDetailQK });
 

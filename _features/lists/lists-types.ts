@@ -49,4 +49,4 @@ export type UpdateListItemResponse = {
   content: string;
 };
 
-export type ListMode = "default" | "edit-item" | "select-items";
+export type ListMode = "default" | "select-items";

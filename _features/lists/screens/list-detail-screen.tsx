@@ -21,17 +21,8 @@ function ListDetailScreen() {
   const [listMode, setListMode] = useState<ListMode>("default");
   const [optionsShowing, setOptionsShowing] = useState<boolean>(false);
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
-  const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const { listId } = useLocalSearchParams<{ listId: string }>();
-  const {
-    data: list,
-    error,
-    isLoading,
-    refetch,
-    isFetching,
-    isError,
-    isSuccess,
-  } = useListById(listId || "");
+  const { data: list, error, isLoading, refetch, isFetching, isError } = useListById(listId || "");
 
   const items = list?.items ?? [];
   const isSelectMode = listMode === "select-items";
@@ -113,9 +104,6 @@ function ListDetailScreen() {
               <ItemRow
                 item={item}
                 listMode={listMode}
-                editingItemId={editingItemId}
-                setEditingItemId={setEditingItemId}
-                setListMode={setListMode}
                 selectedItemIds={selectedItemIds}
                 setSelectedItemIds={setSelectedItemIds}
               />

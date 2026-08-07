@@ -61,7 +61,7 @@ export function Input({
         {
           borderColor: colors.border,
           color: colors.text,
-          borderRadius: theme.radius.sm,
+          borderRadius: theme.radius.lg,
         },
         style,
       ]}
@@ -86,7 +86,6 @@ export function Input({
 
 const styles = StyleSheet.create({
   base: {
-    // flex: 1,
     padding: 16,
     fontSize: 16,
     fontFamily: "DMSans_400Regular",

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
-import { useSelectedGroup } from "@/_shared/hooks/use-selected-group";
+import { useStoredGroupId } from "@/_shared/hooks/use-stored-group-id";
 import { listKeys } from "@/_features/lists/qk.lists";
 import type { ApiError } from "@/_shared/types/api-error";
 import type { DeleteListItemsResponse, List } from "@/_features/lists/lists-types";
@@ -20,7 +20,7 @@ type Context = {
 
 export function useDeleteListItems() {
   const queryClient = useQueryClient();
-  const selectedGroup = useSelectedGroup();
+  const storedGroupId = useStoredGroupId();
 
   return useMutation<DeleteListItemsResponse, ApiError, Vars, Context>({
     mutationFn: ({ listId, itemIds }) => {
@@ -30,16 +30,16 @@ export function useDeleteListItems() {
       });
 
       return listsAPI.deleteListItems({
-        groupId: selectedGroup,
+        groupId: storedGroupId,
         listId,
         itemIds,
       });
     },
 
     onMutate: async ({ listId, itemIds }) => {
-      const listDetailQK = listKeys.detail(selectedGroup, listId);
-      const listsQK = listKeys.group(selectedGroup);
-      const dashboardQK = listKeys.dashboard(selectedGroup);
+      const listDetailQK = listKeys.detail(storedGroupId, listId);
+      const listsQK = listKeys.group(storedGroupId);
+      const dashboardQK = listKeys.dashboard(storedGroupId);
 
       await queryClient.cancelQueries({ queryKey: listDetailQK });
 
