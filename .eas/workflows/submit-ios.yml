@@ -1,4 +1,4 @@
-name: Submit iOS to TestFlight
+name: Deploy iOS
 
 on:
   push:
@@ -6,8 +6,25 @@ on:
       - testflight
 
 jobs:
+  fingerprint:
+    name: Calculate native fingerprint
+    type: fingerprint
+    environment: production
+
+  get_ios_build:
+    name: Find compatible iOS build
+    needs:
+      - fingerprint
+    type: get-build
+    params:
+      fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
+      profile: production
+
   build_ios:
     name: Build iOS
+    needs:
+      - get_ios_build
+    if: ${{ !needs.get_ios_build.outputs.build_id }}
     type: build
     params:
       platform: ios
@@ -20,3 +37,15 @@ jobs:
     type: submit
     params:
       build_id: ${{ needs.build_ios.outputs.build_id }}
+      profile: production
+
+  publish_ios_update:
+    name: Publish iOS update
+    needs:
+      - get_ios_build
+    if: ${{ needs.get_ios_build.outputs.build_id }}
+    type: update
+    environment: production
+    params:
+      platform: ios
+      channel: production

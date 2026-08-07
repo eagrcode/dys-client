@@ -154,13 +154,12 @@ function ToggleComplete({ item, listMode }: { item: ListItem; listMode: ListMode
 const itemRowStyles = StyleSheet.create({
   row: {
     width: "100%",
-    minHeight: 48,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingVertical: 12,
-    paddingLeft: 12,
-    borderWidth: 1,
+    paddingVertical: 10,
+    paddingLeft: 10,
+    borderWidth: StyleSheet.hairlineWidth,
   },
 });
 

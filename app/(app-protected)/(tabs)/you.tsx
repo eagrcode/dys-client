@@ -17,7 +17,12 @@ export default function YouScreen() {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.profile}>
-        <View style={[styles.avatar, { backgroundColor: theme.colors.accent }]}>
+        <View
+          style={[
+            styles.avatar,
+            { backgroundColor: theme.colors.accent, borderRadius: theme.radius.full },
+          ]}
+        >
           <ThemedText style={styles.initials}>{initials}</ThemedText>
         </View>
 

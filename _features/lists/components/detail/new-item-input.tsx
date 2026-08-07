@@ -7,7 +7,7 @@ import { useRef, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import { ErrorAlert } from "@/_shared/components/alert";
 
-export function NewItemInput() {
+const NewItemInput = () => {
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const [newItem, setNewItem] = useState<string>("");
   const { mutate: createListItem, isPending: isCreatePending } = useCreateListItem();
@@ -39,7 +39,7 @@ export function NewItemInput() {
         styles.container,
         {
           borderColor: theme.colors.border,
-          borderRadius: theme.radius.md,
+          borderRadius: theme.radius.xl,
         },
       ]}
     >
@@ -61,7 +61,7 @@ export function NewItemInput() {
       />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -79,3 +79,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
 });
+export { NewItemInput };

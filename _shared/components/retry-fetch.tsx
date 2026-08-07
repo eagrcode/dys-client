@@ -31,9 +31,7 @@ const RetryFetch = ({ error, refetch, isFetching, type }: Props) => {
 
   return (
     <View style={styles.centered}>
-      <ThemedText style={{ opacity: 0.5, marginBottom: 16 }}>
-        {message}
-      </ThemedText>
+      <ThemedText style={{ opacity: 0.5, marginBottom: 16 }}>{message}</ThemedText>
       {canRetry && (
         <Button
           variant="primary"
