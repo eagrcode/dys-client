@@ -11,7 +11,7 @@ export const dashboardApi = {
       "GET",
     );
 
-    return response.data;
+    return response;
   },
 
   getCalendar: async (groupId: string): Promise<DashboardCount> => {
@@ -20,7 +20,7 @@ export const dashboardApi = {
       "GET",
     );
 
-    return response.data;
+    return response;
   },
 
   getAlbums: async (groupId: string): Promise<DashboardCount> => {
@@ -29,7 +29,7 @@ export const dashboardApi = {
       "GET",
     );
 
-    return response.data;
+    return response;
   },
 
   getMessages: async (groupId: string): Promise<DashboardCount> => {
@@ -38,6 +38,6 @@ export const dashboardApi = {
       "GET",
     );
 
-    return response.data;
+    return response;
   },
 };

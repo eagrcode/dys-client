@@ -1,7 +1,7 @@
 import { ThemedText } from "@/_shared/components/themed-text";
 import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { View, StyleSheet } from "react-native";
-import type { ListItem } from "../../lists-types";
+import type { ListItem } from "../../types/t-list";
 
 type Props = {
   items: ListItem[];

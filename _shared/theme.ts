@@ -194,7 +194,7 @@ export const Colors = {
 
     // Backgrounds
     background: "hsl(226, 55%, 6%)",
-    bgLayer1: "hsl(224, 33%, 11%)",
+    bgLayer1: "hsl(224, 33%, 10%)",
     bgLayer2: "hsl(222, 30%, 13%)",
     bgLayer3: "hsl(223, 28%, 16%)",
 

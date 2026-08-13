@@ -10,11 +10,6 @@ import { log } from "../logger/logger";
 
 type SessionExpiredHandler = (sessionError: ApiError) => void | Promise<void>;
 
-type ApiSuccessResponse<T> = {
-  success: true;
-  data: T;
-};
-
 const REFRESH_ENDPOINT = "/auth/refresh";
 
 let refreshPromise: Promise<boolean> | null = null;
@@ -179,7 +174,7 @@ export async function apiCall<T = unknown>(
   method: HttpMethod,
   options: RequestInit = {},
   isRetry = false,
-): Promise<ApiSuccessResponse<T>> {
+): Promise<T> {
   try {
     return await executeApiCall<T>(endpoint, method, options, isRetry);
   } catch (error) {
@@ -205,7 +200,7 @@ async function executeApiCall<T>(
   method: HttpMethod,
   options: RequestInit,
   isRetry: boolean,
-): Promise<ApiSuccessResponse<T>> {
+): Promise<T> {
   const token = await getToken();
   const url = `${API_BASE_URL}${endpoint}`;
   const headers = new Headers(options.headers);
@@ -279,14 +274,10 @@ async function executeApiCall<T>(
     throw apiError;
   }
 
-  if (!isRecord(parsedResponse) || !("data" in parsedResponse)) {
-    throw createInvalidResponseError(endpoint, method, response.status);
-  }
-
   const isBodySensitive = config.body && config.body.toString().includes("password");
   const isParsedResponseSensitive =
-    isRecord(parsedResponse.data) &&
-    Object.keys(parsedResponse.data).some((key) => key.includes("tokens"));
+    isRecord(parsedResponse) &&
+    Object.keys(parsedResponse).some((key) => key.toLowerCase().includes("token"));
 
   log.info(
     "api-call | API Call:",
@@ -301,12 +292,12 @@ async function executeApiCall<T>(
     JSON.stringify(
       {
         status: response.status,
-        data: isParsedResponseSensitive ? "[REDACTED]" : parsedResponse.data,
+        body: isParsedResponseSensitive ? "[REDACTED]" : parsedResponse,
       },
       null,
       2,
     ),
   );
 
-  return parsedResponse as ApiSuccessResponse<T>;
+  return parsedResponse as T;
 }

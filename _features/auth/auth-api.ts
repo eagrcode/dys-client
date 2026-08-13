@@ -15,13 +15,13 @@ export const authAPI = {
         password: formData.password,
       }),
     });
-    return response.data;
+    return response;
   },
 
   signIn: async (formData: SignInInput): Promise<AuthResponse> => {
     const response = await apiCall<AuthResponse>("/auth/login", "POST", {
       body: JSON.stringify({ email: formData.email, password: formData.password }),
     });
-    return response.data;
+    return response;
   },
 };

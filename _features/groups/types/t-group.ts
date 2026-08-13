@@ -6,8 +6,3 @@ export type Group = {
   created_at: string;
   updated_at: string;
 };
-
-export type DeleteGroupResponse = {
-  id: string;
-  name: string;
-};

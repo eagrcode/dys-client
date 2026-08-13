@@ -9,10 +9,9 @@ import { IconSymbol } from "@/_shared/components/icon-symbol";
 import { ThemedText } from "@/_shared/components/themed-text";
 import { ThemedView } from "@/_shared/components/themed-view";
 import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
-import type { Group } from "@/_features/groups/groups-types";
+import type { Group } from "@/_features/groups/types/t-group";
 import RetryFetch from "@/_shared/components/retry-fetch";
 import type { User } from "@/_features/auth/auth-types";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 function GroupsScreen() {
   const theme = useCurrentTheme();
@@ -50,7 +49,7 @@ function GroupsScreen() {
 
   const showGroupActions = (groupId: string) => {
     router.push({
-      pathname: "/(app-protected)/modals/group-actions",
+      pathname: "/(app-protected)/(modals)/group-actions",
       params: { groupId },
     });
   };

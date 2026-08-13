@@ -5,7 +5,7 @@ import { useDeleteGroup } from "@/_features/groups/hooks/use-delete-group";
 import { useGroupById } from "@/_features/groups/hooks/use-group-id";
 import { getGroupInitials } from "@/_features/groups/utils/get-group-initials";
 import { BackButton } from "@/_shared/components/back-button";
-import { IconSymbol } from "@/_shared/components/icon-symbol";
+import { ActionRow } from "@/_shared/components/action-row";
 import { ThemedText } from "@/_shared/components/themed-text";
 import { ThemedView } from "@/_shared/components/themed-view";
 import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
@@ -109,15 +109,27 @@ export default function GroupSettingsScreen() {
             <ThemedText variant="defaultSemiBold" style={styles.sectionTitle}>
               Group
             </ThemedText>
-            <SettingsRow icon="edit" label="Edit group details" disabled />
-            <SettingsRow icon="person" label="Members and invitations" disabled />
+            <ActionRow
+              icon="edit"
+              label="Edit group details"
+              disabledReason="Coming soon"
+            />
+            <ActionRow
+              icon="person"
+              label="Members and invitations"
+              disabledReason="Coming soon"
+            />
           </View>
 
           <View style={styles.section}>
             <ThemedText variant="defaultSemiBold" style={styles.sectionTitle}>
               Your settings
             </ThemedText>
-            <SettingsRow icon="notifications" label="Notification preferences" disabled />
+            <ActionRow
+              icon="notifications"
+              label="Notification preferences"
+              disabledReason="Coming soon"
+            />
           </View>
 
           <View style={styles.section}>
@@ -125,69 +137,20 @@ export default function GroupSettingsScreen() {
               Membership
             </ThemedText>
             {group.created_by === user?.id ? (
-              <SettingsRow
+              <ActionRow
                 icon="trash"
                 label="Delete group"
-                destructive
+                tone="danger"
                 loading={isDeleting}
                 onPress={confirmDelete}
               />
             ) : (
-              <SettingsRow icon="close" label="Leave group" disabled />
+              <ActionRow icon="close" label="Leave group" disabledReason="Coming soon" />
             )}
           </View>
         </ScrollView>
       )}
     </ThemedView>
-  );
-}
-
-function SettingsRow({
-  icon,
-  label,
-  disabled = false,
-  destructive = false,
-  loading = false,
-  onPress,
-}: {
-  icon: React.ComponentProps<typeof IconSymbol>["name"];
-  label: string;
-  disabled?: boolean;
-  destructive?: boolean;
-  loading?: boolean;
-  onPress?: () => void;
-}) {
-  const theme = useCurrentTheme();
-  const foreground = destructive ? theme.colors.danger : theme.colors.text;
-
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ disabled: disabled || loading }}
-      disabled={disabled || loading}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.settingsRow,
-        {
-          backgroundColor: theme.colors.bgLayer1,
-          borderColor: theme.colors.border,
-          borderRadius: theme.radius.lg,
-          opacity: pressed ? 0.65 : disabled ? 0.5 : 1,
-        },
-      ]}
-    >
-      <IconSymbol name={icon} size={20} color={disabled ? theme.colors.textMuted : foreground} />
-      <ThemedText variant="defaultSemiBold" style={[styles.settingsLabel, { color: foreground }]}>
-        {label}
-      </ThemedText>
-      {loading ? (
-        <ActivityIndicator size="small" color={foreground} />
-      ) : disabled ? (
-        <ThemedText variant="soft" style={styles.comingSoon}>
-          Coming soon
-        </ThemedText>
-      ) : null}
-    </Pressable>
   );
 }
 
@@ -259,19 +222,5 @@ const styles = StyleSheet.create({
   sectionTitle: {
     marginLeft: 4,
     fontSize: 14,
-  },
-  settingsRow: {
-    minHeight: 54,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-  },
-  settingsLabel: {
-    flex: 1,
-  },
-  comingSoon: {
-    fontSize: 12,
   },
 });

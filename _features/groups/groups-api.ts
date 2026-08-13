@@ -1,26 +1,36 @@
 import { apiCall } from "@/_shared/utils/api-call";
-import type { Group, DeleteGroupResponse } from "@/_features/groups/groups-types";
+import type {
+  CreateGroup,
+  DeleteGroup,
+  GetGroupById,
+  GetGroups,
+} from "@/_features/groups/types/t-groups-api";
+
+const BASE_URL = "/groups";
 
 export const groupsAPI = {
-  getUserGroups: async (): Promise<Group[]> => {
-    const response = await apiCall<Group[]>(`/groups`, "GET");
-    return response.data;
+  getUserGroups: async (): Promise<GetGroups.Response> => {
+    const response = await apiCall<GetGroups.Response>(BASE_URL, "GET");
+    return response;
   },
 
-  createGroup: async (name: string, description: string): Promise<Group> => {
-    const response = await apiCall<Group>(`/groups`, "POST", {
-      body: JSON.stringify({ name, description }),
+  createGroup: async (req: CreateGroup.Request): Promise<CreateGroup.Response> => {
+    const { data } = req;
+    const response = await apiCall<CreateGroup.Response>(BASE_URL, "POST", {
+      body: JSON.stringify(data),
     });
-    return response.data;
+    return response;
   },
 
-  getGroupById: async (groupId: string): Promise<Group> => {
-    const response = await apiCall<Group>(`/groups/${groupId}`, "GET");
-    return response.data;
+  getGroupById: async (req: GetGroupById.Request): Promise<GetGroupById.Response> => {
+    const { groupId } = req;
+    const response = await apiCall<GetGroupById.Response>(`${BASE_URL}/${groupId}`, "GET");
+    return response;
   },
 
-  deleteGroup: async (groupId: string): Promise<DeleteGroupResponse> => {
-    const response = await apiCall<DeleteGroupResponse>(`/groups/${groupId}`, "DELETE");
-    return response.data;
+  deleteGroup: async (req: DeleteGroup.Request): Promise<DeleteGroup.Response> => {
+    const { groupId } = req;
+    const response = await apiCall<DeleteGroup.Response>(`${BASE_URL}/${groupId}`, "DELETE");
+    return response;
   },
 };

@@ -5,12 +5,10 @@ import { useRouter } from "expo-router";
 import { groupKeys } from "../qk.groups";
 import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 import type { ApiError } from "@/_shared/types/api-error";
-import type { Group } from "@/_features/groups/groups-types";
+import type { Group } from "@/_features/groups/types/t-group";
+import type { CreateGroup } from "@/_features/groups/types/t-groups-api";
 
-type Props = {
-  name: string;
-  description: string;
-};
+type Props = CreateGroup.Request["data"];
 
 export function useCreateGroup() {
   const queryClient = useQueryClient();
@@ -18,8 +16,11 @@ export function useCreateGroup() {
   const { user } = useAuthProvider();
   const router = useRouter();
 
-  return useMutation<Group, ApiError, Props>({
-    mutationFn: ({ name, description }) => groupsAPI.createGroup(name, description),
+  return useMutation<CreateGroup.Response, ApiError, Props>({
+    mutationFn: ({ name, description }) =>
+      groupsAPI.createGroup({
+        data: { name, description },
+      }),
     onSuccess: async (createdGroup) => {
       const userID = user?.id ?? "";
 

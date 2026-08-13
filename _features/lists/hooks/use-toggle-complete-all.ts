@@ -4,11 +4,8 @@ import { listKeys } from "@/_features/lists/qk.lists";
 import { useStoredGroupId } from "@/_shared/hooks/use-stored-group-id";
 import type { QueryKey } from "@tanstack/react-query";
 import type { ApiError } from "@/_shared/types/api-error";
-import type {
-  ToggleCompleteAllListItemsResponse,
-  List,
-  ListItem,
-} from "@/_features/lists/lists-types";
+import type { List, ListItem } from "@/_features/lists/types/t-list";
+import type { ToggleCompleteAllListItems } from "@/_features/lists/types/t-lists-api";
 
 type Vars = {
   listId: string;
@@ -26,7 +23,7 @@ export function useToggleCompleteAllListItems() {
   const queryClient = useQueryClient();
   const storedGroupId = useStoredGroupId();
 
-  return useMutation<ToggleCompleteAllListItemsResponse, ApiError, Vars, Context>({
+  return useMutation<ToggleCompleteAllListItems.Response, ApiError, Vars, Context>({
     mutationFn: ({ listId, completed }) => {
       return listsAPI.toggleCompleteAllListItems({
         groupId: storedGroupId,

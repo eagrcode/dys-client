@@ -16,7 +16,7 @@ const Header = () => {
     if (!selectedGroup) return;
 
     router.push({
-      pathname: "/(app-protected)/modals/group-actions",
+      pathname: "/(app-protected)/(modals)/group-actions",
       params: { groupId: selectedGroup.id },
     });
   };

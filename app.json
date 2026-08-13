@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Dys",
+    "name": "HearthNet",
     "slug": "dys",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,7 +16,7 @@
       }
     },
     "android": {
-      "package": "com.eagrcode.dys",
+      "package": "hearth_net.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

@@ -21,6 +21,7 @@ import { shouldRetryApiError } from "@/_shared/types/api-error";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
 SplashScreen.preventAutoHideAsync();
@@ -49,15 +50,17 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <ThemePreferenceProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <GroupsProvider>
-            <StatusBar style="auto" />
-            <Slot />
-          </GroupsProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </ThemePreferenceProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemePreferenceProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <GroupsProvider>
+              <StatusBar style="auto" />
+              <Slot />
+            </GroupsProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </ThemePreferenceProvider>
+    </GestureHandlerRootView>
   );
 }

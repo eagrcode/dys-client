@@ -1,73 +1,69 @@
 import { apiCall } from "@/_shared/utils/api-call";
 import type {
-  List,
-  ListType,
-  ListItem,
-  ToggleCompleteListItemResponse,
-  DeleteListItemsResponse,
-  ToggleCompleteAllListItemsResponse,
-  UpdateListItemResponse,
-} from "@/_features/lists/lists-types";
+  GetLists,
+  CreateList,
+  GetListById,
+  DeleteList,
+  CreateListItem,
+  UpdateListItem,
+  DeleteListItems,
+  RenameList,
+  ToggleCompleteListItem,
+  ToggleCompleteAllListItems,
+} from "./types/t-lists-api";
+import { log } from "@/_shared/logger/logger";
 
 const BASE_URL = `/groups`;
 
-type ToggleCompleteListItem = {
-  groupId: string;
-  listId: string;
-  itemId: string;
-  completed: boolean;
-};
-
-type ToggleCompleteAllListItems = {
-  groupId: string;
-  listId: string;
-  completed: boolean;
-};
-
 export const listsAPI = {
-  getGroupLists: async (groupId: string): Promise<List[]> => {
-    const response = await apiCall<List[]>(`${BASE_URL}/${groupId}/lists`, "GET");
-    return response.data;
+  getGroupLists: async (req: GetLists.Request): Promise<GetLists.Response> => {
+    const { groupId } = req;
+    const response = await apiCall<GetLists.Response>(`${BASE_URL}/${groupId}/lists`, "GET");
+    return response;
   },
 
-  createList: async (
-    groupId: string,
-    data: { title: string; listType: ListType },
-  ): Promise<List> => {
-    const response = await apiCall<List>(`${BASE_URL}/${groupId}/lists`, "POST", {
+  createList: async (req: CreateList.Request): Promise<CreateList.Response> => {
+    const { groupId, data } = req;
+    const response = await apiCall<CreateList.Response>(`${BASE_URL}/${groupId}/lists`, "POST", {
       body: JSON.stringify(data),
     });
-    return response.data;
+    return response;
   },
 
-  getListById: async (groupId: string, listId: string): Promise<List> => {
-    const response = await apiCall<List>(`${BASE_URL}/${groupId}/lists/${listId}`, "GET");
-    return response.data;
+  getListById: async (req: GetListById.Request): Promise<GetListById.Response> => {
+    const { groupId, listId } = req;
+    const response = await apiCall<GetListById.Response>(
+      `${BASE_URL}/${groupId}/lists/${listId}`,
+      "GET",
+    );
+    log.info("listsAPI.getListById | Response", { response });
+    return response;
   },
 
-  deleteList: async (groupId: string, listId: string): Promise<List> => {
-    const response = await apiCall<List>(`${BASE_URL}/${groupId}/lists/${listId}`, "DELETE");
-    return response.data;
+  deleteList: async (req: DeleteList.Request): Promise<DeleteList.Response> => {
+    const { groupId, listId } = req;
+    const response = await apiCall<DeleteList.Response>(
+      `${BASE_URL}/${groupId}/lists/${listId}`,
+      "DELETE",
+    );
+    return response;
   },
 
-  createListItem: async (groupId: string, listId: string, content: string): Promise<ListItem> => {
-    const response = await apiCall<ListItem>(
+  createListItem: async (req: CreateListItem.Request): Promise<CreateListItem.Response> => {
+    const { groupId, listId, content } = req;
+    const response = await apiCall<CreateListItem.Response>(
       `${BASE_URL}/${groupId}/lists/${listId}/items`,
       "POST",
       {
         body: JSON.stringify({ content }),
       },
     );
-    return response.data;
+    return response;
   },
 
-  updateListItem: async (
-    groupId: string,
-    listId: string,
-    itemId: string,
-    content: string,
-  ): Promise<UpdateListItemResponse> => {
-    const response = await apiCall<UpdateListItemResponse>(
+  updateListItem: async (req: UpdateListItem.Request): Promise<UpdateListItem.Response> => {
+    const { groupId, listId, itemId, content } = req;
+    const response = await apiCall<UpdateListItem.Response>(
       `${BASE_URL}/${groupId}/lists/${listId}/items/${itemId}`,
       "PATCH",
       {
@@ -75,15 +71,12 @@ export const listsAPI = {
       },
     );
 
-    return response.data;
+    return response;
   },
 
-  renameList: async (
-    groupId: string,
-    listId: string,
-    newTitle: string,
-  ): Promise<{ title: string }> => {
-    const response = await apiCall<{ title: string }>(
+  renameList: async (req: RenameList.Request): Promise<RenameList.Response> => {
+    const { groupId, listId, newTitle } = req;
+    const response = await apiCall<RenameList.Response>(
       `${BASE_URL}/${groupId}/lists/${listId}`,
       "PATCH",
       {
@@ -91,19 +84,12 @@ export const listsAPI = {
       },
     );
 
-    return response.data;
+    return response;
   },
 
-  deleteListItems: async ({
-    groupId,
-    listId,
-    itemIds,
-  }: {
-    groupId: string;
-    listId: string;
-    itemIds: string[];
-  }): Promise<DeleteListItemsResponse> => {
-    const response = await apiCall<DeleteListItemsResponse>(
+  deleteListItems: async (req: DeleteListItems.Request): Promise<DeleteListItems.Response> => {
+    const { groupId, listId, itemIds } = req;
+    const response = await apiCall<DeleteListItems.Response>(
       `${BASE_URL}/${groupId}/lists/${listId}/items/delete`,
       "DELETE",
       {
@@ -111,16 +97,14 @@ export const listsAPI = {
       },
     );
 
-    return response.data;
+    return response;
   },
 
-  toggleCompleteListItem: async ({
-    groupId,
-    listId,
-    itemId,
-    completed,
-  }: ToggleCompleteListItem): Promise<ToggleCompleteListItemResponse> => {
-    const response = await apiCall<ToggleCompleteListItemResponse>(
+  toggleCompleteListItem: async (
+    req: ToggleCompleteListItem.Request,
+  ): Promise<ToggleCompleteListItem.Response> => {
+    const { groupId, listId, itemId, completed } = req;
+    const response = await apiCall<ToggleCompleteListItem.Response>(
       `${BASE_URL}/${groupId}/lists/${listId}/items/${itemId}/toggle`,
       "PATCH",
       {
@@ -128,15 +112,14 @@ export const listsAPI = {
       },
     );
 
-    return response.data;
+    return response;
   },
 
-  toggleCompleteAllListItems: async ({
-    groupId,
-    listId,
-    completed,
-  }: ToggleCompleteAllListItems): Promise<ToggleCompleteAllListItemsResponse> => {
-    const response = await apiCall<ToggleCompleteAllListItemsResponse>(
+  toggleCompleteAllListItems: async (
+    req: ToggleCompleteAllListItems.Request,
+  ): Promise<ToggleCompleteAllListItems.Response> => {
+    const { groupId, listId, completed } = req;
+    const response = await apiCall<ToggleCompleteAllListItems.Response>(
       `${BASE_URL}/${groupId}/lists/${listId}/items/toggle-all`,
       "PATCH",
       {
@@ -144,6 +127,6 @@ export const listsAPI = {
       },
     );
 
-    return response.data;
+    return response;
   },
 };

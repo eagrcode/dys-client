@@ -2,9 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
 import { listKeys } from "@/_features/lists/qk.lists";
 import { useStoredGroupId } from "@/_shared/hooks/use-stored-group-id";
-import type { ListItem, List } from "@/_features/lists/lists-types";
+import type { ListItem, List } from "@/_features/lists/types/t-list";
 import type { ApiError } from "@/_shared/types/api-error";
 import type { QueryKey } from "@tanstack/react-query";
+import { CreateListItem } from "../types/t-lists-api";
 
 type Vars = {
   listId: string;
@@ -23,9 +24,9 @@ export function useCreateListItem() {
   const queryClient = useQueryClient();
   const storedGroupId = useStoredGroupId();
 
-  return useMutation<ListItem, ApiError, Vars, Context>({
+  return useMutation<CreateListItem.Response, ApiError, Vars, Context>({
     mutationFn: ({ listId, content }) => {
-      return listsAPI.createListItem(storedGroupId, listId, content);
+      return listsAPI.createListItem({ groupId: storedGroupId, listId, content });
     },
 
     onMutate: async ({ listId, content }) => {
@@ -65,7 +66,9 @@ export function useCreateListItem() {
 
         return {
           ...old,
-          items: old.items?.map((item) => (item.id === context.optimisticItemId ? data : item)),
+          items: old.items?.map((item) =>
+            item.id === context.optimisticItemId ? { ...item, id: data.id } : item,
+          ),
         };
       });
     },

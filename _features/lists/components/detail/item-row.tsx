@@ -5,7 +5,9 @@ import { IconSymbol } from "@/_shared/components/icon-symbol";
 import { ThemedText } from "@/_shared/components/themed-text";
 import { useToggleCompleteListItem } from "@/_features/lists/hooks/use-toggle-complete";
 import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
-import type { ListItem, ListMode } from "@/_features/lists/lists-types";
+import { RowSurface } from "@/_shared/components/row-surface";
+import type { ListItem } from "@/_features/lists/types/t-list";
+import type { ListMode } from "@/_features/lists/types/t-list-ui";
 
 type ItemRowProps = {
   item: ListItem;
@@ -18,13 +20,12 @@ export function ItemRow({ item, listMode, selectedItemIds, setSelectedItemIds }:
   const theme = useCurrentTheme();
 
   return (
-    <View
+    <RowSurface
+      background="bgLayer2"
       style={[
         itemRowStyles.row,
         {
-          backgroundColor: theme.colors.bgLayer2,
           borderRadius: theme.radius.md,
-          borderColor: theme.colors.border,
           ...theme.shadow.sm,
         },
       ]}
@@ -36,7 +37,7 @@ export function ItemRow({ item, listMode, selectedItemIds, setSelectedItemIds }:
         selectedItemIds={selectedItemIds}
         setSelectedItemIds={setSelectedItemIds}
       />
-    </View>
+    </RowSurface>
   );
 }
 
@@ -69,13 +70,10 @@ function ItemContent({ item, listMode, selectedItemIds, setSelectedItemIds }: It
     <View style={itemContentStyles.container}>
       {isSelectMode ? (
         <Pressable
-          accessibilityRole="checkbox"
-          accessibilityLabel={`Select ${item.content}`}
-          accessibilityState={{ checked: isSelectedForDelete }}
           onPress={selectItemForDelete}
           style={({ pressed }) => [
             itemContentStyles.selectionTarget,
-            { opacity: pressed ? 0.65 : 1 },
+            { opacity: pressed ? 0.7 : 1 },
           ]}
         >
           <ItemLabel item={item} />
@@ -134,9 +132,6 @@ function ToggleComplete({ item, listMode }: { item: ListItem; listMode: ListMode
 
   return (
     <Pressable
-      accessibilityRole="checkbox"
-      accessibilityLabel={`${item.completed ? "Mark incomplete" : "Mark complete"}: ${item.content}`}
-      accessibilityState={{ checked: item.completed, disabled: isDisabled }}
       disabled={isDisabled}
       onPress={toggleItem}
       hitSlop={8}
@@ -154,12 +149,7 @@ function ToggleComplete({ item, listMode }: { item: ListItem; listMode: ListMode
 const itemRowStyles = StyleSheet.create({
   row: {
     width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: 10,
-    paddingLeft: 10,
-    borderWidth: StyleSheet.hairlineWidth,
+    gap: 12,
   },
 });
 
@@ -170,14 +160,11 @@ const itemContentStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingRight: 8,
   },
   selectionTarget: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    paddingRight: 8,
   },
   navigationButton: {
     alignItems: "center",
@@ -186,7 +173,6 @@ const itemContentStyles = StyleSheet.create({
   text: {
     flex: 1,
     minWidth: 0,
-    marginLeft: 8,
     fontSize: 16,
   },
   completedText: {

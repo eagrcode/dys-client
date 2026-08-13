@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { useGroups } from "@/_features/groups/hooks/use-groups";
 import { log } from "@/_shared/logger/logger";
-import type { Group } from "../groups-types";
+import type { Group } from "@/_features/groups/types/t-group";
 import { useQueryClient } from "@tanstack/react-query";
 import { groupKeys } from "../qk.groups";
 import { useAuthProvider } from "@/_features/auth/providers/session-provider";

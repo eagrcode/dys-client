@@ -1,4 +1,4 @@
-name: Deploy iOS
+name: Deploy mobile
 
 on:
   push:
@@ -20,6 +20,15 @@ jobs:
       fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
       profile: production
 
+  get_android_build:
+    name: Find compatible Android build
+    needs:
+      - fingerprint
+    type: get-build
+    params:
+      fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
+      profile: production
+
   build_ios:
     name: Build iOS
     needs:
@@ -28,6 +37,16 @@ jobs:
     type: build
     params:
       platform: ios
+      profile: production
+
+  build_android:
+    name: Build Android
+    needs:
+      - get_android_build
+    if: ${{ !needs.get_android_build.outputs.build_id }}
+    type: build
+    params:
+      platform: android
       profile: production
 
   submit_ios:
@@ -39,6 +58,15 @@ jobs:
       build_id: ${{ needs.build_ios.outputs.build_id }}
       profile: production
 
+  submit_android:
+    name: Submit to Google Play internal testing
+    needs:
+      - build_android
+    type: submit
+    params:
+      build_id: ${{ needs.build_android.outputs.build_id }}
+      profile: production
+
   publish_ios_update:
     name: Publish iOS update
     needs:
@@ -48,4 +76,15 @@ jobs:
     environment: production
     params:
       platform: ios
+      channel: production
+
+  publish_android_update:
+    name: Publish Android update
+    needs:
+      - get_android_build
+    if: ${{ needs.get_android_build.outputs.build_id }}
+    type: update
+    environment: production
+    params:
+      platform: android
       channel: production

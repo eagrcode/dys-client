@@ -2,7 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
 import { useStoredGroupId } from "@/_shared/hooks/use-stored-group-id";
 import { listKeys } from "../qk.lists";
-import type { List, UpdateListItemResponse } from "@/_features/lists/lists-types";
+import type { List } from "@/_features/lists/types/t-list";
+import type { UpdateListItem } from "@/_features/lists/types/t-lists-api";
 import type { ApiError } from "@/_shared/types/api-error";
 
 type Vars = {
@@ -20,9 +21,14 @@ export function useUpdateListItem() {
   const queryClient = useQueryClient();
   const storedGroupId = useStoredGroupId();
 
-  return useMutation<UpdateListItemResponse, ApiError, Vars, Context>({
+  return useMutation<UpdateListItem.Response, ApiError, Vars, Context>({
     mutationFn: ({ listId, itemId, content }) => {
-      return listsAPI.updateListItem(storedGroupId, listId, itemId, content);
+      return listsAPI.updateListItem({
+        groupId: storedGroupId,
+        listId,
+        itemId,
+        content,
+      });
     },
 
     onMutate: async ({ listId, itemId, content }) => {

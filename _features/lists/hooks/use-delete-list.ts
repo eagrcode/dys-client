@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
 import { listKeys } from "@/_features/lists/qk.lists";
-import { useRouter } from "expo-router";
 import { useStoredGroupId } from "@/_shared/hooks/use-stored-group-id";
 import type { ApiError } from "@/_shared/types/api-error";
-import type { List } from "@/_features/lists/lists-types";
+import type { List } from "@/_features/lists/types/t-list";
+import { DeleteList } from "../types/t-lists-api";
 
 type Vars = string;
 
@@ -17,11 +17,13 @@ type Context = {
 export function useDeleteList() {
   const queryClient = useQueryClient();
   const storedGroupId = useStoredGroupId();
-  const router = useRouter();
 
-  return useMutation<List, ApiError, Vars, Context>({
+  return useMutation<DeleteList.Response, ApiError, Vars, Context>({
     mutationFn: (listId) => {
-      return listsAPI.deleteList(storedGroupId, listId);
+      return listsAPI.deleteList({
+        groupId: storedGroupId,
+        listId,
+      });
     },
 
     onMutate: async (listId) => {
@@ -43,10 +45,6 @@ export function useDeleteList() {
     onError: (_err, _vars, context) => {
       if (!context) return;
       queryClient.setQueryData(context.listsQK, context.prevGroupLists);
-    },
-
-    onSuccess: () => {
-      router.back();
     },
 
     onSettled: (_data, _error, _vars, context) => {

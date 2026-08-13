@@ -1,15 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { groupsAPI } from "@/_features/groups/groups-api";
 import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import type { Group } from "@/_features/groups/groups-types";
 import { log } from "@/_shared/logger/logger";
-import type { ApiError } from "@/_shared/types/api-error";
 import { groupKeys } from "@/_features/groups/qk.groups";
+import { QUERY_TIMES } from "@/_shared/config/query-policy";
+import type { GetGroups } from "@/_features/groups/types/t-groups-api";
+import type { ApiError } from "@/_shared/types/api-error";
 
 export function useGroups() {
   const { user, isLoading: authLoading } = useAuthProvider();
 
-  return useQuery<Group[], ApiError>({
+  return useQuery<GetGroups.Response, ApiError>({
     queryKey: groupKeys.all(user?.id ?? ""),
     queryFn: async () => {
       log.info("useGroups | Firing query", { userId: user?.id });
@@ -17,6 +18,7 @@ export function useGroups() {
       return response ?? [];
     },
     enabled: !!user?.id && !authLoading,
-    staleTime: 5 * 60 * 1000,
+    staleTime: QUERY_TIMES.groups.staleTime,
+    gcTime: QUERY_TIMES.groups.gcTime,
   });
 }

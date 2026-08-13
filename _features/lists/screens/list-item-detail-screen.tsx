@@ -3,13 +3,13 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   View,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { BackButton } from "@/_shared/components/back-button";
+import { ActionRow } from "@/_shared/components/action-row";
 import { Button } from "@/_shared/components/button";
 import { ErrorAlert } from "@/_shared/components/alert";
 import { IconSymbol } from "@/_shared/components/icon-symbol";
@@ -21,7 +21,7 @@ import { useListById } from "@/_features/lists/hooks/use-list-id";
 import { useToggleCompleteListItem } from "@/_features/lists/hooks/use-toggle-complete";
 import { useUpdateListItem } from "@/_features/lists/hooks/use-update-list-item";
 import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
-import type { ListItem } from "@/_features/lists/lists-types";
+import type { ListItem } from "@/_features/lists/types/t-list";
 
 function ListItemDetailScreen() {
   const theme = useCurrentTheme();
@@ -29,12 +29,12 @@ function ListItemDetailScreen() {
     listId: string;
     itemId: string;
   }>();
-  const { data: list, error, isLoading, isError, isFetching, refetch } = useListById(listId);
+  const { data: list, error, isPending, isError, isFetching, refetch } = useListById(listId);
   const item = list?.items?.find((listItem) => listItem.id === itemId);
 
   let content: React.ReactNode;
 
-  if (isLoading) {
+  if (isPending) {
     content = (
       <View style={screenStyles.stateContainer}>
         <ActivityIndicator color={theme.colors.accent} />
@@ -222,65 +222,12 @@ function ItemActions({ item, listId }: { item: ListItem; listId: string }) {
         <ThemedText variant="defaultSemiBold" style={actionSectionStyles.sectionTitle}>
           Planning
         </ThemedText>
-        <ActionRow icon="person" label="Assigned to" hint="Coming soon" disabled />
-        <ActionRow icon="calendar" label="Due date" hint="Coming soon" disabled />
-        <ActionRow icon="flag" label="Priority" hint="Coming soon" disabled />
-        <ActionRow icon="notifications" label="Reminder" hint="Coming soon" disabled />
+        <ActionRow icon="person" label="Assigned to" disabledReason="Coming soon" />
+        <ActionRow icon="calendar" label="Due date" disabledReason="Coming soon" />
+        <ActionRow icon="flag" label="Priority" disabledReason="Coming soon" />
+        <ActionRow icon="notifications" label="Reminder" disabledReason="Coming soon" />
       </View>
     </>
-  );
-}
-
-function ActionRow({
-  icon,
-  label,
-  hint,
-  disabled = false,
-  loading = false,
-  onPress,
-}: {
-  icon: React.ComponentProps<typeof IconSymbol>["name"];
-  label: string;
-  hint?: string;
-  disabled?: boolean;
-  loading?: boolean;
-  onPress?: () => void;
-}) {
-  const theme = useCurrentTheme();
-  const isDisabled = disabled || loading;
-
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ disabled: isDisabled }}
-      disabled={isDisabled}
-      onPress={onPress}
-      style={({ pressed }) => [
-        actionRowStyles.row,
-        {
-          backgroundColor: theme.colors.bgLayer1,
-          borderColor: theme.colors.border,
-          borderRadius: theme.radius.lg,
-          opacity: pressed ? 0.65 : disabled ? 0.5 : 1,
-        },
-      ]}
-    >
-      <IconSymbol
-        name={icon}
-        size={20}
-        color={disabled ? theme.colors.textMuted : theme.colors.accent}
-      />
-      <ThemedText variant="defaultSemiBold" style={actionRowStyles.label}>
-        {label}
-      </ThemedText>
-      {loading ? (
-        <ActivityIndicator size="small" color={theme.colors.accent} />
-      ) : hint ? (
-        <ThemedText variant="soft" style={actionRowStyles.hint}>
-          {hint}
-        </ThemedText>
-      ) : null}
-    </Pressable>
   );
 }
 
@@ -375,22 +322,6 @@ const actionSectionStyles = StyleSheet.create({
   sectionTitle: {
     marginLeft: 4,
     fontSize: 16,
-  },
-});
-
-const actionRowStyles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    padding: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  label: {
-    flex: 1,
-  },
-  hint: {
-    fontSize: 12,
   },
 });
 

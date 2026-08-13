@@ -4,9 +4,8 @@ import { useAuthProvider } from "@/_features/auth/providers/session-provider";
 import { listKeys } from "@/_features/lists/qk.lists";
 import { useStoredGroupId } from "@/_shared/hooks/use-stored-group-id";
 import type { ApiError } from "@/_shared/types/api-error";
-import type { List } from "@/_features/lists/lists-types";
-
-const STALE_TIME = 5 * 60 * 1000;
+import { GetListById } from "../types/t-lists-api";
+import { QUERY_TIMES } from "@/_shared/config/query-policy";
 
 export function useListById(listId: string) {
   const { user } = useAuthProvider();
@@ -15,12 +14,16 @@ export function useListById(listId: string) {
   const queryKey = listKeys.detail(storedGroupId, listId);
   const enabled = !!userId && !!storedGroupId && !!listId;
 
-  return useQuery<List, ApiError>({
+  return useQuery<GetListById.Response, ApiError>({
     queryKey: queryKey,
     queryFn: async () => {
-      return await listsAPI.getListById(storedGroupId, listId);
+      return await listsAPI.getListById({
+        groupId: storedGroupId,
+        listId: listId,
+      });
     },
     enabled: enabled,
-    staleTime: STALE_TIME,
+    staleTime: QUERY_TIMES.lists.staleTime,
+    gcTime: QUERY_TIMES.lists.gcTime,
   });
 }

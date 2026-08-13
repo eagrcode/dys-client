@@ -3,7 +3,7 @@ import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { View, Pressable, StyleSheet, Alert } from "react-native";
 import { useDeleteListItems } from "@/_features/lists/hooks/use-delete-list-items";
 import { useLocalSearchParams } from "expo-router";
-import type { ListMode } from "@/_features/lists/lists-types";
+import type { ListMode } from "@/_features/lists/types/t-list-ui";
 import { ErrorAlert } from "@/_shared/components/alert";
 
 type Props = {

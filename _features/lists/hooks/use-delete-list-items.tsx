@@ -3,7 +3,8 @@ import { listsAPI } from "@/_features/lists/lists-api";
 import { useStoredGroupId } from "@/_shared/hooks/use-stored-group-id";
 import { listKeys } from "@/_features/lists/qk.lists";
 import type { ApiError } from "@/_shared/types/api-error";
-import type { DeleteListItemsResponse, List } from "@/_features/lists/lists-types";
+import type { List } from "@/_features/lists/types/t-list";
+import type { DeleteListItems } from "@/_features/lists/types/t-lists-api";
 import type { QueryKey } from "@tanstack/react-query";
 
 type Vars = {
@@ -22,7 +23,7 @@ export function useDeleteListItems() {
   const queryClient = useQueryClient();
   const storedGroupId = useStoredGroupId();
 
-  return useMutation<DeleteListItemsResponse, ApiError, Vars, Context>({
+  return useMutation<DeleteListItems.Response, ApiError, Vars, Context>({
     mutationFn: ({ listId, itemIds }) => {
       console.log("useDeleteListItems | Firing query", {
         listId: listId,

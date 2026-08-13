@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/_features/lists/lists-api";
+import type { RenameList } from "../types/t-lists-api";
 import { useStoredGroupId } from "@/_shared/hooks/use-stored-group-id";
 import { listKeys } from "@/_features/lists/qk.lists";
-import type { List } from "@/_features/lists/lists-types";
+import type { List } from "@/_features/lists/types/t-list";
 import type { ApiError } from "@/_shared/types/api-error";
 import type { QueryKey } from "@tanstack/react-query";
 
@@ -21,9 +22,9 @@ export function useRenameList() {
   const queryClient = useQueryClient();
   const storedGroupId = useStoredGroupId();
 
-  return useMutation<{ title: string }, ApiError, Vars, Context>({
+  return useMutation<RenameList.Response, ApiError, Vars, Context>({
     mutationFn: ({ listId, newTitle }) => {
-      return listsAPI.renameList(storedGroupId, listId, newTitle);
+      return listsAPI.renameList({ groupId: storedGroupId, listId, newTitle });
     },
 
     onMutate: async ({ listId, newTitle }) => {

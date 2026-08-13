@@ -3,8 +3,9 @@ import { useRouter } from "expo-router";
 import { listsAPI } from "@/_features/lists/lists-api";
 import { listKeys } from "@/_features/lists/qk.lists";
 import { useStoredGroupId } from "@/_shared/hooks/use-stored-group-id";
-import type { List, ListType } from "@/_features/lists/lists-types";
+import type { ListType } from "@/_features/lists/constants/list-types-config";
 import type { ApiError } from "@/_shared/types/api-error";
+import type { CreateList } from "@/_features/lists/types/t-lists-api";
 
 type Vars = {
   title: string;
@@ -16,11 +17,14 @@ export function useCreateList() {
   const storedGroupId = useStoredGroupId();
   const router = useRouter();
 
-  return useMutation<List, ApiError, Vars>({
+  return useMutation<CreateList.Response, ApiError, Vars>({
     mutationFn: ({ title, listType }) => {
-      return listsAPI.createList(storedGroupId, {
-        title,
-        listType,
+      return listsAPI.createList({
+        groupId: storedGroupId,
+        data: {
+          title: title,
+          listType: listType,
+        },
       });
     },
 

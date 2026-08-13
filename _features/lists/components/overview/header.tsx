@@ -5,7 +5,7 @@ import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { useRouter } from "expo-router";
 import { View, Pressable, StyleSheet } from "react-native";
 
-const Header = ({ isLoading, isFetching }: { isLoading: boolean; isFetching: boolean }) => {
+function Header({ isLoading, isFetching }: { isLoading: boolean; isFetching: boolean }) {
   const router = useRouter();
   const theme = useCurrentTheme();
 
@@ -24,7 +24,7 @@ const Header = ({ isLoading, isFetching }: { isLoading: boolean; isFetching: boo
       </Pressable>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   header: {
