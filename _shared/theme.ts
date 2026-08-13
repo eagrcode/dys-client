@@ -186,7 +186,7 @@ export const Colors = {
     danger: Accent.danger,
 
     // Text
-    text: "#F4F6FA",
+    text: "#dce2ef",
     textSoft: "#B8BECC",
     textMuted: "#7E8798",
     textDisabled: "#565F70",
@@ -207,7 +207,7 @@ export const Colors = {
     ambientGlowSecondary: "#FF6B3D",
 
     // Icons
-    icon: "#C6CAD6",
+    icon: "#d3d6df",
     iconAccent: Accent.accent,
 
     // Tab Bar

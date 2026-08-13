@@ -10,10 +10,12 @@ export function Header({
   listId,
   listMode,
   title,
+  onCancelSelection,
 }: {
   listId: string;
   listMode: ListMode;
   title: string;
+  onCancelSelection: () => void;
 }) {
   const theme = useCurrentTheme();
 
@@ -25,17 +27,23 @@ export function Header({
           {title}
         </ThemedText>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <Pressable
-            onPress={() =>
-              router.push({
-                pathname: "/(app-protected)/(modals)/list-detail-actions",
-                params: { listId, listMode },
-              })
-            }
-            style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
-          >
-            <IconSymbol name="ellipsis" size={30} color={theme.colors.icon} />
-          </Pressable>
+          {listMode === "select-items" ? (
+            <Pressable onPress={onCancelSelection} hitSlop={10}>
+              <IconSymbol name="xmark" size={25} color={theme.colors.icon} />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() =>
+                router.push({
+                  pathname: "/(app-protected)/(modals)/list-detail-actions",
+                  params: { listId, listMode },
+                })
+              }
+              style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+            >
+              <IconSymbol name="ellipsis" size={30} color={theme.colors.icon} />
+            </Pressable>
+          )}
         </View>
       </View>
     </View>

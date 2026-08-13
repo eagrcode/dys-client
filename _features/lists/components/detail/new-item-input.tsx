@@ -10,7 +10,7 @@ import { ErrorAlert } from "@/_shared/components/alert";
 const NewItemInput = () => {
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const [newItem, setNewItem] = useState<string>("");
-  const { mutate: createListItem, isPending: isCreatePending } = useCreateListItem();
+  const { mutate: createListItem } = useCreateListItem();
   const theme = useCurrentTheme();
   const inputRef = useRef<TextInput>(null);
 
@@ -20,9 +20,6 @@ const NewItemInput = () => {
     createListItem(
       { listId: listId, content: newItem.trim() },
       {
-        onSuccess: () => {
-          setNewItem("");
-        },
         onError: (error) => {
           ErrorAlert({
             title: "Failed to create item",
@@ -31,6 +28,7 @@ const NewItemInput = () => {
         },
       },
     );
+    setNewItem("");
   };
 
   return (
@@ -56,7 +54,6 @@ const NewItemInput = () => {
         onChangeText={(content) => setNewItem(content)}
         onSubmitEditing={handleAddItemPress}
         submitBehavior="submit"
-        editable={!isCreatePending}
         maxLength={100}
       />
     </View>

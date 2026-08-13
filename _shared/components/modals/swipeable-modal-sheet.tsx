@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo } from "react";
 import { type Href, router, useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -12,17 +12,25 @@ import Animated, {
 } from "react-native-reanimated";
 import { BackHandler, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 
-const SHEET_HEIGHT_RATIO = 0.85;
+const DEFAULT_SHEET_HEIGHT_RATIO = 0.85;
 
 type Props = {
   children: React.ReactNode;
   fallbackHref: Href;
+  sheetHeightRatio?: number;
 };
 
-export function SwipeableModalSheet({ children, fallbackHref }: Props) {
+export type SwipeableModalSheetHandle = {
+  dismiss: (afterDismiss?: () => void) => void;
+};
+
+export const SwipeableModalSheet = forwardRef<SwipeableModalSheetHandle, Props>(function ModalSheet(
+  { children, fallbackHref, sheetHeightRatio },
+  ref,
+) {
   const theme = useCurrentTheme();
   const { height: windowHeight } = useWindowDimensions();
-  const sheetHeight = windowHeight * SHEET_HEIGHT_RATIO;
+  const sheetHeight = windowHeight * (sheetHeightRatio ?? DEFAULT_SHEET_HEIGHT_RATIO);
   const sheetTranslateY = useSharedValue(sheetHeight);
   const scrimOpacity = useSharedValue(0);
   const isClosing = useSharedValue(false);
@@ -36,17 +44,22 @@ export function SwipeableModalSheet({ children, fallbackHref }: Props) {
     router.replace(fallbackHref);
   }, [fallbackHref]);
 
-  const dismiss = useCallback(() => {
-    if (isClosing.value) return;
+  const dismiss = useCallback(
+    (afterDismiss?: () => void) => {
+      if (isClosing.value) return;
 
-    isClosing.value = true;
-    scrimOpacity.value = withTiming(0, { duration: 160 });
-    sheetTranslateY.value = withTiming(sheetHeight, { duration: 220 }, (finished) => {
-      if (finished) {
-        scheduleOnRN(completeDismiss);
-      }
-    });
-  }, [completeDismiss, isClosing, scrimOpacity, sheetHeight, sheetTranslateY]);
+      isClosing.value = true;
+      scrimOpacity.value = withTiming(0, { duration: 160 });
+      sheetTranslateY.value = withTiming(sheetHeight, { duration: 220 }, (finished) => {
+        if (finished) {
+          scheduleOnRN(afterDismiss ?? completeDismiss);
+        }
+      });
+    },
+    [completeDismiss, isClosing, scrimOpacity, sheetHeight, sheetTranslateY],
+  );
+
+  useImperativeHandle(ref, () => ({ dismiss }), [dismiss]);
 
   useEffect(() => {
     isClosing.value = false;
@@ -110,7 +123,7 @@ export function SwipeableModalSheet({ children, fallbackHref }: Props) {
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.scrim, scrimAnimatedStyle]}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} />
+        <Pressable style={StyleSheet.absoluteFill} onPress={() => dismiss()} />
       </Animated.View>
 
       <Animated.View
@@ -135,7 +148,7 @@ export function SwipeableModalSheet({ children, fallbackHref }: Props) {
       </Animated.View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -161,7 +174,7 @@ const styles = StyleSheet.create({
   handleContainer: {
     alignItems: "center",
     justifyContent: "center",
-    height: 40,
+    height: 50,
   },
   handle: {
     width: 40,

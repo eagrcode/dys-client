@@ -7,4 +7,8 @@ export const QUERY_TIMES = {
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   },
+  members: {
+    staleTime: 60 * 60 * 1000, // 60 minutes
+    gcTime: 60 * 60 * 1000, // 60 minutes
+  },
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from "react-native";
 import { router, useLocalSearchParams, type Href } from "expo-router";
 import { useDeleteList } from "@/_features/lists/hooks/use-delete-list";
@@ -9,11 +9,17 @@ import type { ListMode } from "@/_features/lists/types/t-list-ui";
 import { ErrorAlert } from "@/_shared/components/alert";
 import { Button } from "@/_shared/components/button";
 import { Input } from "@/_shared/components/input";
-import { SwipeableModalSheet } from "@/_shared/components/modals/swipeable-modal-sheet";
+import {
+  SwipeableModalSheet,
+  type SwipeableModalSheetHandle,
+} from "@/_shared/components/modals/swipeable-modal-sheet";
 import RetryFetch from "@/_shared/components/retry-fetch";
 import { ThemedText } from "@/_shared/components/themed-text";
 import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
 import { ActionRow } from "@/_shared/components/action-row";
+import { IconSymbol } from "@/_shared/components/icon-symbol";
+// import { useGroupMembers } from "@/_features/members/hooks/use-group-members";
+// import type { Member } from "@/_features/members/types/t-members";
 
 type OptionsMode = "options" | "rename";
 
@@ -24,10 +30,12 @@ type EditOption = {
   destructive?: boolean;
   disabled?: boolean;
   loading?: boolean;
+  icon?: React.ComponentProps<typeof IconSymbol>["name"] | null;
 };
 
 export default function ListDetailActionsModal() {
   const theme = useCurrentTheme();
+  const sheetRef = useRef<SwipeableModalSheetHandle>(null);
   const [optionsMode, setOptionsMode] = useState<OptionsMode>("options");
   const [newTitle, setNewTitle] = useState("");
   const { listId = "", listMode = "default" } = useLocalSearchParams<{
@@ -39,6 +47,11 @@ export default function ListDetailActionsModal() {
     useToggleCompleteAllListItems();
   const { mutate: deleteList, isPending: isDeletePending } = useDeleteList();
   const { mutate: renameList, isPending: isRenamePending } = useRenameList();
+  // const { data: groupMembers } = useGroupMembers(list?.group_id ?? "");
+
+  // const listCreatedByName: string =
+  //   groupMembers?.find((member: Member) => member.user_id === list?.created_by)?.first_name ??
+  //   "Unknown";
 
   const fallbackHref: Href = listId
     ? {
@@ -69,9 +82,11 @@ export default function ListDetailActionsModal() {
   const handleToggleSelectMode = () => {
     const nextListMode: ListMode = listMode === "select-items" ? "default" : "select-items";
 
-    router.dismissTo({
-      pathname: "/(app-protected)/lists/[listId]/detail",
-      params: { listId, mode: nextListMode },
+    sheetRef.current?.dismiss(() => {
+      router.dismissTo({
+        pathname: "/(app-protected)/lists/[listId]/detail",
+        params: { listId, mode: nextListMode },
+      });
     });
   };
 
@@ -126,6 +141,7 @@ export default function ListDetailActionsModal() {
       id: "rename",
       title: "Rename List",
       onPress: handleRename,
+      icon: "rename",
     },
     {
       id: "toggle-complete",
@@ -133,12 +149,14 @@ export default function ListDetailActionsModal() {
       onPress: handleToggleComplete,
       disabled: !list?.items?.length,
       loading: isToggleCompletePending,
+      icon: list?.completed ? "checkbox-blank-outline" : "checkbox-outline",
     },
     {
       id: "delete-selection",
       title: listMode === "select-items" ? "Cancel Delete Selection" : "Delete Selection",
       onPress: handleToggleSelectMode,
       disabled: !list?.items?.length,
+      icon: "close-box-outline",
     },
     {
       id: "delete",
@@ -146,6 +164,7 @@ export default function ListDetailActionsModal() {
       onPress: handleDelete,
       destructive: true,
       loading: isDeletePending,
+      icon: "delete-forever",
     },
   ];
 
@@ -192,7 +211,11 @@ export default function ListDetailActionsModal() {
           >
             <ThemedText style={{ color: theme.colors.accent }}>Save</ThemedText>
           </Button>
-          <Button variant="secondary" onPress={() => router.back()} style={styles.flexButton}>
+          <Button
+            variant="secondary"
+            onPress={() => setOptionsMode("options")}
+            style={styles.flexButton}
+          >
             <ThemedText style={{ color: theme.colors.text }}>Cancel</ThemedText>
           </Button>
         </View>
@@ -208,8 +231,8 @@ export default function ListDetailActionsModal() {
             onPress={option.onPress}
             tone={option.destructive ? "danger" : "default"}
             disabled={option.disabled}
-            loading={option.loading}
             background="bgLayer2"
+            icon={option.icon ?? null}
           />
         ))}
       </View>
@@ -217,7 +240,12 @@ export default function ListDetailActionsModal() {
   }
 
   return (
-    <SwipeableModalSheet fallbackHref={fallbackHref}>
+    <SwipeableModalSheet ref={sheetRef} fallbackHref={fallbackHref} sheetHeightRatio={0.6}>
+      <View style={styles.header}>
+        <ThemedText variant="defaultSemiBold" style={{ fontSize: 16 }}>
+          List Options
+        </ThemedText>
+      </View>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[styles.content, isShowingState && styles.stateContent]}
@@ -231,6 +259,12 @@ export default function ListDetailActionsModal() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    width: "100%",
+    marginBottom: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   scrollView: {
     flex: 1,
   },

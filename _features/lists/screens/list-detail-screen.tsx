@@ -1,4 +1,4 @@
-import { View, StyleSheet, ActivityIndicator, FlatList } from "react-native";
+import { View, StyleSheet, ActivityIndicator, FlatList, Pressable } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ThemedText } from "@/_shared/components/themed-text";
 import { ThemedView } from "@/_shared/components/themed-view";
@@ -8,12 +8,13 @@ import { useEffect, useState } from "react";
 import { Header } from "@/_features/lists/components/detail/header";
 import { NewItemInput } from "@/_features/lists/components/detail/new-item-input";
 import { ItemRow } from "@/_features/lists/components/detail/item-row";
-import { DeleteItemsToolbar } from "@/_features/lists/components/detail/delete-items-toolbar";
+import { DeleteItems } from "@/_features/lists/components/detail/delete-items";
 import RetryFetch from "@/_shared/components/retry-fetch";
 import { ProgressIndicator } from "@/_features/lists/components/detail/progress-indicator";
 import type { ListItem } from "@/_features/lists/types/t-list";
 import type { ListMode } from "@/_features/lists/types/t-list-ui";
 import { LIST_TYPES, type ListType } from "@/_features/lists/constants/list-types-config";
+import { IconSymbol } from "@/_shared/components/icon-symbol";
 
 const SCREEN_PADDING = 16;
 
@@ -45,6 +46,11 @@ function ListDetailScreen() {
   const title = list?.title ?? routeTitle ?? "List";
   const listType = list?.list_type ?? routeListType;
   const createdAt = list?.created_at ?? routeCreatedAt;
+
+  const cancelSelection = () => {
+    setSelectedItemIds(new Set());
+    setListMode("default");
+  };
 
   useEffect(() => {
     if (!requestedListMode) return;
@@ -103,19 +109,24 @@ function ListDetailScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <Header listId={listId} listMode={listMode} title={title} />
-      {isSelectMode ? (
-        <DeleteItemsToolbar
-          selectedItemIds={selectedItemIds}
-          setSelectedItemIds={setSelectedItemIds}
-          setListMode={setListMode}
-        />
-      ) : (
-        <NewItemInput />
-      )}
+      <Header
+        listId={listId}
+        listMode={listMode}
+        title={title}
+        onCancelSelection={cancelSelection}
+      />
+      <NewItemInput />
       <ItemsCard listType={listType} createdAt={createdAt} items={items}>
         {content}
       </ItemsCard>
+      {isSelectMode && (
+        <DeleteItems
+          selectedItemIds={selectedItemIds}
+          setSelectedItemIds={setSelectedItemIds}
+          setListMode={setListMode}
+          onCancelSelection={cancelSelection}
+        />
+      )}
     </ThemedView>
   );
 }

@@ -50,7 +50,7 @@ export function ActionRow({
   const theme = useCurrentTheme();
   const isDisabled = disabled || loading || Boolean(disabledReason);
   const foreground = tone === "danger" ? theme.colors.danger : theme.colors.text;
-  let iconColor = completed === false ? theme.colors.icon : theme.colors.accent;
+  let iconColor = completed === false ? theme.colors.icon : theme.colors.icon;
 
   if (tone === "danger") {
     iconColor = theme.colors.danger;

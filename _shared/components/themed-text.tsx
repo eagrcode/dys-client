@@ -24,31 +24,31 @@ export function ThemedText({
     default: {
       fontFamily: "DMSans_400Regular",
       fontSize: 16,
-      letterSpacing: 0.7,
+      letterSpacing: 0.5,
       color: theme.colors.text,
     },
     soft: {
       fontFamily: "DMSans_400Regular",
       fontSize: 16,
-      letterSpacing: 0.7,
+      letterSpacing: 0.5,
       color: theme.colors.textMuted,
     },
     defaultSemiBold: {
       fontFamily: "DMSans_600SemiBold",
       fontSize: 16,
-      letterSpacing: 0.7,
+      letterSpacing: 0.5,
       color: theme.colors.text,
     },
     button: {
       fontFamily: "DMSans_700Bold",
       fontSize: 16,
-      letterSpacing: 0.7,
+      letterSpacing: 0.5,
       color: theme.colors.text,
     },
     title: {
       fontFamily: "Syne_500Medium",
       fontSize: 32,
-      letterSpacing: 1.2,
+      letterSpacing: 0.7,
       color: theme.colors.text,
     },
     subtitle: {
@@ -61,7 +61,7 @@ export function ThemedText({
       fontFamily: "DMSans_400Regular",
       lineHeight: 30,
       fontSize: 16,
-      letterSpacing: 0.7,
+      letterSpacing: 0.2,
       color: theme.colors.accent,
     },
   };

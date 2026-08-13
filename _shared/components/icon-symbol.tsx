@@ -76,9 +76,16 @@ const ICONS = {
   "plus.circle.fill": { family: "material-design", name: "plus-circle" },
   "sun.max.fill": { family: "material", name: "light-mode" },
   xmark: { family: "material-design", name: "window-close" },
+  "format-list-checks": { family: "material-design", name: "format-list-checks" },
+  "playlist-remove": { family: "material", name: "playlist-remove" },
+  rename: { family: "material-design", name: "rename" },
+  "delete-forever": { family: "material-design", name: "delete-forever" },
+  "checkbox-blank-outline": { family: "material-design", name: "checkbox-blank-outline" },
+  "checkbox-outline": { family: "material-design", name: "checkbox-outline" },
+  "close-box-outline": { family: "material-design", name: "close-box-outline" },
 } satisfies Record<string, IconConfig>;
 
-type IconSymbolName = keyof typeof ICONS;
+export type IconSymbolName = keyof typeof ICONS;
 
 export function IconSymbol({
   name,
