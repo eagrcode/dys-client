@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from "react-native";
 import { router, useLocalSearchParams, type Href } from "expo-router";
 import { useDeleteList } from "@/_features/lists/hooks/use-delete-list";
@@ -7,8 +7,6 @@ import { useRenameList } from "@/_features/lists/hooks/use-rename-list";
 import { useToggleCompleteAllListItems } from "@/_features/lists/hooks/use-toggle-complete-all";
 import type { ListMode } from "@/_features/lists/types/t-list-ui";
 import { ErrorAlert } from "@/_shared/components/alert";
-import { Button } from "@/_shared/components/button";
-import { Input } from "@/_shared/components/input";
 import {
   SwipeableModalSheet,
   type SwipeableModalSheetHandle,
@@ -20,8 +18,6 @@ import { ActionRow } from "@/_shared/components/action-row";
 import { IconSymbol } from "@/_shared/components/icon-symbol";
 // import { useGroupMembers } from "@/_features/members/hooks/use-group-members";
 // import type { Member } from "@/_features/members/types/t-members";
-
-type OptionsMode = "options" | "rename";
 
 type EditOption = {
   id: string;
@@ -36,8 +32,6 @@ type EditOption = {
 export default function ListDetailActionsModal() {
   const theme = useCurrentTheme();
   const sheetRef = useRef<SwipeableModalSheetHandle>(null);
-  const [optionsMode, setOptionsMode] = useState<OptionsMode>("options");
-  const [newTitle, setNewTitle] = useState("");
   const { listId = "", listMode = "default" } = useLocalSearchParams<{
     listId?: string;
     listMode?: ListMode;
@@ -60,8 +54,6 @@ export default function ListDetailActionsModal() {
       }
     : "/(app-protected)/lists/overview";
   const isShowingState = !listId || isPending || isError || !list;
-  const isSubmitRenameDisabled =
-    newTitle.trim() === "" || newTitle.trim() === list?.title || isRenamePending;
 
   const handleToggleComplete = () => {
     if (!list || isToggleCompletePending) return;
@@ -79,7 +71,7 @@ export default function ListDetailActionsModal() {
     );
   };
 
-  const handleToggleSelectMode = () => {
+  const handleInitSelectMode = () => {
     const nextListMode: ListMode = listMode === "select-items" ? "default" : "select-items";
 
     sheetRef.current?.dismiss(() => {
@@ -115,32 +107,21 @@ export default function ListDetailActionsModal() {
     ]);
   };
 
-  const handleRename = () => {
-    if (!list) return;
-
-    setNewTitle(list.title);
-    setOptionsMode("rename");
-  };
-
-  const handleSaveRename = () => {
-    if (isSubmitRenameDisabled) return;
-
-    renameList(
-      { listId, newTitle: newTitle.trim() },
-      {
-        onSuccess: () => router.back(),
-        onError: (mutationError) => {
-          ErrorAlert({ title: "Failed to rename list", error: mutationError });
-        },
-      },
-    );
+  const handleInitRename = () => {
+    const nextListMode: ListMode = "renaming";
+    sheetRef.current?.dismiss(() => {
+      router.dismissTo({
+        pathname: "/(app-protected)/lists/[listId]/detail",
+        params: { listId, mode: nextListMode },
+      });
+    });
   };
 
   const options: EditOption[] = [
     {
       id: "rename",
       title: "Rename List",
-      onPress: handleRename,
+      onPress: handleInitRename,
       icon: "rename",
     },
     {
@@ -154,7 +135,7 @@ export default function ListDetailActionsModal() {
     {
       id: "delete-selection",
       title: listMode === "select-items" ? "Cancel Delete Selection" : "Delete Selection",
-      onPress: handleToggleSelectMode,
+      onPress: handleInitSelectMode,
       disabled: !list?.items?.length,
       icon: "close-box-outline",
     },
@@ -188,37 +169,6 @@ export default function ListDetailActionsModal() {
     content = (
       <View style={styles.stateContainer}>
         <ThemedText variant="defaultSemiBold">This list could not be found.</ThemedText>
-      </View>
-    );
-  } else if (optionsMode === "rename") {
-    content = (
-      <View style={styles.renameContainer}>
-        <Input
-          style={styles.input}
-          placeholder="New list name"
-          value={newTitle}
-          onChangeText={setNewTitle}
-          autoFocus
-          maxLength={100}
-        />
-        <View style={styles.buttonRow}>
-          <Button
-            disabled={isSubmitRenameDisabled}
-            loading={isRenamePending}
-            variant="secondaryFill2"
-            onPress={handleSaveRename}
-            style={styles.flexButton}
-          >
-            <ThemedText style={{ color: theme.colors.accent }}>Save</ThemedText>
-          </Button>
-          <Button
-            variant="secondary"
-            onPress={() => setOptionsMode("options")}
-            style={styles.flexButton}
-          >
-            <ThemedText style={{ color: theme.colors.text }}>Cancel</ThemedText>
-          </Button>
-        </View>
       </View>
     );
   } else {

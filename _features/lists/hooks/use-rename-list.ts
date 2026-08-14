@@ -15,7 +15,8 @@ type Vars = {
 type Context = {
   listDetailQK: QueryKey;
   groupListsQK: QueryKey;
-  prevList: List | undefined;
+  prevListDetail: List | undefined;
+  prevGroupLists: List[] | undefined;
 };
 
 export function useRenameList() {
@@ -31,9 +32,13 @@ export function useRenameList() {
       const groupListsQK = listKeys.group(storedGroupId);
       const listDetailQK = listKeys.detail(storedGroupId, listId);
 
-      await queryClient.cancelQueries({ queryKey: listDetailQK });
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: listDetailQK, exact: true }),
+        queryClient.cancelQueries({ queryKey: groupListsQK, exact: true }),
+      ]);
 
-      const prevList = queryClient.getQueryData<List>(listDetailQK);
+      const prevListDetail = queryClient.getQueryData<List>(listDetailQK);
+      const prevGroupLists = queryClient.getQueryData<List[]>(groupListsQK);
 
       queryClient.setQueryData<List>(listDetailQK, (old) => {
         if (!old) return old;
@@ -44,18 +49,39 @@ export function useRenameList() {
         };
       });
 
-      return { listDetailQK, groupListsQK, prevList };
+      queryClient.setQueryData<List[]>(groupListsQK, (old) => {
+        if (!old) return old;
+
+        return old.map((list) => (list.id === listId ? { ...list, title: newTitle } : list));
+      });
+
+      return { listDetailQK, groupListsQK, prevListDetail, prevGroupLists };
+    },
+
+    onSuccess: (data, { listId }, context) => {
+      queryClient.setQueryData<List>(context.listDetailQK, (old) => {
+        if (!old) return old;
+        return { ...old, title: data.title };
+      });
+
+      queryClient.setQueryData<List[]>(context.groupListsQK, (old) => {
+        if (!old) return old;
+        return old.map((list) => (list.id === listId ? { ...list, title: data.title } : list));
+      });
     },
 
     onError: (_err, _vars, context) => {
       if (!context) return;
-      queryClient.setQueryData(context.listDetailQK, context.prevList);
+      queryClient.setQueryData(context.listDetailQK, context.prevListDetail);
+      queryClient.setQueryData(context.groupListsQK, context.prevGroupLists);
     },
 
     onSettled: (_data, _error, _vars, context) => {
       if (!context) return;
-      queryClient.invalidateQueries({ queryKey: context.listDetailQK });
-      queryClient.invalidateQueries({ queryKey: context.groupListsQK });
+      return Promise.all([
+        queryClient.invalidateQueries({ queryKey: context.listDetailQK, exact: true }),
+        queryClient.invalidateQueries({ queryKey: context.groupListsQK, exact: true }),
+      ]);
     },
   });
 }

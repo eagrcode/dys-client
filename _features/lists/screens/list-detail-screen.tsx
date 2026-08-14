@@ -112,6 +112,7 @@ function ListDetailScreen() {
       <Header
         listId={listId}
         listMode={listMode}
+        setListMode={setListMode}
         title={title}
         onCancelSelection={cancelSelection}
       />

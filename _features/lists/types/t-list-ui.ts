@@ -1,1 +1,1 @@
-export type ListMode = "default" | "select-items";
+export type ListMode = "default" | "select-items" | "renaming";
