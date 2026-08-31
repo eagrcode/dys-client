@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { listsAPI } from "@/features/lists/api/lists-api";
 import { useAuthProvider } from "@/features/auth/providers/session-provider";
-import { listKeys } from "@/features/lists/queries/list-keys.ts";
+import { listKeys } from "@/features/lists/queries/list-keys";
 import { useStoredGroupId } from "@/shared/hooks/use-stored-group-id";
 import type { ApiError } from "@/shared/api/api-error";
 import { GetListById } from "../types/t-lists-api";

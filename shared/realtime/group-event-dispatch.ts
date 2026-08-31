@@ -1,93 +1,75 @@
-import { Alert } from "react-native";
-import { listKeys } from "@/features/lists/queries/list-keys.ts";
-import type { CacheIdentifier } from "@/features/lists/queries/list-keys.ts";
+import { listKeys } from "@/features/lists/queries/list-keys";
+import type { CacheIdentifier } from "@/features/lists/queries/list-keys";
 import type { GroupEvent } from "./socket-provider";
 import type { QueryClient } from "@tanstack/react-query";
 import { log } from "../logging/logger";
 
 export async function groupEventDispatch(event: GroupEvent, queryClient: QueryClient) {
+  log.info("/group-event-dispatch.ts - groupEventDispatch() | Group Event Received", {
+    groupId: event.groupId,
+    type: event.type,
+    data: event.data,
+    callerSocketId: event.callerSocketId,
+  });
+
   switch (event.type) {
     // Lists
     case "list.created":
-      log.info("Group Event Received", {
-        groupId: event.groupId,
-        type: event.type,
-        data: event.data,
-      });
-
       await invalidateCache(["group", "dashboard"], queryClient, event.groupId);
       break;
 
     case "list.deleted":
-      log.info("Group Event Received", {
-        groupId: event.groupId,
-        type: event.type,
-        data: event.data,
-      });
-
-      Alert.alert("List Deleted", "A list has been deleted in this group. Refreshing your lists.");
-      await invalidateCache(["group", "dashboard"], queryClient, event.groupId);
+      await invalidateCache(
+        ["group", "dashboard", "detail"],
+        queryClient,
+        event.groupId,
+        event.data.id,
+      );
       break;
 
     case "list.renamed":
-      log.info("Group Event Received", {
-        groupId: event.groupId,
-        type: event.type,
-        data: event.data,
-      });
-
-      await invalidateCache(["group"], queryClient, event.groupId);
+      await invalidateCache(["group", "detail"], queryClient, event.groupId, event.data.list_id);
       break;
 
     // List Items
     case "listItem.created":
-      log.info("Group Event Received", {
-        groupId: event.groupId,
-        type: event.type,
-        data: event.data,
-      });
-
-      await invalidateCache(["group", "dashboard"], queryClient, event.groupId);
+      await invalidateCache(
+        ["group", "dashboard", "detail"],
+        queryClient,
+        event.groupId,
+        event.data.list_id,
+      );
       break;
 
     case "listItem.deleted":
-      log.info("Group Event Received", {
-        groupId: event.groupId,
-        type: event.type,
-        data: event.data,
-      });
-
-      await invalidateCache(["group", "dashboard"], queryClient, event.groupId);
+      await invalidateCache(
+        ["group", "dashboard", "detail"],
+        queryClient,
+        event.groupId,
+        event.data.list_id,
+      );
       break;
 
     case "listItem.updated":
-      log.info("Group Event Received", {
-        groupId: event.groupId,
-        type: event.type,
-        data: event.data,
-      });
-
       await invalidateCache(["detail"], queryClient, event.groupId, event.data.list_id);
       break;
 
     case "listItem.toggled":
-      log.info("Group Event Received", {
-        groupId: event.groupId,
-        type: event.type,
-        data: event.data,
-      });
-
-      await invalidateCache(["group", "dashboard"], queryClient, event.groupId);
+      await invalidateCache(
+        ["group", "dashboard", "detail"],
+        queryClient,
+        event.groupId,
+        event.data.list_id,
+      );
       break;
 
     case "listItem.toggledAll":
-      log.info("Group Event Received", {
-        groupId: event.groupId,
-        type: event.type,
-        data: event.data,
-      });
-
-      await invalidateCache(["group", "dashboard"], queryClient, event.groupId);
+      await invalidateCache(
+        ["group", "dashboard", "detail"],
+        queryClient,
+        event.groupId,
+        event.data.list_id,
+      );
       break;
 
     default:
@@ -114,6 +96,7 @@ async function invalidateCache(
         promises.push(
           queryClient.invalidateQueries({
             queryKey: listKeys.group(groupId),
+            exact: true,
           }),
         );
         break;
@@ -122,6 +105,7 @@ async function invalidateCache(
           promises.push(
             queryClient.invalidateQueries({
               queryKey: listKeys.detail(groupId, listId),
+              exact: true,
             }),
           );
         } else {
@@ -135,6 +119,7 @@ async function invalidateCache(
         promises.push(
           queryClient.invalidateQueries({
             queryKey: listKeys.dashboard(groupId),
+            exact: true,
           }),
         );
         break;

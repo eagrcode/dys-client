@@ -2,7 +2,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { groupsAPI } from "@/features/groups/api/groups-api";
 import { useAuthProvider } from "@/features/auth/providers/session-provider";
 import { useGroupsProvider } from "@/features/groups/providers/groups-provider";
-import { groupKeys } from "@/features/groups/queries/group-keys.ts";
+import { groupKeys } from "@/features/groups/queries/group-keys";
 import { QUERY_TIMES } from "@/shared/config/query-policy";
 import type { GetGroupById } from "@/features/groups/types/t-groups-api";
 import type { ApiError } from "@/shared/api/api-error";

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listsAPI } from "@/features/lists/api/lists-api";
 import { useStoredGroupId } from "@/shared/hooks/use-stored-group-id";
-import { listKeys } from "@/features/lists/queries/list-keys.ts";
+import { listKeys } from "@/features/lists/queries/list-keys";
 import type { ApiError } from "@/shared/api/api-error";
 import type { List } from "@/features/lists/types/t-list";
 import type { ToggleCompleteListItem } from "@/features/lists/types/t-lists-api";

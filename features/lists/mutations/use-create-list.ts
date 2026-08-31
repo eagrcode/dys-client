@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { listsAPI } from "@/features/lists/api/lists-api";
-import { listKeys } from "@/features/lists/queries/list-keys.ts";
+import { listKeys } from "@/features/lists/queries/list-keys";
 import { useStoredGroupId } from "@/shared/hooks/use-stored-group-id";
 import type { ListType } from "@/features/lists/constants/list-types-config";
 import type { ApiError } from "@/shared/api/api-error";

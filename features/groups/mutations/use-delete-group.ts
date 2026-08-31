@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { groupsAPI } from "@/features/groups/api/groups-api";
 import { useGroupsProvider } from "@/features/groups/providers/groups-provider";
 import { useGroups } from "@/features/groups/queries/use-groups";
-import { groupKeys } from "@/features/groups/queries/group-keys.ts";
+import { groupKeys } from "@/features/groups/queries/group-keys";
 import { useRouter } from "expo-router";
 import { useAuthProvider } from "@/features/auth/providers/session-provider";
 import type { Group } from "@/features/groups/types/t-group";

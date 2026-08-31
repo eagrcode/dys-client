@@ -4,7 +4,7 @@ import { useGroups } from "@/features/groups/queries/use-groups";
 import { log } from "@/shared/logging/logger";
 import type { Group } from "@/features/groups/types/t-group";
 import { useQueryClient } from "@tanstack/react-query";
-import { groupKeys } from "../queries/group-keys.ts";
+import { groupKeys } from "../queries/group-keys";
 import { useAuthProvider } from "@/features/auth/providers/session-provider";
 
 type StoredGroupId = string | null;
