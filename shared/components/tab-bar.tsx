@@ -3,6 +3,7 @@ import { type BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { spacing } from "@/shared/theme/theme";
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const theme = useCurrentTheme();
@@ -12,7 +13,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     <View
       style={[
         {
-          paddingBottom: insets.bottom ? insets.bottom : 16,
+          paddingBottom: insets.bottom ? insets.bottom : spacing[16],
           backgroundColor: theme.colors.tabBar,
           borderTopColor: theme.colors.border,
           borderTopWidth: StyleSheet.hairlineWidth,
@@ -61,9 +62,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-evenly",
-    gap: 8,
+    gap: spacing[8],
   },
   tabButton: {
-    padding: 16,
+    padding: spacing[16],
   },
 });

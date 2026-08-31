@@ -1,5 +1,6 @@
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import { LinearGradient } from "expo-linear-gradient";
+import { spacing, radius } from "@/shared/theme/theme";
 import {
   ActivityIndicator,
   Pressable,
@@ -47,7 +48,7 @@ export function Button({
         variantStyles[variant],
         {
           opacity: pressed ? 0.85 : isDisabled ? 0.5 : 1,
-          borderRadius: theme.radius.xl,
+          borderRadius: radius.lg,
           overflow: "hidden",
         },
         style,
@@ -64,7 +65,7 @@ export function Button({
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === "primary" ? "#fff" : theme.colors.accent}
+          color={variant === "primary" ? theme.colors.onAccent : theme.colors.accent}
         />
       ) : (
         children
@@ -75,7 +76,7 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    padding: 16,
+    padding: spacing[12],
     alignItems: "center",
     justifyContent: "center",
   },

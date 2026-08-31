@@ -11,6 +11,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { BackHandler, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
+import { radius, spacing } from "@/shared/theme/theme";
 
 const DEFAULT_SHEET_HEIGHT_RATIO = 0.85;
 
@@ -122,7 +123,13 @@ export const SwipeableModalSheet = forwardRef<SwipeableModalSheetHandle, Props>(
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.scrim, scrimAnimatedStyle]}>
+      <Animated.View
+        style={[
+          styles.scrim,
+          scrimAnimatedStyle,
+          { backgroundColor: theme.colors.overlay },
+        ]}
+      >
         <Pressable style={StyleSheet.absoluteFill} onPress={() => dismiss()} />
       </Animated.View>
 
@@ -157,19 +164,18 @@ const styles = StyleSheet.create({
   },
   scrim: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   sheet: {
     width: "100%",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    borderTopLeftRadius: radius["3xl"],
+    borderTopRightRadius: radius["3xl"],
     overflow: "hidden",
     elevation: 12,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingBottom: spacing[16],
   },
   safeArea: {
     flex: 1,
+    paddingHorizontal: spacing[16],
   },
   handleContainer: {
     alignItems: "center",
@@ -179,6 +185,6 @@ const styles = StyleSheet.create({
   handle: {
     width: 40,
     height: 5,
-    borderRadius: 999,
+    borderRadius: radius.full,
   },
 });
