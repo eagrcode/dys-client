@@ -2,7 +2,7 @@ import { useQueries } from "@tanstack/react-query";
 import { dashboardApi } from "@/features/dashboard/api/dashboard-api";
 import { useAuthProvider } from "@/features/auth/providers/session-provider";
 import { useGroupsProvider } from "@/features/groups/providers/groups-provider";
-import { listKeys } from "@/features/lists/queries/list-keys.ts";
+import { listKeys } from "@/features/lists/queries/list-keys";
 
 const STALE_TIME = 5 * 60 * 1000;
 
@@ -16,9 +16,6 @@ export function useDashboardData() {
     enabled,
     staleTime: STALE_TIME,
     retry: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
   };
 
   const [lists, calendar, albums, messages] = useQueries({
