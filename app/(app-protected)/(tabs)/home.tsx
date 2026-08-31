@@ -1,9 +1,9 @@
 import { StyleSheet } from "react-native";
-import { ThemedView } from "@/_shared/components/themed-view";
-import { Summary } from "@/_features/dashboard/components/summary";
-import { Header } from "@/_features/dashboard/components/header";
-import { useGroupById } from "@/_features/groups/hooks/use-group-id";
-import { useGroupMembers } from "@/_features/members/hooks/use-group-members";
+import { ThemedView } from "@/shared/components/themed-view";
+import { Summary } from "@/features/dashboard/components/summary";
+import { Header } from "@/features/dashboard/components/header";
+import { useGroupById } from "@/features/groups/queries/use-group-id";
+import { useGroupMembers } from "@/features/members/queries/use-group-members";
 
 function HomeScreen() {
   useGroupById();

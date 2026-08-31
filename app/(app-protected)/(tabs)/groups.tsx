@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { router } from "expo-router";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useGroups } from "@/_features/groups/hooks/use-groups";
-import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
-import { getGroupInitials } from "@/_features/groups/utils/get-group-initials";
-import { IconSymbol } from "@/_shared/components/icon-symbol";
-import { ThemedText } from "@/_shared/components/themed-text";
-import { ThemedView } from "@/_shared/components/themed-view";
-import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
-import type { Group } from "@/_features/groups/types/t-group";
-import RetryFetch from "@/_shared/components/retry-fetch";
-import type { User } from "@/_features/auth/auth-types";
+import { useAuthProvider } from "@/features/auth/providers/session-provider";
+import { useGroups } from "@/features/groups/queries/use-groups";
+import { useGroupsProvider } from "@/features/groups/providers/groups-provider";
+import { getGroupInitials } from "@/features/groups/utils/get-group-initials";
+import { IconSymbol } from "@/shared/components/icon";
+import { ThemedText } from "@/shared/components/themed-text";
+import { ThemedView } from "@/shared/components/themed-view";
+import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
+import type { Group } from "@/features/groups/types/t-group";
+import RetryFetch from "@/shared/components/retry-fetch";
+import type { User } from "@/features/auth/types/auth-types";
 
 function GroupsScreen() {
   const theme = useCurrentTheme();

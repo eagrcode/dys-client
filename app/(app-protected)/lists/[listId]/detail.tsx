@@ -1,4 +1,4 @@
-import { ListDetailScreen } from "@/_features/lists/screens/list-detail-screen";
+import { ListDetailScreen } from "@/features/lists/screens/list-detail-screen";
 
 function ListDetailRoute() {
   return <ListDetailScreen />;

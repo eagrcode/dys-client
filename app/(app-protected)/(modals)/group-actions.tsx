@@ -1,12 +1,12 @@
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { getGroupInitials } from "@/_features/groups/utils/get-group-initials";
-import { ActionRow } from "@/_shared/components/action-row";
-import { SwipeableModalSheet } from "@/_shared/components/modals/swipeable-modal-sheet";
-import { ThemedText } from "@/_shared/components/themed-text";
-import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useGroupById } from "@/_features/groups/hooks/use-group-id";
+import { getGroupInitials } from "@/features/groups/utils/get-group-initials";
+import { ActionRow } from "@/shared/components/action-row";
+import { SwipeableModalSheet } from "@/shared/components/modals/swipeable-modal-sheet";
+import { ThemedText } from "@/shared/components/themed-text";
+import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
+import { useAuthProvider } from "@/features/auth/providers/session-provider";
+import { useGroupById } from "@/features/groups/queries/use-group-id";
 
 const FALLBACK_HREF = "/(app-protected)/(tabs)/home";
 

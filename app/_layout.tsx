@@ -1,7 +1,7 @@
 // import "../wdyr";
-import { AuthProvider } from "@/_features/auth/providers/session-provider";
-import { GroupsProvider } from "@/_features/groups/providers/groups-provider";
-import { ThemePreferenceProvider } from "@/_shared/providers/theme-mode-provider";
+import { AuthProvider } from "@/features/auth/providers/session-provider";
+import { GroupsProvider } from "@/features/groups/providers/groups-provider";
+import { ThemePreferenceProvider } from "@/shared/providers/theme-mode-provider";
 import {
   DMSans_400Regular,
   DMSans_500Medium,
@@ -17,7 +17,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/syne";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { shouldRetryApiError } from "@/_shared/types/api-error";
+import { shouldRetryApiError } from "@/shared/api/api-error";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";

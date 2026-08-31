@@ -1,4 +1,4 @@
-import { ListsOverviewScreen } from "@/_features/lists/screens/lists-overview-screen";
+import { ListsOverviewScreen } from "@/features/lists/screens/lists-overview-screen";
 
 function ListsOverviewRoute() {
   return <ListsOverviewScreen />;

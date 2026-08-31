@@ -1,8 +1,8 @@
 import { Redirect } from "expo-router";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useGroups } from "@/_features/groups/hooks/use-groups";
-import { log } from "@/_shared/logger/logger";
-import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import { useAuthProvider } from "@/features/auth/providers/session-provider";
+import { useGroups } from "@/features/groups/queries/use-groups";
+import { log } from "@/shared/logging/logger";
+import { useGroupsProvider } from "@/features/groups/providers/groups-provider";
 
 export default function Index() {
   const { user, isLoading: authLoading } = useAuthProvider();

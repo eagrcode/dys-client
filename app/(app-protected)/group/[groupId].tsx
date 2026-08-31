@@ -1,14 +1,14 @@
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useDeleteGroup } from "@/_features/groups/hooks/use-delete-group";
-import { useGroupById } from "@/_features/groups/hooks/use-group-id";
-import { getGroupInitials } from "@/_features/groups/utils/get-group-initials";
-import { BackButton } from "@/_shared/components/back-button";
-import { ActionRow } from "@/_shared/components/action-row";
-import { ThemedText } from "@/_shared/components/themed-text";
-import { ThemedView } from "@/_shared/components/themed-view";
-import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
+import { useAuthProvider } from "@/features/auth/providers/session-provider";
+import { useDeleteGroup } from "@/features/groups/mutations/use-delete-group";
+import { useGroupById } from "@/features/groups/queries/use-group-id";
+import { getGroupInitials } from "@/features/groups/utils/get-group-initials";
+import { BackButton } from "@/shared/components/back-button";
+import { ActionRow } from "@/shared/components/action-row";
+import { ThemedText } from "@/shared/components/themed-text";
+import { ThemedView } from "@/shared/components/themed-view";
+import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 
 export default function GroupSettingsScreen() {
   const theme = useCurrentTheme();

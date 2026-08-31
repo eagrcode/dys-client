@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
-import { ThemedText } from "@/_shared/components/themed-text";
-import { ThemedView } from "@/_shared/components/themed-view";
+import { ThemedText } from "@/shared/components/themed-text";
+import { ThemedView } from "@/shared/components/themed-view";
 
 export default function CalendarScreen() {
   return (

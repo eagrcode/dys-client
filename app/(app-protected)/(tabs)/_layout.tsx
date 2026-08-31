@@ -1,7 +1,7 @@
-import { IconSymbol } from "@/_shared/components/icon-symbol";
-import { TabBar } from "@/_shared/components/tab-bar";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useGroupsProvider } from "@/_features/groups/providers/groups-provider";
+import { IconSymbol } from "@/shared/components/icon";
+import { TabBar } from "@/shared/components/tab-bar";
+import { useAuthProvider } from "@/features/auth/providers/session-provider";
+import { useGroupsProvider } from "@/features/groups/providers/groups-provider";
 import { Tabs } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useRef } from "react";

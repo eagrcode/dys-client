@@ -1,13 +1,13 @@
-import { ThemedText } from "@/_shared/components/themed-text";
-import { Input } from "@/_shared/components/input";
-import { Button } from "@/_shared/components/button";
-import { ThemedView } from "@/_shared/components/themed-view";
-import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
+import { ThemedText } from "@/shared/components/themed-text";
+import { Input } from "@/shared/components/input";
+import { Button } from "@/shared/components/button";
+import { ThemedView } from "@/shared/components/themed-view";
+import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import { useState } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
-import { useCreateList } from "@/_features/lists/hooks/use-create-list";
-import { IconSymbol } from "@/_shared/components/icon-symbol";
-import { ErrorAlert } from "@/_shared/components/alert";
+import { useCreateList } from "@/features/lists/mutations/use-create-list";
+import { IconSymbol } from "@/shared/components/icon";
+import { ErrorAlert } from "@/shared/components/alert";
 
 type ListType = "todo" | "shopping" | "other";
 

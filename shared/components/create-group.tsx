@@ -1,0 +1,150 @@
+import { StyleSheet, View } from "react-native";
+import { ThemedText } from "@/shared/components/themed-text";
+import { ThemedView } from "@/shared/components/themed-view";
+import { Button } from "@/shared/components/button";
+import { Input } from "@/shared/components/input";
+import { ErrorText } from "@/shared/components/error-text";
+import React, { useState } from "react";
+import { useCreateGroup } from "@/features/groups/mutations/use-create-group";
+import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
+import Animated, { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
+import { isApiError } from "@/shared/api/api-error";
+
+type FormData = {
+  name: string;
+  description: string;
+};
+
+const CreateGroup = () => {
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    description: "",
+  });
+  const [fieldErrors, setFieldErrors] = useState<{ [key in keyof FormData]: string }>({
+    name: "",
+    description: "",
+  });
+  const [formError, setFormError] = useState<string>("");
+
+  const { mutateAsync: createGroup, isPending: isCreating } = useCreateGroup();
+
+  const theme = useCurrentTheme();
+
+  const submitDisabled = isCreating || !formData.name || !formData.description;
+
+  const keyboard = useAnimatedKeyboard();
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: -keyboard.height.value / 10 }],
+  }));
+
+  const handleSetFormData = (key: keyof FormData, value: string) => {
+    // Clear previous errors
+    setFieldErrors((prev) => ({ ...prev, [key]: "" }));
+    setFormError("");
+
+    setFormData({ ...formData, [key]: value });
+  };
+
+  const handleCreateGroupPress = async () => {
+    setFieldErrors({ name: "", description: "" });
+    setFormError("");
+
+    try {
+      await createGroup({ name: formData.name, description: formData.description });
+    } catch (error: unknown) {
+      handleErrors(error);
+    }
+  };
+
+  const handleErrors = (error: unknown) => {
+    if (!isApiError(error)) {
+      setFormError("An unexpected error occurred. Please try again.");
+      return;
+    }
+
+    if (error.code === "LIMIT_EXCEEDED") {
+      setFormError("Too many attempts. Please try again later.");
+    } else if (error.code === "VALIDATION_ERROR") {
+      error.errors?.forEach(({ field, message }) => {
+        if (field === "name" || field === "description") {
+          setFieldErrors((prev) => ({ ...prev, [field]: message }));
+        }
+      });
+    } else {
+      setFormError(error.message || "An unexpected error occurred. Please try again.");
+    }
+  };
+
+  const renderFieldError = (field: keyof FormData) => {
+    if (fieldErrors[field]) {
+      return <ErrorText error={fieldErrors[field]} />;
+    }
+    return null;
+  };
+
+  const renderFormError = () => {
+    if (formError) {
+      return <ErrorText error={formError} />;
+    }
+    return null;
+  };
+
+  return (
+    <ThemedView style={styles.container}>
+      <Animated.View style={animatedStyle}>
+        <View style={[styles.form, { backgroundColor: theme.colors.background }]}>
+          <ThemedText variant="subtitle" style={{ fontSize: 20, letterSpacing: 2 }}>
+            Create a Group
+          </ThemedText>
+          <View style={styles.inputs}>
+            <Input
+              placeholder="Name"
+              value={formData.name}
+              onChangeText={(content) => handleSetFormData("name", content)}
+              inputMode="text"
+              editable={!isCreating}
+            />
+            {renderFieldError("name")}
+            <Input
+              placeholder="Description"
+              value={formData.description}
+              onChangeText={(content) => handleSetFormData("description", content)}
+              inputMode="text"
+              editable={!isCreating}
+            />
+            {renderFieldError("description")}
+          </View>
+          {renderFormError()}
+          <Button
+            variant="primary"
+            style={{ borderRadius: theme.radius.md }}
+            onPress={handleCreateGroupPress}
+            disabled={submitDisabled}
+            loading={isCreating}
+          >
+            <ThemedText variant="defaultSemiBold" style={{ color: "#fff" }}>
+              Submit
+            </ThemedText>
+          </Button>
+        </View>
+      </Animated.View>
+    </ThemedView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    position: "relative",
+    flex: 1,
+    gap: 16,
+    justifyContent: "center",
+  },
+  form: {
+    gap: 16,
+  },
+  inputs: {
+    gap: 8,
+  },
+});
+
+export default CreateGroup;

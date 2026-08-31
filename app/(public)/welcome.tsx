@@ -1,7 +1,7 @@
-import { ThemedText } from "@/_shared/components/themed-text";
-import { ThemedView } from "@/_shared/components/themed-view";
-import { Button } from "@/_shared/components/button";
-import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
+import { ThemedText } from "@/shared/components/themed-text";
+import { ThemedView } from "@/shared/components/themed-view";
+import { Button } from "@/shared/components/button";
+import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import { useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";

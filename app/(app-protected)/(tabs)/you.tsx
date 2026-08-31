@@ -1,10 +1,10 @@
-import { ThemedText } from "@/_shared/components/themed-text";
-import { ThemedView } from "@/_shared/components/themed-view";
-import { Button } from "@/_shared/components/button";
-import { IconSymbol } from "@/_shared/components/icon-symbol";
-import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
-import { useAuthProvider } from "@/_features/auth/providers/session-provider";
-import { useThemePreference } from "@/_shared/providers/theme-mode-provider";
+import { ThemedText } from "@/shared/components/themed-text";
+import { ThemedView } from "@/shared/components/themed-view";
+import { Button } from "@/shared/components/button";
+import { IconSymbol } from "@/shared/components/icon";
+import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
+import { useAuthProvider } from "@/features/auth/providers/session-provider";
+import { useThemePreference } from "@/shared/providers/theme-mode-provider";
 import { StyleSheet, View } from "react-native";
 
 export default function YouScreen() {

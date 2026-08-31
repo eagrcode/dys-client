@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { SocketProvider } from "@/_shared/realtime/socket-provider";
+import { SocketProvider } from "@/shared/realtime/socket-provider";
 
 export default function AppProtectedLayout() {
   return (

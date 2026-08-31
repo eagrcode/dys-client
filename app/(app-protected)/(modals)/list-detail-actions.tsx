@@ -1,21 +1,21 @@
 import { useRef } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from "react-native";
 import { router, useLocalSearchParams, type Href } from "expo-router";
-import { useDeleteList } from "@/_features/lists/hooks/use-delete-list";
-import { useListById } from "@/_features/lists/hooks/use-list-id";
-import { useRenameList } from "@/_features/lists/hooks/use-rename-list";
-import { useToggleCompleteAllListItems } from "@/_features/lists/hooks/use-toggle-complete-all";
-import type { ListMode } from "@/_features/lists/types/t-list-ui";
-import { ErrorAlert } from "@/_shared/components/alert";
+import { useDeleteList } from "@/features/lists/mutations/use-delete-list";
+import { useListById } from "@/features/lists/queries/use-list-id";
+import { useRenameList } from "@/features/lists/mutations/use-rename-list";
+import { useToggleCompleteAllListItems } from "@/features/lists/mutations/use-toggle-complete-all";
+import type { ListMode } from "@/features/lists/types/t-list-ui";
+import { ErrorAlert } from "@/shared/components/alert";
 import {
   SwipeableModalSheet,
   type SwipeableModalSheetHandle,
-} from "@/_shared/components/modals/swipeable-modal-sheet";
-import RetryFetch from "@/_shared/components/retry-fetch";
-import { ThemedText } from "@/_shared/components/themed-text";
-import { useCurrentTheme } from "@/_shared/hooks/use-current-theme";
-import { ActionRow } from "@/_shared/components/action-row";
-import { IconSymbol } from "@/_shared/components/icon-symbol";
+} from "@/shared/components/modals/swipeable-modal-sheet";
+import RetryFetch from "@/shared/components/retry-fetch";
+import { ThemedText } from "@/shared/components/themed-text";
+import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
+import { ActionRow } from "@/shared/components/action-row";
+import { IconSymbol } from "@/shared/components/icon";
 // import { useGroupMembers } from "@/_features/members/hooks/use-group-members";
 // import type { Member } from "@/_features/members/types/t-members";
 

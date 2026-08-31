@@ -1,4 +1,4 @@
-import { RegistrationScreen } from "@/_features/auth/screens/registration-screen";
+import { RegistrationScreen } from "@/features/auth/screens/registration-screen";
 
 function RegistrationRoute() {
   return <RegistrationScreen />;
