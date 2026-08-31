@@ -9,13 +9,17 @@ import {
 import { AuthProvider } from "@/features/auth/providers/session-provider";
 import { GroupsProvider } from "@/features/groups/providers/groups-provider";
 import { ThemePreferenceProvider } from "@/shared/providers/theme-mode-provider";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { focusManager, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { shouldRetryApiError } from "@/shared/api/api-error";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
+import { FloatingDevTools } from "@buoy-gg/core";
+import { useEffect, useRef } from "react";
+import { AppState, AppStateStatus } from "react-native";
+import { log } from "@/shared/logging/logger";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -42,6 +46,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemePreferenceProvider>
         <QueryClientProvider client={queryClient}>
+          <FloatingDevTools headless />
           <AuthProvider>
             <GroupsProvider>
               <StatusBar style="auto" />
