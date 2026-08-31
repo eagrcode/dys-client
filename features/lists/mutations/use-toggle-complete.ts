@@ -68,9 +68,9 @@ export function useToggleCompleteListItem() {
     onSettled: (_data, _error, _vars, context) => {
       if (!context) return;
 
-      queryClient.invalidateQueries({ queryKey: context.listDetailQK });
-      queryClient.invalidateQueries({ queryKey: context.listsQK });
-      queryClient.invalidateQueries({ queryKey: context.dashboardQK });
+      queryClient.invalidateQueries({ queryKey: context.listDetailQK, exact: true });
+      queryClient.invalidateQueries({ queryKey: context.listsQK, exact: true });
+      queryClient.invalidateQueries({ queryKey: context.dashboardQK, exact: true });
     },
   });
 }
