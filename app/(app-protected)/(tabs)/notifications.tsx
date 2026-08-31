@@ -1,11 +1,12 @@
 import { StyleSheet } from "react-native";
 import { ThemedText } from "@/shared/components/themed-text";
 import { ThemedView } from "@/shared/components/themed-view";
+import { spacing } from "@/shared/theme/theme";
 
 export default function NotificationsScreen() {
   return (
     <ThemedView style={styles.container}>
-      <ThemedText variant="title">Notifications</ThemedText>
+      <ThemedText variant="header">Notifications</ThemedText>
       <ThemedText>Coming soon...</ThemedText>
     </ThemedView>
   );
@@ -16,6 +17,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    gap: 8,
+    gap: spacing[8],
   },
 });

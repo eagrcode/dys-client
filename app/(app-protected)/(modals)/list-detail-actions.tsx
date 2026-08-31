@@ -1,23 +1,21 @@
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from "react-native";
 import { router, useLocalSearchParams, type Href } from "expo-router";
 import { useDeleteList } from "@/features/lists/mutations/use-delete-list";
 import { useListById } from "@/features/lists/queries/use-list-id";
-import { useRenameList } from "@/features/lists/mutations/use-rename-list";
 import { useToggleCompleteAllListItems } from "@/features/lists/mutations/use-toggle-complete-all";
 import type { ListMode } from "@/features/lists/types/t-list-ui";
 import { ErrorAlert } from "@/shared/components/alert";
+import { RetryFetch } from "@/shared/components/retry-fetch";
+import { ThemedText } from "@/shared/components/themed-text";
+import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
+import { ActionRow } from "@/shared/components/action-row";
+import type { IconName } from "@/shared/components/icon";
 import {
   SwipeableModalSheet,
   type SwipeableModalSheetHandle,
 } from "@/shared/components/modals/swipeable-modal-sheet";
-import RetryFetch from "@/shared/components/retry-fetch";
-import { ThemedText } from "@/shared/components/themed-text";
-import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
-import { ActionRow } from "@/shared/components/action-row";
-import { IconSymbol } from "@/shared/components/icon";
-// import { useGroupMembers } from "@/_features/members/hooks/use-group-members";
-// import type { Member } from "@/_features/members/types/t-members";
+import { spacing } from "@/shared/theme/theme";
 
 type EditOption = {
   id: string;
@@ -26,26 +24,20 @@ type EditOption = {
   destructive?: boolean;
   disabled?: boolean;
   loading?: boolean;
-  icon?: React.ComponentProps<typeof IconSymbol>["name"] | null;
+  icon?: IconName | null;
 };
 
 export default function ListDetailActionsModal() {
   const theme = useCurrentTheme();
   const sheetRef = useRef<SwipeableModalSheetHandle>(null);
-  const { listId = "", listMode = "default" } = useLocalSearchParams<{
-    listId?: string;
-    listMode?: ListMode;
+  const { listId, listMode = "default" } = useLocalSearchParams<{
+    listId: string;
+    listMode: ListMode;
   }>();
   const { data: list, error, isPending, isError, isFetching, refetch } = useListById(listId);
   const { mutate: toggleCompleteAllListItems, isPending: isToggleCompletePending } =
     useToggleCompleteAllListItems();
   const { mutate: deleteList, isPending: isDeletePending } = useDeleteList();
-  const { mutate: renameList, isPending: isRenamePending } = useRenameList();
-  // const { data: groupMembers } = useGroupMembers(list?.group_id ?? "");
-
-  // const listCreatedByName: string =
-  //   groupMembers?.find((member: Member) => member.user_id === list?.created_by)?.first_name ??
-  //   "Unknown";
 
   const fallbackHref: Href = listId
     ? {
@@ -53,6 +45,7 @@ export default function ListDetailActionsModal() {
         params: { listId },
       }
     : "/(app-protected)/lists/overview";
+
   const isShowingState = !listId || isPending || isError || !list;
 
   const handleToggleComplete = () => {
@@ -122,7 +115,7 @@ export default function ListDetailActionsModal() {
       id: "rename",
       title: "Rename List",
       onPress: handleInitRename,
-      icon: "rename",
+      icon: "pencil-simple",
     },
     {
       id: "toggle-complete",
@@ -130,14 +123,14 @@ export default function ListDetailActionsModal() {
       onPress: handleToggleComplete,
       disabled: !list?.items?.length,
       loading: isToggleCompletePending,
-      icon: list?.completed ? "checkbox-blank-outline" : "checkbox-outline",
+      icon: list?.completed ? "square" : "square-check",
     },
     {
       id: "delete-selection",
       title: listMode === "select-items" ? "Cancel Delete Selection" : "Delete Selection",
       onPress: handleInitSelectMode,
       disabled: !list?.items?.length,
-      icon: "close-box-outline",
+      icon: "selection",
     },
     {
       id: "delete",
@@ -145,7 +138,7 @@ export default function ListDetailActionsModal() {
       onPress: handleDelete,
       destructive: true,
       loading: isDeletePending,
-      icon: "delete-forever",
+      icon: "trash",
     },
   ];
 
@@ -154,7 +147,7 @@ export default function ListDetailActionsModal() {
   if (!listId) {
     content = (
       <View style={styles.stateContainer}>
-        <ThemedText variant="defaultSemiBold">This list could not be found.</ThemedText>
+        <ThemedText>This list could not be found.</ThemedText>
       </View>
     );
   } else if (isPending) {
@@ -168,22 +161,26 @@ export default function ListDetailActionsModal() {
   } else if (!list) {
     content = (
       <View style={styles.stateContainer}>
-        <ThemedText variant="defaultSemiBold">This list could not be found.</ThemedText>
+        <ThemedText>This list could not be found.</ThemedText>
       </View>
     );
   } else {
     content = (
-      <View style={styles.options}>
-        {options.map((option) => (
-          <ActionRow
-            key={option.id}
-            label={option.title}
-            onPress={option.onPress}
-            tone={option.destructive ? "danger" : "default"}
-            disabled={option.disabled}
-            background="bgLayer2"
-            icon={option.icon ?? null}
-          />
+      <View>
+        {options.map((option, index) => (
+          <Fragment key={option.id}>
+            <ActionRow
+              label={option.title}
+              onPress={option.onPress}
+              tone={option.destructive ? "danger" : "default"}
+              disabled={option.disabled}
+              loading={option.loading}
+              icon={option.icon ?? null}
+            />
+            {index < options.length - 1 ? (
+              <View style={[styles.separator, { backgroundColor: theme.colors.border }]} />
+            ) : null}
+          </Fragment>
         ))}
       </View>
     );
@@ -192,9 +189,7 @@ export default function ListDetailActionsModal() {
   return (
     <SwipeableModalSheet ref={sheetRef} fallbackHref={fallbackHref} sheetHeightRatio={0.6}>
       <View style={styles.header}>
-        <ThemedText variant="defaultSemiBold" style={{ fontSize: 16 }}>
-          List Options
-        </ThemedText>
+        <ThemedText variant="button">List Options</ThemedText>
       </View>
       <ScrollView
         style={styles.scrollView}
@@ -211,7 +206,7 @@ export default function ListDetailActionsModal() {
 const styles = StyleSheet.create({
   header: {
     width: "100%",
-    marginBottom: 16,
+    marginBottom: spacing[16],
     justifyContent: "center",
     alignItems: "center",
   },
@@ -228,30 +223,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 12,
+    gap: spacing[12],
   },
-  options: {
-    gap: 8,
-  },
-  optionButton: {
-    width: "100%",
-    padding: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  renameContainer: {
-    gap: 16,
-  },
-  input: {
-    borderWidth: 2,
-    padding: 12,
-  },
-  buttonRow: {
-    width: "100%",
-    flexDirection: "row",
-    gap: 8,
-  },
-  flexButton: {
-    flex: 1,
-    padding: 12,
+  separator: {
+    height: StyleSheet.hairlineWidth,
   },
 });

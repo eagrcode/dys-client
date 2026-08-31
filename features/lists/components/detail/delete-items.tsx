@@ -1,27 +1,19 @@
 import { ThemedText } from "@/shared/components/themed-text";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
-import { View, Pressable, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet, Alert } from "react-native";
 import { useDeleteListItems } from "@/features/lists/mutations/use-delete-list-items";
-import { useLocalSearchParams } from "expo-router";
-import type { ListMode } from "@/features/lists/types/t-list-ui";
 import { ErrorAlert } from "@/shared/components/alert";
-import { IconSymbol } from "@/shared/components/icon";
+import { Icon } from "@/shared/components/icon";
+import { spacing, radius } from "@/shared/theme/theme";
 
 type Props = {
+  listId: string;
   selectedItemIds: Set<string>;
-  setSelectedItemIds: React.Dispatch<React.SetStateAction<Set<string>>>;
-  setListMode: React.Dispatch<React.SetStateAction<ListMode>>;
   onCancelSelection: () => void;
 };
 
-export function DeleteItems({
-  selectedItemIds,
-  setSelectedItemIds,
-  setListMode,
-  onCancelSelection,
-}: Props) {
-  const theme = useCurrentTheme();
-  const { listId } = useLocalSearchParams<{ listId: string }>();
+export function DeleteItems({ listId, selectedItemIds, onCancelSelection }: Props) {
+  const { colors } = useCurrentTheme();
   const { mutate: deleteListItems, isPending: isDeletePending } = useDeleteListItems();
 
   const count = selectedItemIds.size;
@@ -29,6 +21,20 @@ export function DeleteItems({
     count === 0 ? "Select items" : `Delete ${count} ${count === 1 ? "item" : "items"}`;
 
   const onDeletePress = () => {
+    Alert.alert("Delete Items", `Are you sure you want to delete ${count} items?`, [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => confirmDelete(),
+      },
+    ]);
+  };
+
+  const confirmDelete = () => {
     deleteListItems(
       { listId, itemIds: [...selectedItemIds] },
       {
@@ -51,15 +57,15 @@ export function DeleteItems({
         style={[
           deleteItemsBtnStyles.btn,
           {
-            backgroundColor: theme.colors.bgLayer3,
-            borderRadius: theme.radius.full,
-            borderColor: theme.colors.border,
+            backgroundColor: colors.bgLayer3,
+            borderRadius: radius.full,
+            borderColor: colors.border,
           },
         ]}
         onPress={onDeletePress}
-        disabled={isDeletePending}
+        disabled={isDeletePending || count === 0}
       >
-        <IconSymbol name="delete-forever" size={30} color={theme.colors.danger} />
+        <Icon name="trash" size={30} color={colors.danger} />
       </Pressable>
       <ThemedText>{btnText}</ThemedText>
     </View>
@@ -68,7 +74,7 @@ export function DeleteItems({
 
 const deleteItemsBtnStyles = StyleSheet.create({
   container: {
-    gap: 8,
+    gap: spacing[8],
     justifyContent: "center",
     alignItems: "center",
     width: "auto",
@@ -76,8 +82,6 @@ const deleteItemsBtnStyles = StyleSheet.create({
   btn: {
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderWidth: StyleSheet.hairlineWidth,
+    padding: spacing[16],
   },
 });

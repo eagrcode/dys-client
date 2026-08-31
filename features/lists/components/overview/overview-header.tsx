@@ -1,26 +1,26 @@
 import { BackButton } from "@/shared/components/back-button";
-import { IconSymbol } from "@/shared/components/icon";
+import { Icon } from "@/shared/components/icon";
 import { ThemedText } from "@/shared/components/themed-text";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import { useRouter } from "expo-router";
 import { View, Pressable, StyleSheet } from "react-native";
+import { spacing } from "@/shared/theme/theme";
 
-function Header({ isLoading, isFetching }: { isLoading: boolean; isFetching: boolean }) {
+export function Header({ isLoading, isFetching }: { isLoading: boolean; isFetching: boolean }) {
   const router = useRouter();
-  const theme = useCurrentTheme();
+  const { colors } = useCurrentTheme();
 
   return (
     <View style={styles.header}>
-      <BackButton type="left" size={30} />
-      <ThemedText variant="title" style={styles.title}>
-        Lists
-      </ThemedText>
+      <BackButton type="left" />
+      <ThemedText variant="header">Lists</ThemedText>
       <Pressable
         disabled={isLoading || isFetching}
         onPress={() => router.push("/(app-protected)/lists/create-list")}
+        hitSlop={10}
         style={({ pressed }) => [{ opacity: pressed || isLoading || isFetching ? 0.6 : 1 }]}
       >
-        <IconSymbol name={"plus"} size={28} color={theme.colors.accent} />
+        <Icon name="plus" size={25} color={colors.accent} weight="bold" />
       </Pressable>
     </View>
   );
@@ -31,12 +31,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 20,
-    letterSpacing: 2,
+    paddingLeft: spacing[16],
+    paddingRight: spacing[16],
   },
 });
-
-export { Header };

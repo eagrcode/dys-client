@@ -1,4 +1,4 @@
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Alert, SectionList, StyleSheet, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useAuthProvider } from "@/features/auth/providers/session-provider";
 import { useDeleteGroup } from "@/features/groups/mutations/use-delete-group";
@@ -9,13 +9,29 @@ import { ActionRow } from "@/shared/components/action-row";
 import { ThemedText } from "@/shared/components/themed-text";
 import { ThemedView } from "@/shared/components/themed-view";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
+import { radius, spacing } from "@/shared/theme/theme";
+import type { Group } from "@/features/groups/types/t-group";
+import type { User } from "@/features/auth/types/auth-types";
+import { Icon } from "@/shared/components/icon";
+
+type Row = {
+  icon: React.ComponentProps<typeof Icon>["name"] | null;
+  rowTitle: string;
+  onPress: () => void;
+  isDestructive?: boolean;
+  groupCreator?: boolean;
+};
+
+type Section = {
+  title: string;
+  data: Row[];
+};
 
 export default function GroupSettingsScreen() {
-  const theme = useCurrentTheme();
   const { user } = useAuthProvider();
   const { groupId } = useLocalSearchParams<{ groupId: string }>();
-  const { data: group, isPending, isError, isFetching, refetch } = useGroupById(groupId);
-  const { mutate: deleteGroup, isPending: isDeleting } = useDeleteGroup();
+  const { data: group } = useGroupById(groupId);
+  const { mutate: deleteGroup } = useDeleteGroup();
 
   const confirmDelete = () => {
     if (!groupId || !group) return;
@@ -42,185 +58,145 @@ export default function GroupSettingsScreen() {
     );
   };
 
+  if (!group) {
+    return null;
+  }
+
+  const sections: Section[] = [
+    {
+      title: "Group",
+      data: [
+        {
+          icon: "pencil-simple",
+          rowTitle: "Edit group details",
+          onPress: () => void 0,
+        },
+      ],
+    },
+    {
+      title: "Your settings",
+      data: [
+        {
+          icon: "bell",
+          rowTitle: "Notification preferences",
+          onPress: () => void 0,
+        },
+      ],
+    },
+    {
+      title: "Membership",
+      data: [
+        {
+          icon: "trash",
+          rowTitle: group.created_by === user?.id ? "Delete group" : "Leave group",
+          isDestructive: true,
+          onPress: confirmDelete,
+          groupCreator: group.created_by === user?.id,
+        },
+      ],
+    },
+  ];
+
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.header}>
-        <BackButton type="left" />
-        <ThemedText variant="title" style={styles.title}>
-          Group settings
-        </ThemedText>
-      </View>
-
-      {isPending ? (
-        <View style={styles.stateContainer}>
-          <ActivityIndicator color={theme.colors.accent} />
-        </View>
-      ) : isError || !group ? (
-        <View style={styles.stateContainer}>
-          <ThemedText variant="defaultSemiBold">This group could not be loaded.</ThemedText>
-          <Pressable
-            accessibilityRole="button"
-            disabled={isFetching || !groupId}
-            onPress={() => refetch()}
-            style={({ pressed }) => ({ opacity: pressed ? 0.6 : isFetching ? 0.5 : 1 })}
-          >
-            <ThemedText variant="defaultSemiBold" style={{ color: theme.colors.accent }}>
-              {isFetching ? "Retrying…" : "Retry"}
-            </ThemedText>
-          </Pressable>
-        </View>
-      ) : (
-        <ScrollView
-          style={styles.content}
-          contentContainerStyle={styles.contentContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          <View
-            style={[
-              styles.groupCard,
-              {
-                backgroundColor: theme.colors.bgLayer1,
-                borderColor: theme.colors.border,
-                borderRadius: theme.radius.xl,
-              },
-            ]}
-          >
-            <View style={[styles.groupAvatar, { backgroundColor: theme.colors.accentSoft }]}>
-              <ThemedText style={[styles.initials, { color: theme.colors.accent }]}>
-                {getGroupInitials(group.name)}
-              </ThemedText>
-            </View>
-            <View style={styles.groupDetails}>
-              <ThemedText variant="defaultSemiBold" style={styles.groupName}>
-                {group.name}
-              </ThemedText>
-              <ThemedText variant="soft" style={styles.role}>
-                {group.created_by === user?.id ? "Created by you" : "Member"}
-              </ThemedText>
-              {group.description ? (
-                <ThemedText variant="soft" style={styles.description}>
-                  {group.description}
-                </ThemedText>
-              ) : null}
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <ThemedText variant="defaultSemiBold" style={styles.sectionTitle}>
-              Group
-            </ThemedText>
-            <ActionRow
-              icon="edit"
-              label="Edit group details"
-              disabledReason="Coming soon"
-            />
-            <ActionRow
-              icon="person"
-              label="Members and invitations"
-              disabledReason="Coming soon"
-            />
-          </View>
-
-          <View style={styles.section}>
-            <ThemedText variant="defaultSemiBold" style={styles.sectionTitle}>
-              Your settings
-            </ThemedText>
-            <ActionRow
-              icon="notifications"
-              label="Notification preferences"
-              disabledReason="Coming soon"
-            />
-          </View>
-
-          <View style={styles.section}>
-            <ThemedText variant="defaultSemiBold" style={styles.sectionTitle}>
-              Membership
-            </ThemedText>
-            {group.created_by === user?.id ? (
-              <ActionRow
-                icon="trash"
-                label="Delete group"
-                tone="danger"
-                loading={isDeleting}
-                onPress={confirmDelete}
-              />
-            ) : (
-              <ActionRow icon="close" label="Leave group" disabledReason="Coming soon" />
-            )}
-          </View>
-        </ScrollView>
-      )}
+    <ThemedView isSecondary header={<Header />}>
+      <GroupSummary group={group} user={user} />
+      <SectionList
+        sections={sections}
+        keyExtractor={(row) => row.rowTitle}
+        renderSectionHeader={({ section: { title } }) => (
+          <ThemedText variant="subHeader">{title}</ThemedText>
+        )}
+        renderItem={({ item }) => (
+          <ActionRow
+            icon={item.icon}
+            label={item.rowTitle}
+            onPress={item.onPress}
+            disabledReason={!item.groupCreator ? "Coming soon" : undefined}
+            tone={item.isDestructive ? "danger" : "default"}
+          />
+        )}
+      />
     </ThemedView>
   );
 }
 
-const styles = StyleSheet.create({
+function Header() {
+  return (
+    <View style={headerStyles.container}>
+      <BackButton type="left" />
+      <ThemedText variant="header">Group settings</ThemedText>
+    </View>
+  );
+}
+
+type GroupSummaryProps = {
+  group: Group;
+  user: User | null;
+};
+
+function GroupSummary({ group, user }: GroupSummaryProps) {
+  const { colors } = useCurrentTheme();
+  return (
+    <View
+      style={[
+        groupSummaryStyles.groupCard,
+        {
+          backgroundColor: colors.bgLayer1,
+          borderColor: colors.border,
+          borderRadius: radius.lg,
+        },
+      ]}
+    >
+      <View
+        style={[
+          groupSummaryStyles.groupAvatar,
+          { backgroundColor: colors.accentSoft, borderRadius: radius.lg },
+        ]}
+      >
+        <ThemedText
+          variant="header"
+          style={[groupSummaryStyles.initials, { color: colors.accent }]}
+        >
+          {getGroupInitials(group.name)}
+        </ThemedText>
+      </View>
+      <View>
+        <ThemedText variant="subHeader">{group.name}</ThemedText>
+        {group.description ? <ThemedText variant="tag">{group.description}</ThemedText> : null}
+      </View>
+    </View>
+  );
+}
+
+const headerStyles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 16,
-  },
-  header: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    marginBottom: 20,
+    gap: spacing[8],
   },
-  title: {
-    flex: 1,
-    fontSize: 24,
-    letterSpacing: 1,
-  },
-  stateContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-  },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    gap: 24,
-    paddingBottom: 40,
-  },
+});
+
+const groupSummaryStyles = StyleSheet.create({
   groupCard: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 14,
-    padding: 16,
+    gap: spacing[8],
+    padding: spacing[16],
     borderWidth: 1,
   },
   groupAvatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 17,
+    width: 50,
+    height: 50,
     alignItems: "center",
     justifyContent: "center",
   },
   initials: {
-    fontFamily: "DMSans_700Bold",
-    fontSize: 18,
-  },
-  groupDetails: {
-    flex: 1,
-    gap: 3,
-  },
-  groupName: {
-    fontSize: 18,
-  },
-  role: {
-    fontSize: 12,
-  },
-  description: {
-    marginTop: 6,
-    fontSize: 14,
-    lineHeight: 19,
-  },
-  section: {
-    gap: 10,
-  },
-  sectionTitle: {
-    marginLeft: 4,
-    fontSize: 14,
+    fontSize: 20,
   },
 });
+
+{
+  /* <ThemedText variant="tag" style={[groupSummaryStyles.role, { color: colors.textMuted }]}>
+  {group.created_by === user?.id ? "Created by you" : "Member"}
+</ThemedText>; */
+}

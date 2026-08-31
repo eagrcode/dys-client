@@ -3,6 +3,7 @@ import { ThemedText } from "./themed-text";
 import { Button } from "./button";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import type { ApiError } from "@/shared/api/api-error";
+import { spacing } from "@/shared/theme/theme";
 
 type Props = {
   error: ApiError | null;
@@ -11,7 +12,7 @@ type Props = {
   type: string;
 };
 
-const RetryFetch = ({ error, refetch, isFetching, type }: Props) => {
+export function RetryFetch({ error, refetch, isFetching, type }: Props) {
   const theme = useCurrentTheme();
   const isNotFound = error?.status === 404;
   const isNetworkError = error?.code === "NETWORK_ERROR";
@@ -31,23 +32,27 @@ const RetryFetch = ({ error, refetch, isFetching, type }: Props) => {
 
   return (
     <View style={styles.centered}>
-      <ThemedText style={{ opacity: 0.5, marginBottom: 16 }}>{message}</ThemedText>
+      <ThemedText style={{ opacity: 0.5, marginBottom: spacing[16] }}>{message}</ThemedText>
       {canRetry && (
         <Button
           variant="primary"
-          style={{ paddingVertical: 8, paddingHorizontal: 16, borderRadius: theme.radius.sm }}
+          style={{
+            paddingVertical: spacing[8],
+            paddingHorizontal: spacing[16],
+            borderRadius: theme.radius.sm,
+          }}
           onPress={() => void refetch()}
           loading={isFetching}
           disabled={isFetching}
         >
-          <ThemedText variant="button" style={{ color: "#fff" }}>
+          <ThemedText variant="button" style={{ color: theme.colors.onAccent }}>
             {isFetching ? "Retrying..." : "Retry"}
           </ThemedText>
         </Button>
       )}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   centered: {
@@ -56,5 +61,3 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
-
-export default RetryFetch;

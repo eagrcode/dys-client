@@ -1,168 +1,212 @@
 import { ThemedText } from "@/shared/components/themed-text";
-import { IconSymbol } from "@/shared/components/icon";
 import { useDashboardData } from "@/features/dashboard/queries/use-dashboard-data";
+import { Icon } from "@/shared/components/icon";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import { useRouter, type Href } from "expo-router";
-import { FlatList, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
+import { spacing, radius } from "@/shared/theme/theme";
+import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { DashboardCount } from "@/features/dashboard/types/dashboard-types";
 
-type DashboardTileId = "lists" | "calendar" | "albums" | "messages";
+type DashboardTileId = "lists" | "calendar" | "albums" | "chat";
 
 type Feature = {
   id: DashboardTileId;
   name: string;
-  icon: React.ComponentProps<typeof IconSymbol>["name"];
+  icon: React.ComponentProps<typeof Icon>["name"];
   route: Href;
-  count: number;
-  label: string;
-  tag: string;
+  label: string | null;
+  featureDisabled: boolean;
+  showLabelSkeleton: boolean;
 };
 
 type DashboardQueries = {
   lists: UseQueryResult<DashboardCount, Error>;
   calendar: UseQueryResult<DashboardCount, Error>;
   albums: UseQueryResult<DashboardCount, Error>;
-  messages: UseQueryResult<DashboardCount, Error>;
+  chat: UseQueryResult<DashboardCount, Error>;
 };
 
 const TILE_CONFIG = [
   {
     id: "lists",
     name: "Lists",
-    icon: "list",
+    icon: "list-bullets",
     route: "/(app-protected)/lists/overview",
     tag: "Outstanding",
+    featureDisabled: false,
   },
-  // {
-  //   id: "calendar",
-  //   name: "Calendar",
-  //   icon: "calendar",
-  //   route: "/(app-protected)/calendar",
-  //   tag: "Upcoming",
-  // },
-  // {
-  //   id: "albums",
-  //   name: "Albums",
-  //   icon: "photo",
-  //   route: "/(app-protected)/albums",
-  //   tag: "Albums",
-  // },
-  // {
-  //   id: "messages",
-  //   name: "HearthChat",
-  //   icon: "chat",
-  //   route: "/(app-protected)/text-channels",
-  //   tag: "Unread",
-  // },
+  {
+    id: "calendar",
+    name: "Calendar",
+    icon: "calendar-dots",
+    route: "/(app-protected)/calendar",
+    tag: "Coming soon",
+    featureDisabled: true,
+  },
+  {
+    id: "albums",
+    name: "Albums",
+    icon: "images",
+    route: "/(app-protected)/albums",
+    tag: "Coming soon",
+    featureDisabled: true,
+  },
+  {
+    id: "chat",
+    name: "Chat",
+    icon: "chat-text",
+    route: "/(app-protected)/text-channels",
+    tag: "Coming soon",
+    featureDisabled: true,
+  },
 ] as const;
 
-const buildFeatures = (queries: DashboardQueries): Feature[] => {
+function buildFeatures(queries: DashboardQueries): Feature[] {
   return TILE_CONFIG.map((tile) => {
     const query = queries[tile.id];
-    const count = query.data?.count ?? 0;
-    const label = query.isPending
-      ? `— ${tile.tag}`
-      : query.isError
-        ? "Unavailable"
-        : `${count} ${tile.tag}`;
+
+    const showLabelSkeleton = !tile.featureDisabled && query.isPending && !query.data;
+
+    let label: string | null = null;
+
+    if (tile.featureDisabled) {
+      label = tile.tag;
+    } else if (query.isError) {
+      label = "Unavailable";
+    } else if (query.data) {
+      label = `${query.data.count} ${tile.tag}`;
+    }
 
     return {
-      ...tile,
-      count,
+      id: tile.id,
+      name: tile.name,
+      icon: tile.icon,
+      route: tile.route,
       label,
+      featureDisabled: tile.featureDisabled,
+      showLabelSkeleton,
     };
   });
-};
+}
 
-const Summary = () => {
-  const { lists, calendar, albums, messages } = useDashboardData();
+export function Summary() {
+  const { lists, calendar, albums, chat } = useDashboardData();
 
-  const queries = { lists, calendar, albums, messages };
+  const queries: DashboardQueries = {
+    lists,
+    calendar,
+    albums,
+    chat,
+  };
 
   const features = buildFeatures(queries);
 
   return (
-    <View style={dashboardStyles.grid}>
-      {features.map((item) => (
-        <Tile key={item.id} {...item} />
-      ))}
-    </View>
+    <FlatList
+      data={features}
+      numColumns={2}
+      columnWrapperStyle={styles.column}
+      contentContainerStyle={styles.content}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => <Tile {...item} />}
+    />
   );
-};
+}
 
-const Tile = ({ name, icon, route, label }: Feature) => {
+function Tile({ name, icon, route, label, featureDisabled, showLabelSkeleton }: Feature) {
   const router = useRouter();
-  const theme = useCurrentTheme();
-  const { width } = useWindowDimensions();
-  const tileWidth = (width - 48) / 2;
+  const { colors } = useCurrentTheme();
+
+  const handlePress = () => {
+    if (!featureDisabled) {
+      router.push(route);
+    }
+  };
 
   return (
     <Pressable
-      onPress={() => router.push(route)}
-      style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+      onPress={handlePress}
+      style={({ pressed }) => [
+        styles.pressable,
+        {
+          opacity: pressed && !featureDisabled ? 0.7 : 1,
+        },
+      ]}
     >
       <View
         style={[
-          tileStyles.tile,
+          styles.tile,
           {
-            width: tileWidth,
-            borderRadius: theme.radius.xl,
-            backgroundColor: theme.colors.bgLayer1,
-            borderColor: theme.colors.border,
-            borderBottomColor: theme.colors.cyanSoft,
-            ...theme.shadow.tile,
+            borderRadius: radius.sm,
+            backgroundColor: colors.bgLayer1,
+            borderColor: colors.border,
+            opacity: featureDisabled ? 0.4 : 1,
           },
         ]}
       >
         <View>
-          <ThemedText variant="defaultSemiBold">{name}</ThemedText>
-          <ThemedText style={tileStyles.label}>{label}</ThemedText>
+          <ThemedText variant="subHeader" style={styles.title}>
+            {name}
+          </ThemedText>
+
+          {showLabelSkeleton ? (
+            <View
+              style={[
+                styles.labelSkeleton,
+                {
+                  backgroundColor: colors.bgLayer3,
+                },
+              ]}
+            />
+          ) : (
+            label && (
+              <ThemedText variant="tag" style={styles.label}>
+                {label}
+              </ThemedText>
+            )
+          )}
         </View>
 
-        <IconSymbol
-          name={icon}
-          size={36}
-          color={
-            (
-              theme.colors.homeTileColors[name as keyof typeof theme.colors.homeTileColors] as {
-                bg: string;
-                border: string;
-                icon: string;
-                label: string;
-              }
-            ).icon
-          }
-        />
+        <View style={styles.icon}>
+          <Icon name={icon} size={25} color={colors.icon} />
+        </View>
       </View>
     </Pressable>
   );
-};
+}
 
-const dashboardStyles = StyleSheet.create({
-  grid: {
-    gap: 16,
+const styles = StyleSheet.create({
+  column: {
+    gap: spacing[8],
   },
-  row: {
-    justifyContent: "space-between",
+  content: {
+    gap: spacing[8],
   },
-});
-
-const tileStyles = StyleSheet.create({
+  pressable: {
+    flex: 1,
+  },
   tile: {
-    height: 100,
+    width: "100%",
+    minHeight: 80,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
+    padding: spacing[12],
     borderWidth: StyleSheet.hairlineWidth,
     borderBottomWidth: 1,
   },
+  title: {
+    fontSize: 18,
+  },
   label: {
-    minHeight: 20,
     fontSize: 14,
-    opacity: 0.7,
+  },
+  labelSkeleton: {
+    width: 80,
+    height: 16,
+    borderRadius: 2,
+  },
+  icon: {
+    alignSelf: "flex-start",
   },
 });
-
-export { Summary };

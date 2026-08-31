@@ -1,17 +1,19 @@
+import type { IconName } from "@/shared/components/icon";
+
 export const LIST_TYPES = {
   todo: {
     label: "Todo",
-    icon: "checkmark.circle.fill",
+    icon: "list-checks",
   },
   shopping: {
     label: "Shopping",
-    icon: "cart.fill",
+    icon: "shopping-cart",
   },
   other: {
-    label: "Other",
-    icon: "list.bullet",
+    label: "General",
+    icon: "list-bullets",
   },
-} as const;
+} as const satisfies Record<string, { label: string; icon: IconName }>;
 
 export type ListType = keyof typeof LIST_TYPES;
 

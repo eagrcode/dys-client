@@ -18,7 +18,7 @@ export function useDashboardData() {
     retry: false,
   };
 
-  const [lists, calendar, albums, messages] = useQueries({
+  const [lists, calendar, albums, chat] = useQueries({
     queries: [
       {
         queryKey: listKeys.dashboard(storedGroupId || ""),
@@ -36,21 +36,21 @@ export function useDashboardData() {
         ...options,
       },
       {
-        queryKey: ["dashboardData", userId, storedGroupId, "messages"],
+        queryKey: ["dashboardData", userId, storedGroupId, "chat"],
         queryFn: () => dashboardApi.getMessages(storedGroupId || ""),
         ...options,
       },
     ],
   });
 
-  const dashboardQueries = [lists, calendar, albums, messages];
+  const dashboardQueries = [lists, calendar, albums, chat];
   const isInitialSettled = dashboardQueries.every((query) => query.isSuccess || query.isError);
 
   return {
     lists,
     calendar,
     albums,
-    messages,
+    chat,
 
     isInitialSettled,
 

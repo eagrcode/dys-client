@@ -1,10 +1,3 @@
-import { ThemedText } from "@/shared/components/themed-text";
-import { ThemedView } from "@/shared/components/themed-view";
-import { Button } from "@/shared/components/button";
-import { ErrorText } from "@/shared/components/error-text";
-import { Input } from "@/shared/components/input";
-import { useAuthProvider } from "@/features/auth/providers/session-provider";
-import { useState, useRef, useEffect } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -13,11 +6,22 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { ThemedText } from "@/shared/components/themed-text";
+import { ThemedView } from "@/shared/components/themed-view";
+import { Button } from "@/shared/components/button";
+import { ErrorText } from "@/shared/components/error-text";
+import { Input } from "@/shared/components/input";
+import { useAuthProvider } from "@/features/auth/providers/session-provider";
+import { useState, useRef, useEffect } from "react";
 import { isApiError } from "@/shared/api/api-error";
+import { spacing } from "@/shared/theme/theme";
+import { BackButton } from "@/shared/components/back-button";
 import type { TextInput } from "react-native";
 import type { SignInInput } from "@/features/auth/providers/session-provider";
+import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 
-function SignInScreen() {
+export function SignInScreen() {
+  const theme = useCurrentTheme();
   const [formData, setFormData] = useState<SignInInput>({
     email: "",
     password: "",
@@ -28,8 +32,8 @@ function SignInScreen() {
   });
   const [formError, setFormError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const inputRef = useRef<TextInput>(null);
   const { signIn, sessionErrorMsg, clearSessionErrorMsg } = useAuthProvider();
+  const inputRef = useRef<TextInput>(null);
 
   const submitDisabled = isLoading || !formData.email || !formData.password;
 
@@ -111,10 +115,9 @@ function SignInScreen() {
 
   return (
     <TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss} accessible={false}>
-      <ThemedView style={styles.container}>
-        <ThemedText variant="title" style={{ marginBottom: 16, fontSize: 22 }}>
-          Welcome back! 👋
-        </ThemedText>
+      <ThemedView header={<BackButton type={"left"} />}>
+        <ThemedText variant="headerLg">Welcome back! 👋</ThemedText>
+        <ThemedText variant="body">Sign in to continue</ThemedText>
         <View style={styles.form}>
           <View style={styles.inputs}>
             <Input
@@ -126,6 +129,10 @@ function SignInScreen() {
               autoComplete="email"
               textContentType="emailAddress"
               ref={inputRef}
+              paddingHorizontal="lg"
+              paddingVertical="md"
+              radius="sm"
+              autoCapitalize="none"
             />
             {renderFieldError("email")}
             <Input
@@ -136,13 +143,21 @@ function SignInScreen() {
               inputMode="text"
               autoComplete="password"
               textContentType="password"
+              paddingHorizontal="lg"
+              paddingVertical="md"
+              radius="sm"
+              autoCapitalize="none"
             />
             {renderFieldError("password")}
           </View>
           {renderFormError()}
           <Button variant="primary" onPress={handleSignInPress} disabled={submitDisabled}>
-            <ThemedText variant="button">
-              {isLoading ? <ActivityIndicator size="small" color="#fff" /> : "Sign In"}
+            <ThemedText variant="button" style={{ color: theme.colors.onAccent }}>
+              {isLoading ? (
+                <ActivityIndicator size="small" color={theme.colors.onAccent} />
+              ) : (
+                "Sign In"
+              )}
             </ThemedText>
           </Button>
         </View>
@@ -152,19 +167,11 @@ function SignInScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    padding: 16,
-  },
   form: {
     width: "100%",
-    gap: 16,
+    gap: spacing[16],
   },
   inputs: {
-    gap: 8,
+    gap: spacing[8],
   },
 });
-
-export { SignInScreen };

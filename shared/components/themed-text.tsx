@@ -1,73 +1,61 @@
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
-import { StyleProp, Text } from "react-native";
-import type { TextStyle } from "react-native";
+import { Text } from "react-native";
+import type { TextProps, TextStyle } from "react-native";
 
-type Variant = "default" | "soft" | "title" | "defaultSemiBold" | "subtitle" | "link" | "button";
+type Variant = "tag" | "body" | "header" | "headerLg" | "subHeader" | "button";
 
-type Props = {
+type Props = TextProps & {
   variant?: Variant;
-  style?: StyleProp<TextStyle>;
   children: React.ReactNode;
-  numberOfLines?: number;
+  completed?: boolean;
 };
 
-export function ThemedText({
-  style,
-  variant = "default",
-  children,
-  numberOfLines,
-  ...rest
-}: Props) {
-  const theme = useCurrentTheme();
+export function ThemedText({ style, variant = "body", children, completed, ...rest }: Props) {
+  const { colors } = useCurrentTheme();
+
+  const baseStyles = {
+    letterSpacing: 0.5,
+    color: colors.text,
+  };
 
   const variantStyles: Record<Variant, TextStyle> = {
-    default: {
-      fontFamily: "DMSans_400Regular",
-      fontSize: 16,
-      letterSpacing: 0.5,
-      color: theme.colors.text,
+    tag: {
+      fontFamily: "HankenGrotesk_300Light",
+      fontSize: 15,
+      opacity: 0.8,
     },
-    soft: {
-      fontFamily: "DMSans_400Regular",
-      fontSize: 16,
-      letterSpacing: 0.5,
-      color: theme.colors.textMuted,
+    body: {
+      fontFamily: "HankenGrotesk_300Light",
+      fontSize: 18,
     },
-    defaultSemiBold: {
-      fontFamily: "DMSans_600SemiBold",
-      fontSize: 16,
-      letterSpacing: 0.5,
-      color: theme.colors.text,
+    subHeader: {
+      fontFamily: "HankenGrotesk_500Medium",
+      fontSize: 20,
+    },
+    header: {
+      fontFamily: "HankenGrotesk_600SemiBold",
+      fontSize: 22,
+      color: colors.textHeader,
+      letterSpacing: 1,
+    },
+    headerLg: {
+      fontFamily: "HankenGrotesk_600SemiBold",
+      fontSize: 26,
+      color: colors.textHeader,
+      letterSpacing: 1,
     },
     button: {
-      fontFamily: "DMSans_700Bold",
-      fontSize: 16,
-      letterSpacing: 0.5,
-      color: theme.colors.text,
-    },
-    title: {
-      fontFamily: "Syne_500Medium",
-      fontSize: 32,
-      letterSpacing: 0.7,
-      color: theme.colors.text,
-    },
-    subtitle: {
-      fontFamily: "DMSans_400Regular",
+      fontFamily: "HankenGrotesk_600SemiBold",
       fontSize: 18,
-      letterSpacing: 0.7,
-      color: theme.colors.text,
-    },
-    link: {
-      fontFamily: "DMSans_400Regular",
-      lineHeight: 30,
-      fontSize: 16,
-      letterSpacing: 0.2,
-      color: theme.colors.accent,
     },
   };
 
+  const completedStyle: TextStyle = completed
+    ? { textDecorationLine: "line-through", opacity: 0.5 }
+    : {};
+
   return (
-    <Text numberOfLines={numberOfLines} style={[variantStyles[variant], style]} {...rest}>
+    <Text style={[baseStyles, variantStyles[variant], completedStyle, style]} {...rest}>
       {children}
     </Text>
   );

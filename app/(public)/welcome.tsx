@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
+import { radius, spacing } from "@/shared/theme/theme";
 
 const PILL_CONTENT = ["Lists", "Calendar", "Albums", "Chat"];
 
@@ -20,11 +21,14 @@ export default function Welcome() {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
-        <ThemedText variant="title" style={[styles.title, { color: theme.colors.accent }]}>
+        <ThemedText variant="header" style={[styles.title, { color: theme.colors.accent }]}>
           HearthLink
         </ThemedText>
 
-        <ThemedText variant="soft" style={styles.tagline}>
+        <ThemedText
+          variant="body"
+          style={[styles.tagline, { color: theme.colors.textMuted }]}
+        >
           For couples, households, and the groups that matter most.
         </ThemedText>
 
@@ -33,7 +37,9 @@ export default function Welcome() {
 
       <View style={styles.buttons}>
         <Button variant="primary" onPress={() => router.push("/(public)/sign-up")}>
-          <ThemedText variant="button">Create Account</ThemedText>
+          <ThemedText variant="button" style={{ color: theme.colors.onAccent }}>
+            Create Account
+          </ThemedText>
         </Button>
 
         <Button variant="secondary" onPress={() => router.push("/(public)/sign-in")}>
@@ -62,7 +68,9 @@ const Pills = () => {
             },
           ]}
         >
-          <ThemedText variant="soft">{pill}</ThemedText>
+          <ThemedText variant="body" style={{ color: theme.colors.textMuted }}>
+            {pill}
+          </ThemedText>
         </View>
       ))}
     </View>
@@ -71,7 +79,7 @@ const Pills = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: spacing[16],
     width: "100%",
     height: "100%",
   },
@@ -79,7 +87,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    gap: 16,
+    gap: spacing[16],
     maxWidth: "90%",
     textAlign: "center",
     alignSelf: "center",
@@ -92,19 +100,19 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   buttons: {
-    gap: 16,
+    gap: spacing[16],
   },
 });
 
 const pillStyles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    gap: 8,
+    gap: spacing[8],
   },
   pill: {
     borderWidth: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: spacing[12],
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: radius.full,
   },
 });

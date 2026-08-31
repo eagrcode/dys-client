@@ -5,13 +5,14 @@ import { useAuthProvider } from "@/features/auth/providers/session-provider";
 import { useGroups } from "@/features/groups/queries/use-groups";
 import { useGroupsProvider } from "@/features/groups/providers/groups-provider";
 import { getGroupInitials } from "@/features/groups/utils/get-group-initials";
-import { IconSymbol } from "@/shared/components/icon";
+import { Icon } from "@/shared/components/icon";
 import { ThemedText } from "@/shared/components/themed-text";
 import { ThemedView } from "@/shared/components/themed-view";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import type { Group } from "@/features/groups/types/t-group";
-import RetryFetch from "@/shared/components/retry-fetch";
+import { RetryFetch } from "@/shared/components/retry-fetch";
 import type { User } from "@/features/auth/types/auth-types";
+import { spacing } from "@/shared/theme/theme";
 
 function GroupsScreen() {
   const theme = useCurrentTheme();
@@ -49,7 +50,7 @@ function GroupsScreen() {
 
   const showGroupActions = (groupId: string) => {
     router.push({
-      pathname: "/(app-protected)/(modals)/group-actions",
+      pathname: "/(app-protected)/group/[groupId]",
       params: { groupId },
     });
   };
@@ -101,10 +102,13 @@ const Header = () => {
   return (
     <View style={headerStyles.header}>
       <View>
-        <ThemedText variant="title" style={headerStyles.title}>
+        <ThemedText variant="header" style={headerStyles.title}>
           Groups
         </ThemedText>
-        <ThemedText variant="soft" style={headerStyles.subtitle}>
+        <ThemedText
+          variant="body"
+          style={[headerStyles.subtitle, { color: theme.colors.textMuted }]}
+        >
           Choose where you want to spend time.
         </ThemedText>
       </View>
@@ -115,7 +119,7 @@ const Header = () => {
         onPress={() => router.push("/(app-protected)/create-group")}
         style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
       >
-        <IconSymbol name="plus-circle-filled" size={30} color={theme.colors.accent} />
+        <Icon name="plus-circle" size={30} color={theme.colors.accent} weight="fill" />
       </Pressable>
     </View>
   );
@@ -206,14 +210,21 @@ const GroupCard = ({
         </View>
 
         <View style={groupCardStyles.cardContent}>
-          <ThemedText variant="defaultSemiBold" numberOfLines={1}>
+          <ThemedText variant="subHeader" numberOfLines={1}>
             {group.name}
           </ThemedText>
-          <ThemedText variant="soft" style={groupCardStyles.role}>
+          <ThemedText
+            variant="tag"
+            style={[groupCardStyles.role, { color: theme.colors.textMuted }]}
+          >
             {isCreator ? "Created by you" : "Member"}
           </ThemedText>
           {group.description ? (
-            <ThemedText variant="soft" style={groupCardStyles.description} numberOfLines={1}>
+            <ThemedText
+              variant="tag"
+              style={[groupCardStyles.description, { color: theme.colors.textMuted }]}
+              numberOfLines={1}
+            >
               {group.description}
             </ThemedText>
           ) : null}
@@ -228,7 +239,7 @@ const GroupCard = ({
         onPress={onOpenActions}
         style={({ pressed }) => [{ opacity: pressed ? 0.5 : isSwitching ? 0.4 : 1 }]}
       >
-        <IconSymbol name="ellipsis" size={20} color={theme.colors.icon} />
+        <Icon name="dots-three" size={20} color={theme.colors.icon} weight="bold" />
       </Pressable>
     </View>
   );
@@ -242,7 +253,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    gap: 16,
+    gap: spacing[16],
   },
 });
 
@@ -266,14 +277,14 @@ const listStyles = StyleSheet.create({
     flex: 1,
   },
   listContent: {
-    gap: 12,
-    paddingBottom: 32,
+    gap: spacing[12],
+    paddingBottom: spacing[32],
   },
   stateContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 12,
+    gap: spacing[12],
   },
 });
 
@@ -282,14 +293,14 @@ const groupCardStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    paddingVertical: spacing[12],
+    paddingHorizontal: spacing[16],
   },
   cardMain: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: spacing[12],
   },
   groupAvatar: {
     width: 48,
@@ -298,7 +309,7 @@ const groupCardStyles = StyleSheet.create({
     justifyContent: "center",
   },
   initials: {
-    fontFamily: "DMSans_700Bold",
+    fontFamily: "HankenGrotesk_600SemiBold",
     fontSize: 17,
   },
   cardContent: {

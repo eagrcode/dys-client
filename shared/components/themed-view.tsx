@@ -1,37 +1,73 @@
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import type { StyleProp, ViewStyle, ViewProps } from "react-native";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { spacing, layout } from "../theme/theme";
 
-type Props = {
+type Props = ViewProps & {
   style?: StyleProp<ViewStyle>;
+  header?: React.ReactNode;
   children: React.ReactNode;
-  otherProps?: ViewProps;
+  horizontalInset?: "screen" | "none";
+  isSecondary?: boolean;
 };
 
-const ThemedView = ({ style, children, ...otherProps }: Props) => {
-  const theme = useCurrentTheme();
+export const ThemedView = ({
+  header = null,
+  style,
+  children,
+  horizontalInset = "screen",
+  isSecondary = false,
+  ...otherProps
+}: Props) => {
+  const { colors } = useCurrentTheme();
   const insets = useSafeAreaInsets();
+  const horizontalPadding = horizontalInset === "screen" ? layout.screenPadding : 0;
 
   return (
     <View
       style={[
         {
           flex: 1,
-          paddingTop: insets.top + 16,
-          paddingBottom: insets.bottom + 16,
-          paddingLeft: insets.left + 16,
-          paddingRight: insets.right + 16,
-          backgroundColor: theme.colors.background,
+          paddingTop: insets.top + layout.screenPadding,
+          paddingBottom: insets.bottom + layout.screenPadding,
+          backgroundColor: isSecondary ? colors.backgroundSecondary : colors.background,
         },
         style,
       ]}
       {...otherProps}
     >
-      {children}
+      {header && (
+        <>
+          <View
+            style={{
+              paddingHorizontal: horizontalPadding,
+              minHeight: 30,
+              justifyContent: "center",
+            }}
+          >
+            {header}
+          </View>
+          <View
+            style={{
+              borderTopWidth: StyleSheet.hairlineWidth,
+              borderColor: colors.border,
+              marginTop: spacing[16],
+              marginBottom: layout.headerBottomMargin,
+            }}
+          ></View>
+        </>
+      )}
+      <View
+        style={{
+          flex: 1,
+          alignSelf: "stretch",
+          gap: layout.contentGap,
+          paddingHorizontal: horizontalPadding,
+        }}
+      >
+        {children}
+      </View>
     </View>
   );
 };
-
-export { ThemedView };

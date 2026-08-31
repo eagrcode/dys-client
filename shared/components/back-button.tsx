@@ -1,31 +1,29 @@
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import { router } from "expo-router";
-import { Pressable, StyleProp, TextStyle, StyleSheet } from "react-native";
-import { IconSymbol } from "./icon";
+import { Pressable, StyleProp, ViewStyle } from "react-native";
+import { Icon } from "./icon";
 
 type Props = {
   type: "down" | "left" | "close";
   size?: number;
-  style?: StyleProp<TextStyle>;
+  style?: StyleProp<ViewStyle>;
 };
 
-export function BackButton({ type, size = 30, style }: Props) {
+export function BackButton({ type, size = 22, style }: Props) {
   const theme = useCurrentTheme();
 
   return (
     <Pressable
       onPress={() => router.back()}
-      style={({ pressed }) => [styles.closeBtn, { opacity: pressed ? 0.6 : 1 }, style]}
+      hitSlop={7}
+      style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }, style]}
     >
-      <IconSymbol
-        name={type === "down" ? "chevron-down" : type === "left" ? "chevron-left" : "close"}
+      <Icon
+        name={type === "down" ? "caret-down" : type === "left" ? "caret-left" : "x"}
         size={size}
         color={theme.colors.icon}
+        weight="bold"
       />
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  closeBtn: {},
-});

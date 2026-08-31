@@ -1,17 +1,19 @@
-import { IconSymbol } from "@/shared/components/icon";
+import { Icon } from "@/shared/components/icon";
 import { Input } from "@/shared/components/input";
 import { useCreateListItem } from "@/features/lists/mutations/use-create-list-item";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
-import { useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { TextInput } from "react-native";
 import { ErrorAlert } from "@/shared/components/alert";
 
-const NewItemInput = () => {
-  const { listId } = useLocalSearchParams<{ listId: string }>();
+type Props = {
+  listId: string;
+};
+
+export function AddItem({ listId }: Props) {
   const [newItem, setNewItem] = useState<string>("");
   const { mutate: createListItem } = useCreateListItem();
-  const theme = useCurrentTheme();
+  const { colors } = useCurrentTheme();
   const inputRef = useRef<TextInput>(null);
 
   const handleAddItemPress = () => {
@@ -32,48 +34,27 @@ const NewItemInput = () => {
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          borderColor: theme.colors.border,
-          borderRadius: theme.radius.xl,
-        },
-      ]}
-    >
-      <IconSymbol
-        name="plus"
-        size={30}
-        color={!newItem.trim() ? theme.colors.textMuted : theme.colors.icon}
-      />
-      <Input
-        ref={inputRef}
-        style={[styles.input]}
-        placeholder="New item"
-        value={newItem}
-        onChangeText={(content) => setNewItem(content)}
-        onSubmitEditing={handleAddItemPress}
-        submitBehavior="submit"
-        maxLength={100}
-      />
-    </View>
+    <Input
+      ref={inputRef}
+      leftIcon={
+        <Icon
+          name="plus"
+          size={22}
+          color={!newItem.trim() ? colors.textMuted : colors.icon}
+          weight="bold"
+        />
+      }
+      paddingHorizontal="lg"
+      paddingVertical="md"
+      placeholder="New item"
+      value={newItem}
+      onChangeText={setNewItem}
+      onSubmitEditing={handleAddItemPress}
+      submitBehavior="submit"
+      maxLength={100}
+      autoCapitalize="sentences"
+      borderThickness="hairline"
+      radius="sm"
+    />
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 8,
-    borderWidth: 1,
-  },
-  input: {
-    flex: 1,
-    width: undefined,
-    borderWidth: 0,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-  },
-});
-export { NewItemInput };
+}

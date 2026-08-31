@@ -1,96 +1,97 @@
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
-import { type Ref } from "react";
+import { type ReactNode, type Ref } from "react";
+import { controlSize, radius as radiusMap } from "@/shared/theme/theme";
 import {
   StyleSheet,
   TextInput,
-  type KeyboardTypeOptions,
+  View,
   type StyleProp,
+  type TextInputProps,
   type TextStyle,
+  type ViewStyle,
 } from "react-native";
 
-type InputProps = {
+type InputSize = "sm" | "md" | "lg";
+type InputRadius = "sm" | "md" | "lg" | "full";
+type InputAppearance = "outlined" | "plain";
+type BorderThickness = "hairline" | number;
+
+type InputProps = TextInputProps & {
   ref?: Ref<TextInput>;
-  placeholder?: string;
-  value: string;
-  onChangeText: (text: string) => void;
-  secureTextEntry?: boolean;
-  keyboardType?: KeyboardTypeOptions;
-  inputMode?: "none" | "text" | "decimal" | "numeric" | "tel" | "search" | "email" | "url";
-  autoComplete?: string;
-  editable?: boolean;
-  autoFocus?: boolean;
-  style?: StyleProp<TextStyle>;
-  onSubmitEditing?: () => void;
-  submitBehavior?: "submit" | "blurAndSubmit" | "newline";
-  textContentType?:
-    | "none"
-    | "emailAddress"
-    | "password"
-    | "username"
-    | "name"
-    | "givenName"
-    | "familyName";
-  maxLength?: number;
+  appearance?: InputAppearance;
+  containerStyle?: StyleProp<ViewStyle>;
+  inputStyle?: StyleProp<TextStyle>;
+  paddingHorizontal?: InputSize;
+  paddingVertical?: InputSize;
+  radius?: InputRadius;
+  borderThickness?: BorderThickness;
+  size?: InputSize;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
 };
 
 export function Input({
   ref,
-  placeholder,
-  value,
-  onChangeText,
-  secureTextEntry,
-  keyboardType,
-  inputMode,
-  autoComplete,
-  textContentType,
-  editable,
-  autoFocus = false,
-  style,
-  onSubmitEditing,
-  submitBehavior,
-  maxLength,
+  appearance = "outlined",
+  containerStyle,
+  inputStyle,
+  leftIcon,
+  paddingHorizontal,
+  paddingVertical,
+  radius = "full",
+  size = "md",
+  rightIcon,
+  borderThickness = 1,
+  ...textInputProps
 }: InputProps) {
-  const theme = useCurrentTheme();
-  const colors = theme.colors;
+  const { colors } = useCurrentTheme();
+  const isOutlined = appearance === "outlined";
+  const horizontalSize = paddingHorizontal ?? size;
+  const verticalSize = paddingVertical ?? size;
+  const horizontalPadding = controlSize[horizontalSize].padding;
+  const verticalPadding = controlSize[verticalSize].padding;
 
   return (
-    <TextInput
-      ref={ref}
+    <View
       style={[
-        styles.base,
-        {
+        styles.container,
+        isOutlined && {
+          borderWidth: borderThickness === "hairline" ? StyleSheet.hairlineWidth : borderThickness,
           borderColor: colors.border,
-          color: colors.text,
-          borderRadius: theme.radius.lg,
+          borderRadius: radiusMap[radius],
+          gap: horizontalPadding,
+          paddingHorizontal: horizontalPadding,
+          paddingVertical: verticalPadding,
         },
-        style,
+        containerStyle,
       ]}
-      placeholder={placeholder}
-      placeholderTextColor={colors.textMuted}
-      value={value}
-      onChangeText={onChangeText}
-      secureTextEntry={secureTextEntry}
-      keyboardType={keyboardType}
-      inputMode={inputMode}
-      autoComplete={autoComplete as any}
-      textContentType={textContentType}
-      editable={editable}
-      autoFocus={autoFocus}
-      onSubmitEditing={onSubmitEditing}
-      submitBehavior={submitBehavior}
-      autoCapitalize="none"
-      maxLength={maxLength}
-    />
+    >
+      {leftIcon}
+      <TextInput
+        {...textInputProps}
+        ref={ref}
+        style={[styles.input, { color: colors.text }, inputStyle]}
+        placeholderTextColor={colors.textMuted}
+      />
+      {rightIcon}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  base: {
-    padding: 16,
-    fontSize: 16,
-    fontFamily: "DMSans_400Regular",
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "transparent",
-    borderWidth: 1,
-    letterSpacing: 0.7,
+  },
+  input: {
+    flex: 1,
+    minWidth: 0,
+    alignSelf: "stretch",
+    padding: 0,
+    margin: 0,
+    fontSize: 16,
+    fontFamily: "HankenGrotesk_400Regular",
+    letterSpacing: 0.5,
   },
 });

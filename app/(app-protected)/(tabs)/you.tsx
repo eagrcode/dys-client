@@ -1,11 +1,12 @@
 import { ThemedText } from "@/shared/components/themed-text";
 import { ThemedView } from "@/shared/components/themed-view";
 import { Button } from "@/shared/components/button";
-import { IconSymbol } from "@/shared/components/icon";
+import { Icon } from "@/shared/components/icon";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import { useAuthProvider } from "@/features/auth/providers/session-provider";
 import { useThemePreference } from "@/shared/providers/theme-mode-provider";
 import { StyleSheet, View } from "react-native";
+import { spacing } from "@/shared/theme/theme";
 
 export default function YouScreen() {
   const { user, signOut } = useAuthProvider();
@@ -23,10 +24,12 @@ export default function YouScreen() {
             { backgroundColor: theme.colors.accent, borderRadius: theme.radius.full },
           ]}
         >
-          <ThemedText style={styles.initials}>{initials}</ThemedText>
+          <ThemedText style={[styles.initials, { color: theme.colors.onAccent }]}>
+            {initials}
+          </ThemedText>
         </View>
 
-        <ThemedText variant="title">
+        <ThemedText variant="header">
           {user ? `${user.first_name} ${user.last_name}` : "Unknown"}
         </ThemedText>
         <ThemedText style={styles.email}>{user?.email}</ThemedText>
@@ -35,10 +38,11 @@ export default function YouScreen() {
       <View style={styles.actions}>
         <Button variant="secondaryFill1" onPress={toggleMode}>
           <View style={styles.row}>
-            <IconSymbol
-              name={theme.scheme === "light" ? "moon.fill" : "sun.max.fill"}
+            <Icon
+              name={theme.scheme === "light" ? "moon" : "sun"}
               size={20}
               color={theme.colors.icon}
+              weight="fill"
             />
             <ThemedText>{theme.scheme === "light" ? "Dark Mode" : "Light Mode"}</ThemedText>
           </View>
@@ -55,11 +59,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "space-between",
-    paddingBottom: 16,
+    paddingBottom: spacing[16],
   },
   profile: {
     alignItems: "center",
-    gap: 16,
+    gap: spacing[16],
   },
   avatar: {
     width: 100,
@@ -75,11 +79,11 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   actions: {
-    gap: 8,
+    gap: spacing[8],
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: spacing[12],
   },
 });

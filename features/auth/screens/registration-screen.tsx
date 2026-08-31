@@ -8,8 +8,12 @@ import { useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import type { RegistrationInput } from "@/features/auth/providers/session-provider";
 import { isApiError } from "@/shared/api/api-error";
+import { BackButton } from "@/shared/components/back-button";
+import { spacing } from "@/shared/theme/theme";
+import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 
-function RegistrationScreen() {
+export function RegistrationScreen() {
+  const theme = useCurrentTheme();
   const [formData, setFormData] = useState<RegistrationInput>({
     first_name: "",
     last_name: "",
@@ -103,7 +107,9 @@ function RegistrationScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView header={<BackButton type={"left"} />}>
+      <ThemedText variant="headerLg">Create an account</ThemedText>
+      <ThemedText variant="body">Enter your details to get started</ThemedText>
       <View style={styles.form}>
         <View style={styles.inputs}>
           <Input
@@ -113,6 +119,9 @@ function RegistrationScreen() {
             inputMode="text"
             autoComplete="given-name"
             textContentType="givenName"
+            paddingHorizontal="lg"
+            paddingVertical="md"
+            radius="sm"
           />
           {renderFieldError("first_name")}
           <Input
@@ -122,6 +131,9 @@ function RegistrationScreen() {
             inputMode="text"
             autoComplete="family-name"
             textContentType="familyName"
+            paddingHorizontal="lg"
+            paddingVertical="md"
+            radius="sm"
           />
           {renderFieldError("last_name")}
           <Input
@@ -132,6 +144,9 @@ function RegistrationScreen() {
             inputMode="email"
             autoComplete="email"
             textContentType="emailAddress"
+            paddingHorizontal="lg"
+            paddingVertical="md"
+            radius="sm"
           />
           {renderFieldError("email")}
           <Input
@@ -142,13 +157,20 @@ function RegistrationScreen() {
             inputMode="text"
             autoComplete="password-new"
             textContentType="password"
+            paddingHorizontal="lg"
+            paddingVertical="md"
+            radius="sm"
           />
           {renderFieldError("password")}
         </View>
         {renderFormError()}
         <Button variant="primary" onPress={handleSignUpPress} disabled={submitDisabled}>
-          <ThemedText>
-            {isLoading ? <ActivityIndicator size="small" color="#fff" /> : "Sign Up"}
+          <ThemedText variant="button" style={{ color: theme.colors.onAccent }}>
+            {isLoading ? (
+              <ActivityIndicator size="small" color={theme.colors.onAccent} />
+            ) : (
+              "Sign Up"
+            )}
           </ThemedText>
         </Button>
       </View>
@@ -157,19 +179,11 @@ function RegistrationScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-  },
   form: {
     width: "100%",
-    gap: 16,
+    gap: spacing[16],
   },
   inputs: {
-    gap: 8,
+    gap: spacing[8],
   },
 });
-
-export { RegistrationScreen };

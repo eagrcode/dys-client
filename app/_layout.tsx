@@ -1,21 +1,14 @@
 // import "../wdyr";
+import {
+  HankenGrotesk_300Light,
+  HankenGrotesk_400Regular,
+  HankenGrotesk_500Medium,
+  HankenGrotesk_600SemiBold,
+  useFonts,
+} from "@expo-google-fonts/hanken-grotesk";
 import { AuthProvider } from "@/features/auth/providers/session-provider";
 import { GroupsProvider } from "@/features/groups/providers/groups-provider";
 import { ThemePreferenceProvider } from "@/shared/providers/theme-mode-provider";
-import {
-  DMSans_400Regular,
-  DMSans_500Medium,
-  DMSans_600SemiBold,
-  DMSans_700Bold,
-} from "@expo-google-fonts/dm-sans";
-import {
-  Syne_400Regular,
-  Syne_500Medium,
-  Syne_600SemiBold,
-  Syne_700Bold,
-  Syne_800ExtraBold,
-  useFonts,
-} from "@expo-google-fonts/syne";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { shouldRetryApiError } from "@/shared/api/api-error";
 import { Slot } from "expo-router";
@@ -37,15 +30,10 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    Syne_400Regular,
-    Syne_500Medium,
-    Syne_600SemiBold,
-    Syne_700Bold,
-    Syne_800ExtraBold,
-    DMSans_400Regular,
-    DMSans_500Medium,
-    DMSans_600SemiBold,
-    DMSans_700Bold,
+    HankenGrotesk_300Light,
+    HankenGrotesk_400Regular,
+    HankenGrotesk_500Medium,
+    HankenGrotesk_600SemiBold,
   });
 
   if (!fontsLoaded) return null;

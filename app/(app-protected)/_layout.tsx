@@ -6,15 +6,6 @@ export default function AppProtectedLayout() {
     <SocketProvider>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen
-          name="(modals)/group-actions"
-          options={{
-            animation: "none",
-            presentation: "transparentModal",
-            gestureEnabled: false,
-            contentStyle: { backgroundColor: "transparent" },
-          }}
-        />
-        <Stack.Screen
           name="(modals)/list-detail-actions"
           options={{
             animation: "none",

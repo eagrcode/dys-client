@@ -1,4 +1,4 @@
-import { IconSymbol } from "@/shared/components/icon";
+import { Icon } from "@/shared/components/icon";
 import { TabBar } from "@/shared/components/tab-bar";
 import { useAuthProvider } from "@/features/auth/providers/session-provider";
 import { useGroupsProvider } from "@/features/groups/providers/groups-provider";
@@ -37,7 +37,9 @@ export default function TabLayout() {
         name="home"
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => <IconSymbol size={30} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <Icon size={30} name="house" color={color} weight="fill" />
+          ),
         }}
       />
       <Tabs.Screen
@@ -45,7 +47,9 @@ export default function TabLayout() {
         options={{
           title: "Groups",
           headerShown: false,
-          tabBarIcon: ({ color }) => <IconSymbol size={30} name="groups" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <Icon size={30} name="users" color={color} weight="fill" />
+          ),
         }}
       />
       <Tabs.Screen
@@ -53,7 +57,9 @@ export default function TabLayout() {
         options={{
           title: "Notifications",
           headerShown: false,
-          tabBarIcon: ({ color }) => <IconSymbol size={30} name="bell.fill" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <Icon size={30} name="bell" color={color} weight="fill" />
+          ),
         }}
       />
       <Tabs.Screen
@@ -61,7 +67,9 @@ export default function TabLayout() {
         options={{
           title: "You",
           headerShown: false,
-          tabBarIcon: ({ color }) => <IconSymbol size={30} name="person.fill" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <Icon size={30} name="user" color={color} weight="fill" />
+          ),
         }}
       />
     </Tabs>

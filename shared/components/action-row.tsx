@@ -1,56 +1,44 @@
 import {
   ActivityIndicator,
+  Pressable,
   StyleSheet,
   View,
-  type AccessibilityRole,
   type GestureResponderEvent,
   type StyleProp,
   type ViewStyle,
 } from "react-native";
-import { IconSymbol } from "@/shared/components/icon";
-import { PressableRowSurface, type RowBackground } from "@/shared/components/row-surface";
 import { ThemedText } from "@/shared/components/themed-text";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
+import { Icon, type IconName } from "./icon";
+import { spacing } from "@/shared/theme/theme";
 
 type Props = {
-  accessibilityRole?: AccessibilityRole;
-  background?: RowBackground;
-  completed?: boolean;
   disabled?: boolean;
   disabledReason?: string;
-  icon?: React.ComponentProps<typeof IconSymbol>["name"] | null;
-  iconSize?: number;
+  icon?: IconName | null;
   label: string;
   loading?: boolean;
   onPress?: (event: GestureResponderEvent) => void;
   showChevron?: boolean;
   style?: StyleProp<ViewStyle>;
-  subtitle?: string;
   tone?: "default" | "danger";
-  trailing?: React.ReactNode;
 };
 
 export function ActionRow({
-  accessibilityRole,
-  background,
-  completed,
   disabled = false,
   disabledReason,
   icon = null,
-  iconSize = 20,
   label,
   loading = false,
   onPress,
   showChevron = false,
   style,
-  subtitle,
   tone = "default",
-  trailing,
 }: Props) {
   const theme = useCurrentTheme();
   const isDisabled = disabled || loading || Boolean(disabledReason);
   const foreground = tone === "danger" ? theme.colors.danger : theme.colors.text;
-  let iconColor = completed === false ? theme.colors.icon : theme.colors.icon;
+  let iconColor = theme.colors.icon;
 
   if (tone === "danger") {
     iconColor = theme.colors.danger;
@@ -61,54 +49,51 @@ export function ActionRow({
   }
 
   return (
-    <PressableRowSurface
-      accessibilityRole={accessibilityRole}
-      background={background}
+    <Pressable
+      accessibilityLabel={label}
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
       disabled={isDisabled}
       onPress={onPress}
-      style={style}
+      style={({ pressed }) => [
+        styles.row,
+        {
+          opacity: pressed ? 0.7 : isDisabled ? 0.5 : 1,
+        },
+        style,
+      ]}
     >
-      {icon ? <IconSymbol name={icon} size={iconSize} color={iconColor} /> : null}
+      {icon ? <Icon name={icon} size={22} color={iconColor} /> : null}
 
       <View style={styles.content}>
-        <ThemedText
-          variant="defaultSemiBold"
-          style={[{ color: foreground }, completed && styles.completedText]}
-        >
-          {label}
-        </ThemedText>
-        {subtitle ? (
-          <ThemedText variant="soft" style={styles.supportingText}>
-            {subtitle}
-          </ThemedText>
-        ) : null}
+        <ThemedText style={{ color: foreground }}>{label}</ThemedText>
       </View>
 
       {loading ? (
         <ActivityIndicator size="small" color={foreground} />
       ) : disabledReason ? (
-        <ThemedText variant="soft" style={styles.supportingText}>
+        <ThemedText variant="tag" style={styles.supportingText}>
           {disabledReason}
         </ThemedText>
-      ) : trailing ? (
-        trailing
       ) : showChevron ? (
-        <IconSymbol name="chevron-right" size={18} color={theme.colors.icon} />
+        <Icon name="caret-right" size={18} color={theme.colors.icon} />
       ) : null}
-    </PressableRowSurface>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing[12],
+    paddingVertical: spacing[16],
+  },
   content: {
     flex: 1,
     gap: 2,
   },
   supportingText: {
     fontSize: 12,
-  },
-  completedText: {
-    textDecorationLine: "line-through",
-    opacity: 0.4,
   },
 });

@@ -1,123 +1,149 @@
-import { Feather } from "@react-native-vector-icons/feather";
-import { MaterialIcons } from "@react-native-vector-icons/material-icons";
-import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
-import { FontAwesomeFreeSolid } from "@react-native-vector-icons/fontawesome-free-solid";
-import { SymbolWeight } from "expo-symbols";
-import { ComponentProps } from "react";
-import { OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
+import {
+  SquareIcon,
+  CheckSquareIcon,
+  CheckIcon,
+  CheckCircleIcon,
+  SelectionIcon,
+  CircleIcon,
+  CircleDashedIcon,
+  CaretRightIcon,
+  CaretLeftIcon,
+  CaretUpIcon,
+  CaretDownIcon,
+  ListBulletsIcon,
+  CalendarDotsIcon,
+  ImagesIcon,
+  ChatTextIcon,
+  DotsThreeIcon,
+  XIcon,
+  ArrowRightIcon,
+  BellIcon,
+  PencilSimpleIcon,
+  TrashIcon,
+  PlusIcon,
+  PlusCircleIcon,
+  ListChecksIcon,
+  ShoppingCartIcon,
+  HouseIcon,
+  UsersThreeIcon,
+  UserIcon,
+  MoonIcon,
+  SunIcon,
+} from "phosphor-react-native";
+import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 
-type FeatherIconName = ComponentProps<typeof Feather>["name"];
-type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];
-type MaterialDesignIconName = ComponentProps<typeof MaterialDesignIcons>["name"];
-type FontAwesomeFreeSolidIconName = ComponentProps<typeof FontAwesomeFreeSolid>["name"];
-
-type IconConfig =
-  | {
-      family: "feather";
-      name: FeatherIconName;
-    }
-  | {
-      family: "material";
-      name: MaterialIconName;
-    }
-  | {
-      family: "material-design";
-      name: MaterialDesignIconName;
-    }
-  | {
-      family: "font-awesome";
-      name: FontAwesomeFreeSolidIconName;
-    };
-
-const ICONS = {
-  edit: { family: "feather", name: "edit" },
-  flag: { family: "feather", name: "flag" },
-  calendar: { family: "material", name: "calendar-month" },
-  chat: { family: "material-design", name: "chat" },
-  home: { family: "material", name: "home" },
-  groups: { family: "material", name: "groups" },
-  notifications: { family: "material", name: "notifications" },
-  person: { family: "material", name: "person" },
-  "chevron-left": { family: "feather", name: "chevron-left" },
-  "chevron-right": { family: "feather", name: "chevron-right" },
-  "chevron-down": { family: "feather", name: "chevron-down" },
-  circle: { family: "feather", name: "circle" },
-  check: { family: "feather", name: "check" },
-  close: { family: "material-design", name: "window-close" },
-  ellipsis: { family: "font-awesome", name: "ellipsis" },
-  list: { family: "material", name: "format-list-bulleted" },
-  photo: { family: "material", name: "photo" },
-  plus: { family: "feather", name: "plus" },
-  trash: { family: "feather", name: "trash-2" },
-  settings: { family: "feather", name: "settings" },
-  search: { family: "feather", name: "search" },
-  "square-r": { family: "material-design", name: "square-rounded" },
-  "square-ro": { family: "material-design", name: "square-rounded-outline" },
-
-  // Filled icons
-  "check-circle": { family: "material-design", name: "check-circle" },
-  "close-circle": { family: "material-design", name: "close-circle" },
-  "plus-circle-filled": { family: "material-design", name: "plus-circle" },
-
-  // SF Symbols aliases used by existing screens.
-  "bell.fill": { family: "material", name: "notifications" },
-  "cart.fill": { family: "material", name: "shopping-cart" },
-  "checkmark.circle.fill": { family: "material-design", name: "check-circle" },
-  "chevron.down": { family: "feather", name: "chevron-down" },
-  "chevron.left": { family: "feather", name: "chevron-left" },
-  "chevron.right": { family: "feather", name: "chevron-right" },
-  "gearshape.fill": { family: "feather", name: "settings" },
-  "house.fill": { family: "material", name: "home" },
-  "list.bullet": { family: "material", name: "format-list-bulleted" },
-  "message.fill": { family: "material-design", name: "chat" },
-  "moon.fill": { family: "material", name: "dark-mode" },
-  "person.fill": { family: "material", name: "person" },
-  "photo.on.rectangle": { family: "material", name: "photo-library" },
-  "plus.circle.fill": { family: "material-design", name: "plus-circle" },
-  "sun.max.fill": { family: "material", name: "light-mode" },
-  xmark: { family: "material-design", name: "window-close" },
-  "format-list-checks": { family: "material-design", name: "format-list-checks" },
-  "playlist-remove": { family: "material", name: "playlist-remove" },
-  rename: { family: "material-design", name: "rename" },
-  "delete-forever": { family: "material-design", name: "delete-forever" },
-  "checkbox-blank-outline": { family: "material-design", name: "checkbox-blank-outline" },
-  "checkbox-outline": { family: "material-design", name: "checkbox-outline" },
-  "close-box-outline": { family: "material-design", name: "close-box-outline" },
-} satisfies Record<string, IconConfig>;
-
-export type IconSymbolName = keyof typeof ICONS;
-
-export function IconSymbol({
-  name,
-  size = 24,
-  color,
-  style,
-}: {
-  name: IconSymbolName;
+type IconProps = {
+  name: IconName;
   size?: number;
-  color: string | OpaqueColorValue;
-  style?: StyleProp<TextStyle>;
-  weight?: SymbolWeight;
-}) {
-  const icon = ICONS[name];
+  color?: string;
+  weight?: IconWeight;
+};
 
-  const typedIcon = icon as IconConfig | undefined;
+export type IconName =
+  | "square"
+  | "square-check"
+  | "check"
+  | "check-circle"
+  | "selection"
+  | "circle"
+  | "circle-dashed"
+  | "caret-right"
+  | "caret-left"
+  | "caret-up"
+  | "caret-down"
+  | "list-bullets"
+  | "calendar-dots"
+  | "images"
+  | "chat-text"
+  | "dots-three"
+  | "x"
+  | "arrow-right"
+  | "bell"
+  | "pencil-simple"
+  | "trash"
+  | "plus"
+  | "plus-circle"
+  | "list-checks"
+  | "shopping-cart"
+  | "house"
+  | "users"
+  | "user"
+  | "moon"
+  | "sun";
 
-  if (typedIcon?.family === "feather") {
-    return <Feather name={typedIcon.name} size={size} color={color} style={style} />;
+export type IconWeight = "thin" | "light" | "regular" | "bold" | "fill";
+
+export function Icon({
+  name,
+  size = 20,
+  color,
+  weight = "regular",
+}: IconProps) {
+  const { colors } = useCurrentTheme();
+  color = color ?? colors.icon;
+
+  switch (name) {
+    case "square":
+      return <SquareIcon size={27} color={color} weight="regular" />;
+    case "square-check":
+      return <CheckSquareIcon size={27} color={color} weight="regular" />;
+    case "check":
+      return <CheckIcon size={size} color={color} weight={weight} />;
+    case "check-circle":
+      return <CheckCircleIcon size={size} color={color} weight={weight} />;
+    case "selection":
+      return <SelectionIcon size={size} color={color} weight={weight} />;
+    case "circle":
+      return <CircleIcon size={size} color={color} weight={weight} />;
+    case "circle-dashed":
+      return <CircleDashedIcon size={size} color={color} weight={weight} />;
+    case "caret-right":
+      return <CaretRightIcon size={size} color={color} weight={weight} />;
+    case "caret-left":
+      return <CaretLeftIcon size={size} color={color} weight={weight} />;
+    case "caret-up":
+      return <CaretUpIcon size={size} color={color} weight={weight} />;
+    case "caret-down":
+      return <CaretDownIcon size={size} color={color} weight={weight} />;
+    case "list-bullets":
+      return <ListBulletsIcon size={30} color={color} weight={weight} />;
+    case "calendar-dots":
+      return <CalendarDotsIcon size={size} color={color} weight={weight} />;
+    case "images":
+      return <ImagesIcon size={size} color={color} weight={weight} />;
+    case "chat-text":
+      return <ChatTextIcon size={size} color={color} weight={weight} />;
+    case "dots-three":
+      return <DotsThreeIcon size={size} color={color} weight={weight} />;
+    case "x":
+      return <XIcon size={size} color={color} weight={weight} />;
+    case "arrow-right":
+      return <ArrowRightIcon size={size} color={color} weight={weight} />;
+    case "bell":
+      return <BellIcon size={size} color={color} weight={weight} />;
+    case "pencil-simple":
+      return <PencilSimpleIcon size={size} color={color} weight={weight} />;
+    case "trash":
+      return <TrashIcon size={size} color={color} weight={weight} />;
+    case "plus":
+      return <PlusIcon size={size} color={color} weight={weight} />;
+    case "plus-circle":
+      return <PlusCircleIcon size={size} color={color} weight={weight} />;
+    case "list-checks":
+      return <ListChecksIcon size={30} color={color} weight={weight} />;
+    case "shopping-cart":
+      return <ShoppingCartIcon size={30} color={color} weight={weight} />;
+    case "house":
+      return <HouseIcon size={size} color={color} weight={weight} />;
+    case "users":
+      return <UsersThreeIcon size={size} color={color} weight={weight} />;
+    case "user":
+      return <UserIcon size={size} color={color} weight={weight} />;
+    case "moon":
+      return <MoonIcon size={size} color={color} weight={weight} />;
+    case "sun":
+      return <SunIcon size={size} color={color} weight={weight} />;
+    default:
+      return null;
   }
-
-  if (typedIcon?.family === "material-design") {
-    return <MaterialDesignIcons name={typedIcon.name} size={size} color={color} style={style} />;
-  }
-
-  if (typedIcon?.family === "material") {
-    return <MaterialIcons name={typedIcon.name} size={size} color={color} style={style} />;
-  }
-
-  if (typedIcon?.family === "font-awesome") {
-    return <FontAwesomeFreeSolid name={typedIcon.name} size={size} color={color} style={style} />;
-  }
-
-  return null;
 }

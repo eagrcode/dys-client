@@ -1,123 +1,44 @@
 import { Pressable, StyleSheet, View } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { router } from "expo-router";
 import { ErrorAlert } from "@/shared/components/alert";
-import { IconSymbol } from "@/shared/components/icon";
 import { ThemedText } from "@/shared/components/themed-text";
+import { spacing } from "@/shared/theme/theme";
 import { useToggleCompleteListItem } from "@/features/lists/mutations/use-toggle-complete";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
-import { RowSurface } from "@/shared/components/row-surface";
+import { Icon } from "@/shared/components/icon";
 import type { ListItem } from "@/features/lists/types/t-list";
 import type { ListMode } from "@/features/lists/types/t-list-ui";
 
 type ItemRowProps = {
   item: ListItem;
+  listId: string;
   listMode: ListMode;
-  selectedItemIds: Set<string>;
-  setSelectedItemIds: React.Dispatch<React.SetStateAction<Set<string>>>;
+  selected: boolean;
+  onToggleSelected: (itemId: string) => void;
 };
 
-export function ItemRow({ item, listMode, selectedItemIds, setSelectedItemIds }: ItemRowProps) {
-  const theme = useCurrentTheme();
+export function DetailRow({ item, listId, listMode, selected, onToggleSelected }: ItemRowProps) {
+  if (listMode === "select-items") {
+    return <SelectionRow item={item} selected={selected} onToggleSelected={onToggleSelected} />;
+  }
 
   return (
-    <RowSurface
-      background="bgLayer2"
-      style={[
-        itemRowStyles.row,
-        {
-          borderRadius: theme.radius.md,
-          ...theme.shadow.sm,
-        },
-      ]}
-    >
-      <ToggleComplete item={item} listMode={listMode} />
-      <ItemContent
-        item={item}
-        listMode={listMode}
-        selectedItemIds={selectedItemIds}
-        setSelectedItemIds={setSelectedItemIds}
-      />
-    </RowSurface>
-  );
-}
-
-function ItemContent({ item, listMode, selectedItemIds, setSelectedItemIds }: ItemRowProps) {
-  const theme = useCurrentTheme();
-  const router = useRouter();
-  const { listId = "" } = useLocalSearchParams<{ listId: string }>();
-  const isSelectMode = listMode === "select-items";
-  const isSelectedForDelete = selectedItemIds.has(item.id);
-
-  const selectItemForDelete = () => {
-    setSelectedItemIds((previousIds) => {
-      const nextIds = new Set(previousIds);
-
-      if (nextIds.has(item.id)) {
-        nextIds.delete(item.id);
-      } else {
-        nextIds.add(item.id);
-      }
-
-      return nextIds;
-    });
-  };
-
-  const openItemDetails = () => {
-    router.push(`/(app-protected)/lists/${listId}/items/${item.id}`);
-  };
-
-  return (
-    <View style={itemContentStyles.container}>
-      {isSelectMode ? (
-        <Pressable
-          onPress={selectItemForDelete}
-          style={({ pressed }) => [
-            itemContentStyles.selectionTarget,
-            { opacity: pressed ? 0.7 : 1 },
-          ]}
-        >
-          <ItemLabel item={item} />
-          <IconSymbol
-            name={isSelectedForDelete ? "square-r" : "square-ro"}
-            color={isSelectedForDelete ? theme.colors.errorText : theme.colors.icon}
-            size={20}
-          />
-        </Pressable>
-      ) : (
-        <>
-          <ItemLabel item={item} />
-          <Pressable
-            onPress={openItemDetails}
-            hitSlop={15}
-            style={({ pressed }) => [
-              itemContentStyles.navigationButton,
-              { opacity: pressed ? 0.5 : 1 },
-            ]}
-          >
-            <IconSymbol name="chevron-right" color={theme.colors.icon} size={20} />
-          </Pressable>
-        </>
-      )}
+    <View style={rowStyles.container}>
+      <ToggleComplete item={item} listId={listId} disabled={listMode !== "default"} />
+      <Row item={item} listId={listId} />
     </View>
   );
 }
 
-function ItemLabel({ item }: { item: ListItem }) {
-  return (
-    <ThemedText
-      style={[itemContentStyles.text, item.completed && itemContentStyles.completedText]}
-      numberOfLines={2}
-    >
-      {item.content}
-    </ThemedText>
-  );
-}
+type ToggleCompleteProps = {
+  item: ListItem;
+  listId: string;
+  disabled: boolean;
+};
 
-function ToggleComplete({ item, listMode }: { item: ListItem; listMode: ListMode }) {
-  const { listId = "" } = useLocalSearchParams<{ listId: string }>();
+function ToggleComplete({ item, listId, disabled }: ToggleCompleteProps) {
   const { mutate: toggleCompleteListItem, isPending } = useToggleCompleteListItem();
-  const theme = useCurrentTheme();
-  const isDisabled = listMode !== "default" || isPending;
+  const isDisabled = disabled || isPending;
 
   const toggleItem = () => {
     toggleCompleteListItem(
@@ -134,56 +55,110 @@ function ToggleComplete({ item, listMode }: { item: ListItem; listMode: ListMode
     <Pressable
       disabled={isDisabled}
       onPress={toggleItem}
-      hitSlop={8}
-      style={[toggleStyles.button, { opacity: isDisabled ? 0.5 : 1 }]}
+      hitSlop={15}
+      style={[iconButtonStyles.button, { opacity: disabled ? 0.5 : 1 }]}
     >
-      <IconSymbol
-        name={item.completed ? "check-circle" : "circle"}
-        size={20}
-        color={item.completed ? theme.colors.accent : theme.colors.icon}
-      />
+      <CompletionIcon item={item} />
     </Pressable>
   );
 }
 
-const itemRowStyles = StyleSheet.create({
-  row: {
-    width: "100%",
-    gap: 12,
-  },
-});
+function Row({ item, listId }: { item: ListItem; listId: string }) {
+  const { colors } = useCurrentTheme();
 
-const itemContentStyles = StyleSheet.create({
+  return (
+    <Pressable
+      onPress={() => router.push(`/(app-protected)/lists/${listId}/items/${item.id}`)}
+      style={({ pressed }) => [detailsStyles.target, { opacity: pressed ? 0.5 : 1 }]}
+    >
+      <ItemLabel item={item} />
+      <View style={iconButtonStyles.button}>
+        <Icon name="caret-right" size={20} color={colors.icon} />
+      </View>
+    </Pressable>
+  );
+}
+
+type SelectionRowProps = {
+  item: ListItem;
+  selected: boolean;
+  onToggleSelected: (itemId: string) => void;
+};
+
+function SelectionRow({ item, selected, onToggleSelected }: SelectionRowProps) {
+  const { colors } = useCurrentTheme();
+
+  return (
+    <Pressable
+      onPress={() => onToggleSelected(item.id)}
+      style={({ pressed }) => [rowStyles.container, { opacity: pressed ? 0.5 : 1 }]}
+    >
+      <View style={[iconButtonStyles.button, rowStyles.disabledCompletion]}>
+        <CompletionIcon item={item} />
+      </View>
+      <View style={selectionStyles.content}>
+        <ItemLabel item={item} />
+        <Icon
+          name={selected ? "circle" : "circle-dashed"}
+          weight={selected ? "fill" : "regular"}
+          size={15}
+          color={colors.icon}
+        />
+      </View>
+    </Pressable>
+  );
+}
+
+function CompletionIcon({ item }: { item: ListItem }) {
+  return <Icon name={item.completed ? "square-check" : "square"} />;
+}
+
+function ItemLabel({ item }: { item: ListItem }) {
+  return (
+    <ThemedText style={labelStyles.text} completed={item.completed} numberOfLines={2}>
+      {item.content}
+    </ThemedText>
+  );
+}
+
+const rowStyles = StyleSheet.create({
   container: {
-    flex: 1,
-    minWidth: 0,
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: spacing[16],
   },
-  selectionTarget: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  navigationButton: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  text: {
-    flex: 1,
-    minWidth: 0,
-    fontSize: 16,
-  },
-  completedText: {
-    textDecorationLine: "line-through",
-    opacity: 0.4,
+  disabledCompletion: {
+    opacity: 0.5,
   },
 });
 
-const toggleStyles = StyleSheet.create({
+const iconButtonStyles = StyleSheet.create({
   button: {
     alignItems: "center",
     justifyContent: "center",
+  },
+});
+
+const detailsStyles = StyleSheet.create({
+  target: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing[16],
+  },
+});
+
+const selectionStyles = StyleSheet.create({
+  content: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+});
+
+const labelStyles = StyleSheet.create({
+  text: {
+    flex: 1,
+    paddingVertical: spacing[12],
   },
 });

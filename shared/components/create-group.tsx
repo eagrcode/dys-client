@@ -9,6 +9,7 @@ import { useCreateGroup } from "@/features/groups/mutations/use-create-group";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from "react-native-reanimated";
 import { isApiError } from "@/shared/api/api-error";
+import { spacing } from "@/shared/theme/theme";
 
 type FormData = {
   name: string;
@@ -93,7 +94,7 @@ const CreateGroup = () => {
     <ThemedView style={styles.container}>
       <Animated.View style={animatedStyle}>
         <View style={[styles.form, { backgroundColor: theme.colors.background }]}>
-          <ThemedText variant="subtitle" style={{ fontSize: 20, letterSpacing: 2 }}>
+          <ThemedText variant="subHeader" style={{ fontSize: 20, letterSpacing: 2 }}>
             Create a Group
           </ThemedText>
           <View style={styles.inputs}>
@@ -122,7 +123,7 @@ const CreateGroup = () => {
             disabled={submitDisabled}
             loading={isCreating}
           >
-            <ThemedText variant="defaultSemiBold" style={{ color: "#fff" }}>
+            <ThemedText variant="button" style={{ color: theme.colors.onAccent }}>
               Submit
             </ThemedText>
           </Button>
@@ -136,14 +137,14 @@ const styles = StyleSheet.create({
   container: {
     position: "relative",
     flex: 1,
-    gap: 16,
+    gap: spacing[16],
     justifyContent: "center",
   },
   form: {
-    gap: 16,
+    gap: spacing[16],
   },
   inputs: {
-    gap: 8,
+    gap: spacing[8],
   },
 });
 

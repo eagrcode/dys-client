@@ -1,55 +1,57 @@
-import { View, StyleSheet, ActivityIndicator, FlatList, Pressable } from "react-native";
+import {
+  Header,
+  DeleteItems,
+  AddItem,
+  ProgressIndicator,
+  DetailRow,
+} from "@/features/lists/components/detail";
+import { StyleSheet, FlatList } from "react-native";
+import { spacing } from "@/shared/theme/theme";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ThemedText } from "@/shared/components/themed-text";
 import { ThemedView } from "@/shared/components/themed-view";
-import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import { useListById } from "@/features/lists/queries/use-list-id";
 import { useEffect, useState } from "react";
-import { Header } from "@/features/lists/components/detail/detail-header";
-import { NewItemInput } from "@/features/lists/components/detail/add-item";
-import { ItemRow } from "@/features/lists/components/detail/detail-row";
-import { DeleteItems } from "@/features/lists/components/detail/delete-items";
-import RetryFetch from "@/shared/components/retry-fetch";
-import { ProgressIndicator } from "@/features/lists/components/detail/progress-indicator";
+import { LIST_TYPES } from "@/features/lists/constants/list-types-config";
+import { renderScreenState } from "@/features/lists/utils/render-screen-state";
 import type { ListItem } from "@/features/lists/types/t-list";
 import type { ListMode } from "@/features/lists/types/t-list-ui";
-import { LIST_TYPES, type ListType } from "@/features/lists/constants/list-types-config";
-import { IconSymbol } from "@/shared/components/icon";
 
-const SCREEN_PADDING = 16;
-
-function ListDetailScreen() {
-  const theme = useCurrentTheme();
-  const router = useRouter();
-  const [listMode, setListMode] = useState<ListMode>("default");
-  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
-  const {
-    listId = "",
-    title: routeTitle,
-    listType: routeListType,
-    createdAt: routeCreatedAt,
-    mode: requestedListMode,
-  } = useLocalSearchParams<{
+export function ListDetailScreen() {
+  const { listId, mode: requestedListMode } = useLocalSearchParams<{
     listId: string;
-    title?: string;
-    listType?: ListType;
-    createdAt?: string;
-    mode?: ListMode;
+    mode: ListMode;
   }>();
+
+  const [listMode, setListMode] = useState<ListMode>(requestedListMode ?? "default");
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
+  const router = useRouter();
+
   const { data: list, error, isPending, refetch, isFetching, isError } = useListById(listId);
 
   const isSelectMode = listMode === "select-items";
   const items = list?.items ?? [];
-  const sortedItems = items.sort((a, b) =>
-    a.completed === b.completed ? 0 : a.completed ? 1 : -1,
-  );
-  const title = list?.title ?? routeTitle ?? "List";
-  const listType = list?.list_type ?? routeListType;
-  const createdAt = list?.created_at ?? routeCreatedAt;
+  const title = list?.title ?? "List";
+  const listTypeLabel = list ? LIST_TYPES[list.list_type].label : "";
+  const canAddItems = !isPending && !isError && list !== undefined;
+  const headerOptionsDisabled = isPending || isError || list === undefined;
 
   const cancelSelection = () => {
     setSelectedItemIds(new Set());
     setListMode("default");
+  };
+
+  const toggleItemSelection = (itemId: string) => {
+    setSelectedItemIds((previousIds) => {
+      const nextIds = new Set(previousIds);
+
+      if (nextIds.has(itemId)) {
+        nextIds.delete(itemId);
+      } else {
+        nextIds.add(itemId);
+      }
+
+      return nextIds;
+    });
   };
 
   useEffect(() => {
@@ -59,72 +61,51 @@ function ListDetailScreen() {
     router.setParams({ mode: undefined });
   }, [requestedListMode, router]);
 
-  let content: React.ReactNode;
+  const stateContent = renderScreenState({
+    isPending,
+    isError,
+    isFetching,
+    error,
+    refetch,
+    isEmpty: items.length === 0,
+    isEmptyMessage: "Add items to your list",
+    type: "list items",
+  });
 
-  if (isPending) {
-    content = (
-      <View style={styles.centered}>
-        <ActivityIndicator
-          style={{ transform: [{ scale: 1.2 }] }}
-          size="small"
-          color={theme.colors.accent}
-        />
-      </View>
-    );
-  } else if (isError) {
-    content = <RetryFetch error={error} refetch={refetch} isFetching={isFetching} type="items" />;
-  } else if (!list) {
-    content = (
-      <View style={styles.centered}>
-        <ThemedText variant="defaultSemiBold">This list could not be found.</ThemedText>
-      </View>
-    );
-  } else if (items.length === 0) {
-    content = (
-      <View style={styles.centered}>
-        <ThemedText style={{ opacity: 0.5 }}>Add items to your list</ThemedText>
-      </View>
-    );
-  } else {
-    content = (
-      <FlatList
-        style={styles.flatList}
-        data={sortedItems}
-        extraData={{ isSelectMode, selectedItemIds }}
-        keyExtractor={(item: ListItem) => item.id}
-        contentContainerStyle={styles.listContent}
-        keyboardDismissMode="on-drag"
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }: { item: ListItem }) => (
-          <ItemRow
-            item={item}
-            listMode={listMode}
-            selectedItemIds={selectedItemIds}
-            setSelectedItemIds={setSelectedItemIds}
-          />
-        )}
-      />
-    );
-  }
-
-  return (
-    <ThemedView style={styles.container}>
-      <Header
+  const content: React.ReactNode = stateContent ?? (
+    <>
+      <ProgressIndicator items={items} label={listTypeLabel} />
+      <ItemsList
+        key={listId}
+        items={items}
         listId={listId}
         listMode={listMode}
-        setListMode={setListMode}
-        title={title}
-        onCancelSelection={cancelSelection}
+        selectedItemIds={selectedItemIds}
+        onToggleSelected={toggleItemSelection}
       />
-      <NewItemInput />
-      <ItemsCard listType={listType} createdAt={createdAt} items={items}>
-        {content}
-      </ItemsCard>
-      {isSelectMode && (
-        <DeleteItems
-          selectedItemIds={selectedItemIds}
-          setSelectedItemIds={setSelectedItemIds}
+    </>
+  );
+
+  return (
+    <ThemedView
+      isSecondary
+      header={
+        <Header
+          title={title}
+          listId={listId}
+          listMode={listMode}
           setListMode={setListMode}
+          onCancelSelection={cancelSelection}
+          optionsDisabled={headerOptionsDisabled}
+        />
+      }
+    >
+      {canAddItems && <AddItem listId={listId} />}
+      {content}
+      {isSelectMode && canAddItems && (
+        <DeleteItems
+          listId={listId}
+          selectedItemIds={selectedItemIds}
           onCancelSelection={cancelSelection}
         />
       )}
@@ -132,85 +113,47 @@ function ListDetailScreen() {
   );
 }
 
-type ItemsCardProps = {
-  listType?: ListType;
-  createdAt?: string;
+type ItemsListProps = {
+  listId: string;
   items: ListItem[];
-  children: React.ReactNode;
+  listMode: ListMode;
+  selectedItemIds: Set<string>;
+  onToggleSelected: (itemId: string) => void;
 };
 
-const ItemsCard = ({ listType, createdAt, items, children }: ItemsCardProps) => {
-  const theme = useCurrentTheme();
-  const formattedListCreatedAt = createdAt ? new Date(createdAt).toLocaleDateString() : "—";
-  const listTypeLabel = listType ? LIST_TYPES[listType].label : "—";
+function ItemsList({ listId, items, listMode, selectedItemIds, onToggleSelected }: ItemsListProps) {
+  const sortedItems = [...items].sort((a, b) =>
+    a.completed === b.completed ? 0 : a.completed ? 1 : -1,
+  );
 
   return (
-    <View
-      style={[
-        styles.listCard,
-        {
-          backgroundColor: theme.colors.bgLayer1,
-          borderRadius: theme.radius.xl,
-        },
-      ]}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 8,
-        }}
-      >
-        <View style={[styles.typeChip, { backgroundColor: theme.colors.bgLayer3 }]}>
-          <ThemedText style={{ fontSize: 14, color: theme.colors.accent }}>
-            {listTypeLabel}
-          </ThemedText>
-        </View>
-        <ThemedText variant="soft" style={{ fontSize: 14 }}>
-          {formattedListCreatedAt}
-        </ThemedText>
-      </View>
-
-      <ProgressIndicator items={items} />
-      {children}
-    </View>
+    <FlatList
+      style={listStyles.flatList}
+      data={sortedItems}
+      extraData={{ listMode, selectedItemIds }}
+      keyExtractor={(item: ListItem) => item.id}
+      contentContainerStyle={listStyles.listContent}
+      keyboardDismissMode="on-drag"
+      showsVerticalScrollIndicator={false}
+      renderItem={({ item }: { item: ListItem }) => (
+        <DetailRow
+          item={item}
+          listId={listId}
+          listMode={listMode}
+          selected={selectedItemIds.has(item.id)}
+          onToggleSelected={onToggleSelected}
+        />
+      )}
+    />
   );
-};
+}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    gap: 16,
-    position: "relative",
-  },
-  listCard: {
-    flex: 1,
-    minHeight: 0,
-    gap: 16,
-    padding: SCREEN_PADDING,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
+const listStyles = StyleSheet.create({
   flatList: {
     flex: 1,
     minHeight: 0,
   },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   listContent: {
-    gap: 8,
-    paddingBottom: 16,
-  },
-  typeChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 9999,
+    paddingBottom: spacing[16],
   },
 });
-
-export { ListDetailScreen };
