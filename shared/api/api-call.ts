@@ -2,6 +2,7 @@ import { getToken } from "@/shared/storage/token-manager";
 import { ApiError, isApiError, type HttpMethod } from "@/shared/api/api-error";
 import { API_BASE_URL } from "@/shared/config/environment";
 import { log } from "../logging/logger";
+import { socket } from "@/shared/realtime/socket";
 import {
   fetchResponse,
   parseJsonResponse,
@@ -58,6 +59,10 @@ async function executeApiCall<T>(
 
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  if (socket.connected && socket.id) {
+    headers.set("X-Socket-ID", socket.id);
   }
 
   const config: RequestInit = {
