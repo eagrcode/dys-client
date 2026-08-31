@@ -1,172 +1,21 @@
-import { getToken, getRefreshToken, saveTokens } from "@/shared/storage/token-manager";
-import {
-  ApiError,
-  isApiError,
-  type ApiValidationError,
-  type HttpMethod,
-} from "@/shared/api/api-error";
+import { getToken } from "@/shared/storage/token-manager";
+import { ApiError, isApiError, type HttpMethod } from "@/shared/api/api-error";
 import { API_BASE_URL } from "@/shared/config/environment";
 import { log } from "../logging/logger";
+import {
+  fetchResponse,
+  parseJsonResponse,
+  createHttpError,
+  isRecord,
+} from "@/shared/api/api-helpers";
+import { performRefreshTokens } from "@/shared/auth/token-refresh";
 
 type SessionExpiredHandler = (sessionError: ApiError) => void | Promise<void>;
 
-const REFRESH_ENDPOINT = "/auth/refresh";
-
-let refreshPromise: Promise<boolean> | null = null;
 let sessionExpiredHandler: SessionExpiredHandler | null = null;
 
 export function setSessionExpiredHandler(handler: SessionExpiredHandler | null) {
   sessionExpiredHandler = handler;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function getValidationErrors(value: unknown): ApiValidationError[] | undefined {
-  if (!Array.isArray(value)) {
-    return undefined;
-  }
-
-  const errors = value.filter(
-    (error): error is ApiValidationError =>
-      isRecord(error) && typeof error.field === "string" && typeof error.message === "string",
-  );
-
-  return errors.length > 0 ? errors : undefined;
-}
-
-function createInvalidResponseError(endpoint: string, method: HttpMethod, status: number | null) {
-  return new ApiError({
-    endpoint,
-    method,
-    status,
-    code: "INVALID_RESPONSE",
-    message: "The server returned an invalid response.",
-  });
-}
-
-async function parseJsonResponse(response: Response, endpoint: string, method: HttpMethod) {
-  let responseText: string;
-
-  try {
-    responseText = await response.text();
-  } catch {
-    throw createInvalidResponseError(endpoint, method, response.status);
-  }
-
-  if (!responseText) {
-    throw createInvalidResponseError(endpoint, method, response.status);
-  }
-
-  try {
-    return JSON.parse(responseText) as unknown;
-  } catch {
-    throw createInvalidResponseError(endpoint, method, response.status);
-  }
-}
-
-function createHttpError(
-  response: Response,
-  responseData: unknown,
-  endpoint: string,
-  method: HttpMethod,
-) {
-  const errorData = isRecord(responseData) ? responseData : {};
-  const code = typeof errorData.code === "string" ? errorData.code : "HTTP_ERROR";
-  const message =
-    typeof errorData.message === "string" && errorData.message
-      ? errorData.message
-      : response.statusText || "The request failed.";
-
-  return new ApiError({
-    endpoint,
-    method,
-    status: response.status,
-    code,
-    message,
-    errors: getValidationErrors(errorData.errors),
-  });
-}
-
-async function fetchResponse(
-  url: string,
-  config: RequestInit,
-  endpoint: string,
-  method: HttpMethod,
-) {
-  try {
-    return await fetch(url, config);
-  } catch {
-    throw new ApiError({
-      endpoint,
-      method,
-      status: null,
-      code: "NETWORK_ERROR",
-      message: "Unable to connect to the server. Check your connection and try again.",
-    });
-  }
-}
-
-async function refreshTokens(): Promise<boolean> {
-  const refreshToken = await getRefreshToken();
-
-  if (!refreshToken) {
-    log.warn("api-call | Token refresh failed: no refresh token in cache");
-    return false;
-  }
-
-  const res = await fetchResponse(
-    `${API_BASE_URL}${REFRESH_ENDPOINT}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
-    },
-    REFRESH_ENDPOINT,
-    "POST",
-  );
-
-  const resData = await parseJsonResponse(res, REFRESH_ENDPOINT, "POST");
-
-  if (!res.ok) {
-    const refreshError = createHttpError(res, resData, REFRESH_ENDPOINT, "POST");
-    const refreshTokenRejected =
-      res.status === 401 &&
-      (refreshError.code === "REFRESH_TOKEN_REQUIRED" ||
-        refreshError.code === "REFRESH_TOKEN_INVALID");
-
-    if (refreshTokenRejected) {
-      log.error("api-call | Token refresh rejected:", refreshError);
-      return false;
-    }
-
-    throw refreshError;
-  }
-
-  if (
-    !isRecord(resData) ||
-    typeof resData.accessToken !== "string" ||
-    typeof resData.refreshToken !== "string"
-  ) {
-    throw createInvalidResponseError(REFRESH_ENDPOINT, "POST", res.status);
-  }
-
-  await saveTokens(resData.accessToken, resData.refreshToken);
-  log.info("api-call | Token refresh successful.");
-  return true;
-}
-
-async function refreshTokensOnce(): Promise<boolean> {
-  const pending = refreshPromise ?? (refreshPromise = refreshTokens());
-
-  try {
-    return await pending;
-  } finally {
-    if (refreshPromise === pending) {
-      refreshPromise = null;
-    }
-  }
 }
 
 export async function apiCall<T = unknown>(
@@ -238,6 +87,7 @@ async function executeApiCall<T>(
       message: "Session expired",
       code: "SESSION_EXPIRED",
     });
+
     const handleSessionExpired = async () => {
       log.warn("api-call | Session expired, signing out...");
 
@@ -258,7 +108,7 @@ async function executeApiCall<T>(
     }
 
     // All concurrent 401 responses share one refresh request.
-    const refreshSucceeded = await refreshTokensOnce();
+    const refreshSucceeded = await performRefreshTokens();
 
     if (refreshSucceeded) {
       return apiCall<T>(endpoint, method, options, true);
