@@ -3,14 +3,22 @@ import type { CacheIdentifier } from "@/features/lists/queries/list-keys";
 import type { GroupEvent } from "./socket-provider";
 import type { QueryClient } from "@tanstack/react-query";
 import { log } from "../logging/logger";
+import { socket } from "./socket";
 
 export async function groupEventDispatch(event: GroupEvent, queryClient: QueryClient) {
+  const callerSocketId = event.callerSocketId;
+  const isReceiver = callerSocketId !== socket.id;
+
   log.info("/group-event-dispatch.ts - groupEventDispatch() | Group Event Received", {
     groupId: event.groupId,
     type: event.type,
     data: event.data,
-    callerSocketId: event.callerSocketId,
+    callerSocketId,
   });
+
+  if (callerSocketId && !isReceiver) {
+    return;
+  }
 
   switch (event.type) {
     // Lists
