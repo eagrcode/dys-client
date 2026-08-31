@@ -7,7 +7,7 @@ export const Accent = {
   accentDeep: "#0E7490",
   accentGradient: ["#FF9A5F", "#FF6B3D"] as const,
 
-  violet: "#A879FF",
+  violet: "hsl(261, 100%, 74%)",
   violetSoft: "rgba(168, 121, 255, 0.16)",
   violetGradient: ["#A879FF", "#7C3AED"] as const,
 
@@ -19,137 +19,163 @@ export const Accent = {
   danger: "#FF6B7A",
 };
 
-export const Styling = {
-  borderRadius: {
-    sm: 8, // chips, keyboard keys
-    md: 14, // inputs, list rows, buttons
-    lg: 16, // cards, sheet sections
-    xl: 22, // dashboard tiles
-    xxl: 30, // modals, bottom sheets
-    full: 9999, // pills, avatars, tab bar
-  },
+export const spacing = {
+  4: 4,
+  8: 8,
+  12: 12,
+  16: 16,
+  20: 20,
+  24: 24,
+  28: 28,
+  32: 32,
+  36: 36,
+  40: 40,
+};
 
-  shadow: {
-    tile: {
-      shadowColor: "hsl(0, 0%, 0%)",
-      shadowOffset: { width: 0, height: 5 },
-      shadowOpacity: 0.2,
-      shadowRadius: 10,
-      elevation: 4,
-    },
-    sm: {
-      shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 3,
-      elevation: 2,
-      // shadowBlur: 20,
-    },
-    md: {
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.09,
-      shadowRadius: 10,
-      elevation: 3,
-    },
-    lg: {
-      shadowColor: "hsl(0, 0%, 0%)",
-      shadowOffset: { width: 1, height: 1 },
-      shadowOpacity: 1,
-      shadowRadius: 10,
-      elevation: 10,
-      shadowBlur: 10,
-    },
-    xl: {
-      shadowColor: "hsl(0, 84%, 34%)",
-      shadowOffset: { width: 1, height: 4 },
-      shadowOpacity: 0.2,
-      shadowRadius: 2,
-      elevation: 10,
-      shadowBlur: 10,
-    },
-  },
+export const layout = {
+  screenPadding: spacing[16],
+  headerBottomMargin: spacing[16],
+  contentGap: spacing[16],
+};
 
-  spacing: {
-    xs: 4,
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 24,
-    xxl: 32,
+export const controlSize = {
+  sm: {
+    padding: spacing[8],
+  },
+  md: {
+    padding: spacing[12],
+  },
+  lg: {
+    padding: spacing[16],
+  },
+};
+
+export const radius = {
+  sm: spacing[8],
+  md: spacing[12],
+  lg: spacing[16],
+  xl: spacing[20],
+  "2xl": spacing[24],
+  "3xl": spacing[28],
+  "4xl": spacing[32],
+  full: 9999,
+};
+
+export const shadow = {
+  tile: {
+    shadowColor: "hsl(0, 0%, 0%)",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  sm: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 2,
+    // shadowBlur: 20,
+  },
+  md: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.09,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  lg: {
+    shadowColor: "hsl(0, 0%, 0%)",
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 10,
+    shadowBlur: 10,
+  },
+  xl: {
+    shadowColor: "hsl(0, 84%, 34%)",
+    shadowOffset: { width: 1, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 10,
+    shadowBlur: 10,
   },
 };
 
 export const Colors = {
   light: {
     // Accents
-    accent: "#E86F4A",
-    accentSoft: "rgba(232, 111, 74, 0.14)",
-    accentText: "#0EA5E9",
-    accentDeep: "#9A3F27",
-    accentGradient: ["#FF9A5F", "#E86F4A"] as const,
+    accent: "#BE5032",
+    accentSoft: "rgba(190, 80, 50, 0.13)",
+    accentText: "#0878A6",
+    accentDeep: "#8A321F",
+    accentGradient: ["#E9794F", "#BE5032"] as const,
 
     violet: "#7C3AED",
     violetSoft: "rgba(124, 58, 237, 0.12)",
     violetGradient: ["#A879FF", "#7C3AED"] as const,
 
-    cyan: "#0EA5E9",
-    cyanSoft: "rgba(14, 165, 233, 0.12)",
+    cyan: "#0878A6",
+    cyanSoft: "rgba(8, 120, 166, 0.11)",
 
-    success: "#2FA66A",
-    warning: "#D9822B",
-    danger: "#D94A5D",
+    success: "#237E50",
+    warning: "#A95E18",
+    danger: "#C83D52",
 
     // Text
-    text: "#171717",
-    textSoft: "#4F4A45",
-    textMuted: "#7A736B",
-    textDisabled: "#AAA39A",
-    errorText: "#D94A5D",
+    text: "hsl(228, 28%, 14%)",
+    textHeader: "hsl(220, 20%, 10%)",
+    textSoft: "hsl(226, 16%, 34%)",
+    textMuted: "hsl(225, 12%, 48%)",
+    textDisabled: "hsl(224, 10%, 67%)",
+    errorText: "#C83D52",
+    onAccent: "#FFFFFF",
 
     // Backgrounds
-    background: "#F7F4EE",
-    bgLayer1: "#FFFFFF",
-    bgLayer2: "#F0ECE4",
-    bgLayer3: "#E8E1D7",
+    background: "hsl(225, 35%, 98%)",
+    backgroundSecondary: "hsl(225, 30%, 96%)",
+    bgLayer1: "hsl(0, 0%, 100%)",
+    bgLayer2: "hsl(225, 28%, 94%)",
+    bgLayer3: "hsl(225, 24%, 90%)",
 
     // Screen Gradients
-    screenGradient: ["#F7F4EE", "#EFEAE2", "#F7F4EE"] as const,
-    homeGradient: ["#FFF8EF", "#EFE8DF", "#F7F4EE"] as const,
+    screenGradient: ["#F8F9FD", "#EEF1F8", "#F8F9FD"] as const,
+    homeGradient: ["#FFF8F3", "#F0F2FA", "#F8F9FD"] as const,
 
     // Ambient Glow
     ambientGlowPrimary: "#E86F4A",
     ambientGlowSecondary: "#7C3AED",
 
     // Icons
-    icon: "#5E5A55",
-    iconAccent: "#E86F4A",
+    icon: "hsl(225, 14%, 38%)",
+    iconAccent: "#BE5032",
 
     // Tab Bar
-    tabBar: "#FFFFFF",
-    tabIconDefault: "#8A8179",
-    tabIconSelected: "#E86F4A",
+    tabBar: "hsl(0, 0%, 100%)",
+    tabIconDefault: "hsl(225, 11%, 52%)",
+    tabIconSelected: "#BE5032",
 
     // Header
-    header: "#FFFFFF",
+    header: "hsl(0, 0%, 100%)",
 
     // Borders
-    border: "rgba(23, 23, 23, 0.08)",
-    borderStrong: "rgba(23, 23, 23, 0.16)",
+    border: "rgba(35, 43, 70, 0.09)",
+    borderStrong: "rgba(35, 43, 70, 0.17)",
+    overlay: "rgba(0, 0, 0, 0.5)",
 
     // Dashboard
     homeTileColors: {
       Lists: {
-        bg: "rgba(14, 165, 233, 0.12)",
-        border: "rgba(14, 165, 233, 0.22)",
-        icon: "#0EA5E9",
-        label: "#0EA5E9",
+        bg: "rgba(8, 120, 166, 0.10)",
+        border: "rgba(8, 120, 166, 0.20)",
+        icon: "#0878A6",
+        label: "#0878A6",
       },
       Calendar: {
-        bg: "rgba(232, 111, 74, 0.12)",
-        border: "rgba(232, 111, 74, 0.22)",
-        icon: "#E86F4A",
-        label: "#E86F4A",
+        bg: "rgba(190, 80, 50, 0.10)",
+        border: "rgba(190, 80, 50, 0.20)",
+        icon: "#BE5032",
+        label: "#BE5032",
       },
       Albums: {
         bg: "rgba(124, 58, 237, 0.12)",
@@ -157,11 +183,11 @@ export const Colors = {
         icon: "#7C3AED",
         label: "#7C3AED",
       },
-      HearthChat: {
-        bg: "rgba(47, 166, 106, 0.12)",
-        border: "rgba(47, 166, 106, 0.22)",
-        icon: "#2FA66A",
-        label: "#2FA66A",
+      Chat: {
+        bg: "rgba(35, 126, 80, 0.10)",
+        border: "rgba(35, 126, 80, 0.20)",
+        icon: "#237E50",
+        label: "#237E50",
       },
     },
   },
@@ -186,17 +212,21 @@ export const Colors = {
     danger: Accent.danger,
 
     // Text
-    text: "#dce2ef",
+    text: "hsl(220, 35%, 90%)",
+    textHeader: "hsl(220, 20%, 93%)",
     textSoft: "#B8BECC",
     textMuted: "#7E8798",
     textDisabled: "#565F70",
     errorText: Accent.danger,
+    onAccent: "#FFFFFF",
 
     // Backgrounds
-    background: "hsl(226, 55%, 6%)",
-    bgLayer1: "hsl(224, 33%, 10%)",
-    bgLayer2: "hsl(222, 30%, 13%)",
-    bgLayer3: "hsl(223, 28%, 16%)",
+    background: "hsl(230, 45%, 10%)",
+    backgroundSecondary: "hsl(230, 45%, 11%)",
+
+    bgLayer1: "hsl(230, 40%, 13%)",
+    bgLayer2: "hsl(230, 40%, 15%)",
+    bgLayer3: "hsl(230, 40%, 17%)",
 
     // Screen Gradients
     screenGradient: ["#070B18", "#0B1020", "#070B18"] as const,
@@ -207,11 +237,11 @@ export const Colors = {
     ambientGlowSecondary: "#FF6B3D",
 
     // Icons
-    icon: "#d3d6df",
+    icon: "hsl(220, 20%, 75%)",
     iconAccent: Accent.accent,
 
     // Tab Bar
-    tabBar: "hsl(223, 33%, 10%)",
+    tabBar: "hsl(230, 45%, 10%)",
     tabIconDefault: "#8E95A8",
     tabIconSelected: Accent.accent,
 
@@ -219,8 +249,9 @@ export const Colors = {
     header: "#070B18",
 
     // Borders
-    border: "rgba(255, 255, 255, 0.1)",
+    border: "rgba(200, 200, 200, 0.1)",
     borderStrong: "rgba(255, 255, 255, 0.14)",
+    overlay: "rgba(0, 0, 0, 0.5)",
 
     // Dashboard
     homeTileColors: {
@@ -242,7 +273,7 @@ export const Colors = {
         icon: "#A879FF",
         label: "#A879FF",
       },
-      HearthChat: {
+      Chat: {
         bg: "rgba(112, 224, 163, 0.12)",
         border: "rgba(112, 224, 163, 0.24)",
         icon: "#70E0A3",
