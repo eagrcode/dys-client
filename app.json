@@ -60,7 +60,7 @@
     },
     "owner": "eagrcode",
     "runtimeVersion": {
-      "policy": "appVersion"
+      "policy": "fingerprint"
     },
     "updates": {
       "url": "https://u.expo.dev/1c0abf0e-417e-4703-aac8-a22251212975"
