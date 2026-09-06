@@ -46,14 +46,61 @@ export function ListItemDetailScreen() {
     <ItemDetails key={item?.id} item={item as ListItem} listId={listId} />
   );
 
-  return <ThemedView header={<ItemDetailHeader />}>{content}</ThemedView>;
+  return (
+    <ThemedView header={<ItemDetailHeader listId={listId} item={item} />} isSecondary>
+      {content}
+    </ThemedView>
+  );
 }
 
-function ItemDetailHeader() {
+type ItemDetailHeaderProps = {
+  listId: string;
+  item?: ListItem;
+};
+
+function ItemDetailHeader({ listId, item }: ItemDetailHeaderProps) {
+  const { colors } = useCurrentTheme();
+  const { mutate: toggleComplete, isPending } = useToggleCompleteListItem();
+
+  const toggleItem = () => {
+    toggleComplete(
+      { listId, itemId: item?.id ?? "", completed: !item?.completed },
+      {
+        onError: (error) => {
+          ErrorAlert({ title: "Failed to toggle item completion", error });
+        },
+      },
+    );
+  };
+
   return (
     <View style={headerStyles.header}>
-      <BackButton type="left" />
-      <ThemedText variant="header">Item details</ThemedText>
+      <View style={headerStyles.headerLeft}>
+        <BackButton type="left" />
+        <ThemedText variant="header" completed={item?.completed}>
+          {item?.content}
+        </ThemedText>
+      </View>
+      <Pressable
+        onPress={toggleItem}
+        disabled={isPending}
+        style={({ pressed }) => [
+          summaryStyles.icon,
+          {
+            backgroundColor: item?.completed ? colors.accent.soft : colors.background.layer3,
+            borderRadius: radius.md,
+            borderColor: colors.border.primary,
+            borderWidth: StyleSheet.hairlineWidth,
+          },
+          pressed && { opacity: 0.7 },
+        ]}
+      >
+        <Icon
+          name={item?.completed ? "check-square" : "square"}
+          size={20}
+          fill={item?.completed ? colors.accent.primary : colors.icon.primary}
+        />
+      </Pressable>
     </View>
   );
 }
@@ -79,52 +126,21 @@ function ItemDetails({ item, listId }: { item: ListItem; listId: string }) {
 }
 
 function ItemSummary({ item, listId }: { item: ListItem; listId: string }) {
-  const theme = useCurrentTheme();
-  const { mutate: toggleComplete, isPending } = useToggleCompleteListItem();
-
   const createdAt = new Date(item.created_at).toLocaleDateString();
-
-  const toggleItem = () => {
-    toggleComplete(
-      { listId, itemId: item.id, completed: !item.completed },
-      {
-        onError: (error) => {
-          ErrorAlert({ title: "Failed to toggle item completion", error });
-        },
-      },
-    );
-  };
 
   return (
     <View style={[summaryStyles.card]}>
-      <Pressable
-        onPress={toggleItem}
-        disabled={isPending}
-        style={({ pressed }) => [
-          summaryStyles.icon,
-          { backgroundColor: theme.colors.accentSoft, borderRadius: theme.radius.md },
-          pressed && { opacity: 0.7 },
-        ]}
-      >
-        <Icon
-          name={item.completed ? "check-circle" : "circle"}
-          size={24}
-          color={item.completed ? theme.colors.accent : theme.colors.icon}
-          weight={item.completed ? "fill" : "regular"}
-        />
-      </Pressable>
       <View style={summaryStyles.content}>
-        <ThemedText completed={item.completed}>{item.content}</ThemedText>
-        <ThemedText variant="tag" style={summaryStyles.metadata}>
-          {item.completed ? "Completed" : "Open"} · Created {createdAt}
-        </ThemedText>
+        <ThemedText>Status - {item.completed ? "Completed" : "Outstanding"}</ThemedText>
+        <ThemedText>Created {createdAt}</ThemedText>
+        <ThemedText>Created by User</ThemedText>
       </View>
     </View>
   );
 }
 
 function RenameItem({ item, listId }: { item: ListItem; listId: string }) {
-  const theme = useCurrentTheme();
+  const { colors } = useCurrentTheme();
   const [content, setContent] = useState(item.content);
   const { mutate: updateListItem, isPending } = useUpdateListItem();
   const trimmedContent = content.trim();
@@ -155,10 +171,7 @@ function RenameItem({ item, listId }: { item: ListItem; listId: string }) {
           onSubmitEditing={saveItem}
           submitBehavior="blurAndSubmit"
           maxLength={100}
-          paddingHorizontal="lg"
-          paddingVertical="md"
           borderThickness="hairline"
-          radius="sm"
         />
         <Button
           variant="primary"
@@ -166,7 +179,7 @@ function RenameItem({ item, listId }: { item: ListItem; listId: string }) {
           disabled={isSubmitDisabled}
           onPress={saveItem}
         >
-          <ThemedText variant="button" style={{ color: theme.colors.onAccent }}>
+          <ThemedText variant="button" style={{ color: colors.text.onAccent }}>
             Save changes
           </ThemedText>
         </Button>
@@ -179,7 +192,13 @@ const headerStyles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing[12],
+    justifyContent: "space-between",
+    gap: spacing[8],
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing[8],
   },
 });
 
@@ -202,17 +221,14 @@ const summaryStyles = StyleSheet.create({
     gap: spacing[8],
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     alignItems: "center",
     justifyContent: "center",
   },
   content: {
     flex: 1,
     gap: spacing[4],
-  },
-  metadata: {
-    fontSize: 12,
   },
 });
 

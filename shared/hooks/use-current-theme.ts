@@ -1,6 +1,5 @@
 import {
   Colors,
-  Fonts,
   controlSize,
   layout,
   radius,
@@ -22,7 +21,6 @@ export function useCurrentTheme() {
       spacing,
       controlSize,
       layout,
-      fonts: Fonts,
     }),
     [colorScheme],
   );

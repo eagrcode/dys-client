@@ -1,0 +1,59 @@
+// All icons use the following defaults:
+Style - Rounded
+
+// General
+Ellipsis - dots-horizontal-rounded
+Cross - x
+Plus - plus
+Chevron Left - chevron-left
+Chevron Right - chevron-right
+Trash - trash-x
+Edit - edit
+
+
+
+// Tab Bar - Focused icons are filled with the primary accent color
+Home: {
+    unfocused: "basic/home",
+    focused: "filled/home",
+},
+Groups: {
+    unfocused: "basic/community",
+    focused: "filled/community",
+},
+Notifications: {
+    unfocused: "basic/bell",
+    focused: "filled/bell",
+},
+You: {
+    unfocused: "basic/user-circle",
+    focused: "filled/user-circle",
+}
+
+// Dashboard
+Lists - list-ul-square
+Calendar - calendar-alt
+Albums - image-portrait
+Chat - message-detail
+
+// List types
+Todo - checklist
+Shopping - groceries
+General - list-ul
+
+// List Detail Row
+completion-icon: {
+    completed: "check-square",
+    not-completed: "square",
+}
+selection-icon: {
+    selected: "checkbox-square",
+    not-selected: "checkbox",
+}
+
+// List options
+Rename list - edit
+Mark complete - check-square
+Mark incomplete - square
+Delete selection: square-dashed
+Delete list - trash-x

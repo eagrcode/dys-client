@@ -20,5 +20,6 @@ export function useGroups() {
     enabled: !!user?.id && !authLoading,
     staleTime: QUERY_TIMES.groups.staleTime,
     gcTime: QUERY_TIMES.groups.gcTime,
+    retryOnMount: false,
   });
 }

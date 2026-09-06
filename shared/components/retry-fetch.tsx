@@ -13,7 +13,7 @@ type Props = {
 };
 
 export function RetryFetch({ error, refetch, isFetching, type }: Props) {
-  const theme = useCurrentTheme();
+  const { colors } = useCurrentTheme();
   const isNotFound = error?.status === 404;
   const isNetworkError = error?.code === "NETWORK_ERROR";
   const isServerError = typeof error?.status === "number" && error.status >= 500;
@@ -32,20 +32,17 @@ export function RetryFetch({ error, refetch, isFetching, type }: Props) {
 
   return (
     <View style={styles.centered}>
-      <ThemedText style={{ opacity: 0.5, marginBottom: spacing[16] }}>{message}</ThemedText>
+      <ThemedText style={{ textAlign: "center", marginBottom: spacing[16], maxWidth: "80%" }}>
+        {message}
+      </ThemedText>
       {canRetry && (
         <Button
           variant="primary"
-          style={{
-            paddingVertical: spacing[8],
-            paddingHorizontal: spacing[16],
-            borderRadius: theme.radius.sm,
-          }}
           onPress={() => void refetch()}
           loading={isFetching}
           disabled={isFetching}
         >
-          <ThemedText variant="button" style={{ color: theme.colors.onAccent }}>
+          <ThemedText variant="button" style={{ color: colors.text.onAccent }}>
             {isFetching ? "Retrying..." : "Retry"}
           </ThemedText>
         </Button>
@@ -57,6 +54,7 @@ export function RetryFetch({ error, refetch, isFetching, type }: Props) {
 const styles = StyleSheet.create({
   centered: {
     flex: 1,
+    width: "100%",
     justifyContent: "center",
     alignItems: "center",
   },

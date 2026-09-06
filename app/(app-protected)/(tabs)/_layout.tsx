@@ -6,6 +6,8 @@ import { Tabs } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useRef } from "react";
 
+const ICON_SIZE = 25;
+
 export default function TabLayout() {
   const { user } = useAuthProvider();
   const { isLoading: selectedGroupLoading } = useGroupsProvider();
@@ -37,8 +39,13 @@ export default function TabLayout() {
         name="home"
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Icon size={30} name="house" color={color} weight="fill" />
+          tabBarIcon: ({ color, focused }) => (
+            <Icon
+              size={ICON_SIZE}
+              name="home-alt-2"
+              fill={color}
+              pack={focused ? "filled" : "basic"}
+            />
           ),
         }}
       />
@@ -47,9 +54,7 @@ export default function TabLayout() {
         options={{
           title: "Groups",
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Icon size={30} name="users" color={color} weight="fill" />
-          ),
+          tabBarIcon: ({ color }) => <Icon size={ICON_SIZE} name="group-alt" fill={color} />,
         }}
       />
       <Tabs.Screen
@@ -57,8 +62,8 @@ export default function TabLayout() {
         options={{
           title: "Notifications",
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Icon size={30} name="bell" color={color} weight="fill" />
+          tabBarIcon: ({ color, focused }) => (
+            <Icon size={ICON_SIZE} name="bell" fill={color} pack={focused ? "filled" : "basic"} />
           ),
         }}
       />
@@ -67,8 +72,13 @@ export default function TabLayout() {
         options={{
           title: "You",
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Icon size={30} name="user" color={color} weight="fill" />
+          tabBarIcon: ({ color, focused }) => (
+            <Icon
+              size={ICON_SIZE}
+              name="user-circle"
+              fill={color}
+              pack={focused ? "filled" : "basic"}
+            />
           ),
         }}
       />

@@ -37,15 +37,15 @@ export function ActionRow({
 }: Props) {
   const theme = useCurrentTheme();
   const isDisabled = disabled || loading || Boolean(disabledReason);
-  const foreground = tone === "danger" ? theme.colors.danger : theme.colors.text;
-  let iconColor = theme.colors.icon;
+  const foreground = tone === "danger" ? theme.colors.accent.danger : theme.colors.text.primary;
+  let iconColor = theme.colors.icon.primary;
 
   if (tone === "danger") {
-    iconColor = theme.colors.danger;
+    iconColor = theme.colors.accent.danger;
   }
 
   if (disabledReason) {
-    iconColor = theme.colors.textMuted;
+    iconColor = theme.colors.text.muted;
   }
 
   return (
@@ -63,7 +63,7 @@ export function ActionRow({
         style,
       ]}
     >
-      {icon ? <Icon name={icon} size={22} color={iconColor} /> : null}
+      {icon ? <Icon name={icon} size={20} fill={iconColor} /> : null}
 
       <View style={styles.content}>
         <ThemedText style={{ color: foreground }}>{label}</ThemedText>
@@ -76,7 +76,7 @@ export function ActionRow({
           {disabledReason}
         </ThemedText>
       ) : showChevron ? (
-        <Icon name="caret-right" size={18} color={theme.colors.icon} />
+        <Icon name="chevron-right" size={18} fill={theme.colors.icon.primary} />
       ) : null}
     </Pressable>
   );
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacing[12],
-    paddingVertical: spacing[16],
+    paddingVertical: spacing[12],
   },
   content: {
     flex: 1,

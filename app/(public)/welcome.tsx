@@ -12,23 +12,20 @@ const PILL_CONTENT = ["Lists", "Calendar", "Albums", "Chat"];
 
 export default function Welcome() {
   const router = useRouter();
-  const theme = useCurrentTheme();
+  const { colors } = useCurrentTheme();
 
   useEffect(() => {
     SplashScreen.hideAsync();
   }, []);
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView>
       <View style={styles.content}>
-        <ThemedText variant="header" style={[styles.title, { color: theme.colors.accent }]}>
+        <ThemedText variant="header" style={[styles.title, { color: colors.accent.primary }]}>
           HearthLink
         </ThemedText>
 
-        <ThemedText
-          variant="body"
-          style={[styles.tagline, { color: theme.colors.textMuted }]}
-        >
+        <ThemedText style={styles.tagline}>
           For couples, households, and the groups that matter most.
         </ThemedText>
 
@@ -37,13 +34,13 @@ export default function Welcome() {
 
       <View style={styles.buttons}>
         <Button variant="primary" onPress={() => router.push("/(public)/sign-up")}>
-          <ThemedText variant="button" style={{ color: theme.colors.onAccent }}>
+          <ThemedText variant="button" style={{ color: colors.text.onAccent }}>
             Create Account
           </ThemedText>
         </Button>
 
         <Button variant="secondary" onPress={() => router.push("/(public)/sign-in")}>
-          <ThemedText variant="button" style={{ color: theme.colors.text }}>
+          <ThemedText variant="button" style={{ color: colors.text.primary }}>
             Log In
           </ThemedText>
         </Button>
@@ -52,8 +49,8 @@ export default function Welcome() {
   );
 }
 
-const Pills = () => {
-  const theme = useCurrentTheme();
+function Pills() {
+  const { colors } = useCurrentTheme();
 
   return (
     <View style={pillStyles.container}>
@@ -63,32 +60,27 @@ const Pills = () => {
           style={[
             pillStyles.pill,
             {
-              backgroundColor: theme.colors.bgLayer1,
-              borderColor: theme.colors.border,
+              backgroundColor: colors.background.layer1,
+              borderColor: colors.border.primary,
             },
           ]}
         >
-          <ThemedText variant="body" style={{ color: theme.colors.textMuted }}>
+          <ThemedText variant="body" style={{ color: colors.text.soft }}>
             {pill}
           </ThemedText>
         </View>
       ))}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
-    padding: spacing[16],
-    width: "100%",
-    height: "100%",
-  },
   content: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     gap: spacing[16],
-    maxWidth: "90%",
+    maxWidth: "80%",
     textAlign: "center",
     alignSelf: "center",
   },

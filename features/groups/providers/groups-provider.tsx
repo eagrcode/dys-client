@@ -6,6 +6,7 @@ import type { Group } from "@/features/groups/types/t-group";
 import { useQueryClient } from "@tanstack/react-query";
 import { groupKeys } from "../queries/group-keys";
 import { useAuthProvider } from "@/features/auth/providers/session-provider";
+import { LoadingScreen } from "@/shared/components/loading-screen";
 
 type StoredGroupId = string | null;
 
@@ -28,7 +29,9 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
     isLoading: groupsLoading,
     isError: isUserGroupsError,
     isSuccess: isUserGroupsSuccess,
+    errorUpdatedAt,
   } = useGroups();
+  const hasGroupsFailed = errorUpdatedAt > 0;
 
   const userHasGroup = (groupId: string | null) => {
     return groupId !== null && userGroups.some((group) => group.id === groupId);
@@ -224,7 +227,7 @@ export const GroupsProvider = ({ children }: { children: React.ReactNode }) => {
     <GroupsContext.Provider
       value={{ storedGroupId, selectedGroup, selectGroup, isLoading: isProviderLoading }}
     >
-      {isReconciling ? null : children}
+      {isReconciling ? (hasGroupsFailed ? <LoadingScreen /> : null) : children}
     </GroupsContext.Provider>
   );
 };

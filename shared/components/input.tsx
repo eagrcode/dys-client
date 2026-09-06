@@ -1,6 +1,6 @@
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import { type ReactNode, type Ref } from "react";
-import { controlSize, radius as radiusMap } from "@/shared/theme/theme";
+import { radius } from "@/shared/theme/theme";
 import {
   StyleSheet,
   TextInput,
@@ -11,8 +11,6 @@ import {
   type ViewStyle,
 } from "react-native";
 
-type InputSize = "sm" | "md" | "lg";
-type InputRadius = "sm" | "md" | "lg" | "full";
 type InputAppearance = "outlined" | "plain";
 type BorderThickness = "hairline" | number;
 
@@ -21,11 +19,7 @@ type InputProps = TextInputProps & {
   appearance?: InputAppearance;
   containerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<TextStyle>;
-  paddingHorizontal?: InputSize;
-  paddingVertical?: InputSize;
-  radius?: InputRadius;
   borderThickness?: BorderThickness;
-  size?: InputSize;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
 };
@@ -36,20 +30,12 @@ export function Input({
   containerStyle,
   inputStyle,
   leftIcon,
-  paddingHorizontal,
-  paddingVertical,
-  radius = "full",
-  size = "md",
   rightIcon,
   borderThickness = 1,
   ...textInputProps
 }: InputProps) {
   const { colors } = useCurrentTheme();
   const isOutlined = appearance === "outlined";
-  const horizontalSize = paddingHorizontal ?? size;
-  const verticalSize = paddingVertical ?? size;
-  const horizontalPadding = controlSize[horizontalSize].padding;
-  const verticalPadding = controlSize[verticalSize].padding;
 
   return (
     <View
@@ -57,11 +43,10 @@ export function Input({
         styles.container,
         isOutlined && {
           borderWidth: borderThickness === "hairline" ? StyleSheet.hairlineWidth : borderThickness,
-          borderColor: colors.border,
-          borderRadius: radiusMap[radius],
-          gap: horizontalPadding,
-          paddingHorizontal: horizontalPadding,
-          paddingVertical: verticalPadding,
+          borderColor: colors.border.primary,
+          borderRadius: radius.md,
+          gap: 12,
+          padding: 12,
         },
         containerStyle,
       ]}
@@ -70,8 +55,8 @@ export function Input({
       <TextInput
         {...textInputProps}
         ref={ref}
-        style={[styles.input, { color: colors.text }, inputStyle]}
-        placeholderTextColor={colors.textMuted}
+        style={[styles.input, { color: colors.text.primary }, inputStyle]}
+        placeholderTextColor={colors.text.muted}
       />
       {rightIcon}
     </View>

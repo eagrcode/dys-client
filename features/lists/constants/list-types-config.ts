@@ -3,15 +3,15 @@ import type { IconName } from "@/shared/components/icon";
 export const LIST_TYPES = {
   todo: {
     label: "Todo",
-    icon: "list-checks",
+    icon: "checklist",
   },
   shopping: {
     label: "Shopping",
-    icon: "shopping-cart",
+    icon: "groceries",
   },
   other: {
     label: "General",
-    icon: "list-bullets",
+    icon: "list-ul",
   },
 } as const satisfies Record<string, { label: string; icon: IconName }>;
 

@@ -67,7 +67,7 @@ export default function GroupSettingsScreen() {
       title: "Group",
       data: [
         {
-          icon: "pencil-simple",
+          icon: "edit",
           rowTitle: "Edit group details",
           onPress: () => void 0,
         },
@@ -87,7 +87,7 @@ export default function GroupSettingsScreen() {
       title: "Membership",
       data: [
         {
-          icon: "trash",
+          icon: "trash-x",
           rowTitle: group.created_by === user?.id ? "Delete group" : "Leave group",
           isDestructive: true,
           onPress: confirmDelete,
@@ -141,8 +141,8 @@ function GroupSummary({ group, user }: GroupSummaryProps) {
       style={[
         groupSummaryStyles.groupCard,
         {
-          backgroundColor: colors.bgLayer1,
-          borderColor: colors.border,
+          backgroundColor: colors.background.layer1,
+          borderColor: colors.border.primary,
           borderRadius: radius.lg,
         },
       ]}
@@ -150,12 +150,12 @@ function GroupSummary({ group, user }: GroupSummaryProps) {
       <View
         style={[
           groupSummaryStyles.groupAvatar,
-          { backgroundColor: colors.accentSoft, borderRadius: radius.lg },
+          { backgroundColor: colors.accent.soft, borderRadius: radius.md },
         ]}
       >
         <ThemedText
           variant="header"
-          style={[groupSummaryStyles.initials, { color: colors.accent }]}
+          style={[groupSummaryStyles.initials, { color: colors.accent.primary }]}
         >
           {getGroupInitials(group.name)}
         </ThemedText>
@@ -196,7 +196,7 @@ const groupSummaryStyles = StyleSheet.create({
 });
 
 {
-  /* <ThemedText variant="tag" style={[groupSummaryStyles.role, { color: colors.textMuted }]}>
+  /* <ThemedText variant="tag" style={[groupSummaryStyles.role, { color: colors.text.muted }]}>
   {group.created_by === user?.id ? "Created by you" : "Member"}
 </ThemedText>; */
 }

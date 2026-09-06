@@ -1,6 +1,6 @@
-import { Fragment, useRef } from "react";
+import { Fragment, useRef, type Dispatch, type SetStateAction } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from "react-native";
-import { router, useLocalSearchParams, type Href } from "expo-router";
+import { router } from "expo-router";
 import { useDeleteList } from "@/features/lists/mutations/use-delete-list";
 import { useListById } from "@/features/lists/queries/use-list-id";
 import { useToggleCompleteAllListItems } from "@/features/lists/mutations/use-toggle-complete-all";
@@ -27,26 +27,22 @@ type EditOption = {
   icon?: IconName | null;
 };
 
-export default function ListDetailActionsModal() {
+type Props = {
+  listId: string;
+  listMode: ListMode;
+  onDismiss: () => void;
+  setListMode: Dispatch<SetStateAction<ListMode>>;
+};
+
+export function ListDetailActions({ listId, listMode, onDismiss, setListMode }: Props) {
   const theme = useCurrentTheme();
   const sheetRef = useRef<SwipeableModalSheetHandle>(null);
-  const { listId, listMode = "default" } = useLocalSearchParams<{
-    listId: string;
-    listMode: ListMode;
-  }>();
   const { data: list, error, isPending, isError, isFetching, refetch } = useListById(listId);
   const { mutate: toggleCompleteAllListItems, isPending: isToggleCompletePending } =
     useToggleCompleteAllListItems();
   const { mutate: deleteList, isPending: isDeletePending } = useDeleteList();
 
-  const fallbackHref: Href = listId
-    ? {
-        pathname: "/(app-protected)/lists/[listId]/detail",
-        params: { listId },
-      }
-    : "/(app-protected)/lists/overview";
-
-  const isShowingState = !listId || isPending || isError || !list;
+  const isShowingState = isPending || isError || !list;
 
   const handleToggleComplete = () => {
     if (!list || isToggleCompletePending) return;
@@ -68,10 +64,7 @@ export default function ListDetailActionsModal() {
     const nextListMode: ListMode = listMode === "select-items" ? "default" : "select-items";
 
     sheetRef.current?.dismiss(() => {
-      router.dismissTo({
-        pathname: "/(app-protected)/lists/[listId]/detail",
-        params: { listId, mode: nextListMode },
-      });
+      setListMode(nextListMode);
     });
   };
 
@@ -103,10 +96,7 @@ export default function ListDetailActionsModal() {
   const handleInitRename = () => {
     const nextListMode: ListMode = "renaming";
     sheetRef.current?.dismiss(() => {
-      router.dismissTo({
-        pathname: "/(app-protected)/lists/[listId]/detail",
-        params: { listId, mode: nextListMode },
-      });
+      setListMode(nextListMode);
     });
   };
 
@@ -115,7 +105,7 @@ export default function ListDetailActionsModal() {
       id: "rename",
       title: "Rename List",
       onPress: handleInitRename,
-      icon: "pencil-simple",
+      icon: "edit",
     },
     {
       id: "toggle-complete",
@@ -123,14 +113,14 @@ export default function ListDetailActionsModal() {
       onPress: handleToggleComplete,
       disabled: !list?.items?.length,
       loading: isToggleCompletePending,
-      icon: list?.completed ? "square" : "square-check",
+      icon: list?.completed ? "square" : "check-square",
     },
     {
       id: "delete-selection",
       title: listMode === "select-items" ? "Cancel Delete Selection" : "Delete Selection",
       onPress: handleInitSelectMode,
       disabled: !list?.items?.length,
-      icon: "selection",
+      icon: "square-dashed",
     },
     {
       id: "delete",
@@ -138,7 +128,7 @@ export default function ListDetailActionsModal() {
       onPress: handleDelete,
       destructive: true,
       loading: isDeletePending,
-      icon: "trash",
+      icon: "trash-x",
     },
   ];
 
@@ -153,7 +143,7 @@ export default function ListDetailActionsModal() {
   } else if (isPending) {
     content = (
       <View style={styles.stateContainer}>
-        <ActivityIndicator color={theme.colors.accent} />
+        <ActivityIndicator color={theme.colors.accent.primary} />
       </View>
     );
   } else if (isError) {
@@ -178,7 +168,7 @@ export default function ListDetailActionsModal() {
               icon={option.icon ?? null}
             />
             {index < options.length - 1 ? (
-              <View style={[styles.separator, { backgroundColor: theme.colors.border }]} />
+              <View style={[styles.separator, { backgroundColor: theme.colors.border.primary }]} />
             ) : null}
           </Fragment>
         ))}
@@ -187,13 +177,10 @@ export default function ListDetailActionsModal() {
   }
 
   return (
-    <SwipeableModalSheet ref={sheetRef} fallbackHref={fallbackHref} sheetHeightRatio={0.6}>
-      <View style={styles.header}>
-        <ThemedText variant="button">List Options</ThemedText>
-      </View>
+    <SwipeableModalSheet ref={sheetRef} onDismiss={onDismiss} title="List Options">
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.content, isShowingState && styles.stateContent]}
+        contentContainerStyle={isShowingState ? styles.stateContent : undefined}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -204,23 +191,15 @@ export default function ListDetailActionsModal() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    width: "100%",
-    marginBottom: spacing[16],
-    justifyContent: "center",
-    alignItems: "center",
-  },
   scrollView: {
-    flex: 1,
-  },
-  content: {
-    flexGrow: 1,
+    flexGrow: 0,
+    flexShrink: 1,
   },
   stateContent: {
     justifyContent: "center",
+    paddingVertical: spacing[32],
   },
   stateContainer: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     gap: spacing[12],

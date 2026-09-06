@@ -4,6 +4,7 @@ import {
   AddItem,
   ProgressIndicator,
   DetailRow,
+  ListDetailActions,
 } from "@/features/lists/components/detail";
 import { StyleSheet, FlatList } from "react-native";
 import { spacing } from "@/shared/theme/theme";
@@ -24,6 +25,7 @@ export function ListDetailScreen() {
 
   const [listMode, setListMode] = useState<ListMode>(requestedListMode ?? "default");
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
+  const [areListActionsVisible, setAreListActionsVisible] = useState(false);
   const router = useRouter();
 
   const { data: list, error, isPending, refetch, isFetching, isError } = useListById(listId);
@@ -87,29 +89,41 @@ export function ListDetailScreen() {
   );
 
   return (
-    <ThemedView
-      isSecondary
-      header={
-        <Header
-          title={title}
+    <>
+      <ThemedView
+        isSecondary
+        header={
+          <Header
+            title={title}
+            listId={listId}
+            listMode={listMode}
+            setListMode={setListMode}
+            onCancelSelection={cancelSelection}
+            onOpenOptions={() => setAreListActionsVisible(true)}
+            optionsDisabled={headerOptionsDisabled}
+          />
+        }
+      >
+        {canAddItems && <AddItem listId={listId} />}
+        {content}
+        {isSelectMode && canAddItems && (
+          <DeleteItems
+            listId={listId}
+            selectedItemIds={selectedItemIds}
+            onCancelSelection={cancelSelection}
+          />
+        )}
+      </ThemedView>
+
+      {areListActionsVisible ? (
+        <ListDetailActions
           listId={listId}
           listMode={listMode}
           setListMode={setListMode}
-          onCancelSelection={cancelSelection}
-          optionsDisabled={headerOptionsDisabled}
+          onDismiss={() => setAreListActionsVisible(false)}
         />
-      }
-    >
-      {canAddItems && <AddItem listId={listId} />}
-      {content}
-      {isSelectMode && canAddItems && (
-        <DeleteItems
-          listId={listId}
-          selectedItemIds={selectedItemIds}
-          onCancelSelection={cancelSelection}
-        />
-      )}
-    </ThemedView>
+      ) : null}
+    </>
   );
 }
 

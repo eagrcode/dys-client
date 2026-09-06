@@ -2,6 +2,7 @@ import {
   ActivityIndicator,
   Alert,
   Keyboard,
+  Pressable,
   StyleSheet,
   TouchableWithoutFeedback,
   View,
@@ -12,13 +13,28 @@ import { Button } from "@/shared/components/button";
 import { ErrorText } from "@/shared/components/error-text";
 import { Input } from "@/shared/components/input";
 import { useAuthProvider } from "@/features/auth/providers/session-provider";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { isApiError } from "@/shared/api/api-error";
 import { spacing } from "@/shared/theme/theme";
 import { BackButton } from "@/shared/components/back-button";
-import type { TextInput } from "react-native";
+import type { TextInput, TextInputProps } from "react-native";
 import type { SignInInput } from "@/features/auth/providers/session-provider";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
+import { Icon } from "@/shared/components/icon";
+import { Link } from "expo-router";
+
+type InputField = {
+  key: keyof SignInInput;
+  placeholder: string;
+  inputMode: "text" | "email";
+  textContentType: TextInputProps["textContentType"];
+  value: string;
+  onChange: (value: string) => void | undefined;
+  autoCapitalize?: TextInputProps["autoCapitalize"];
+  autoComplete?: TextInputProps["autoComplete"];
+  keyboardType?: TextInputProps["keyboardType"];
+  icon?: React.ReactNode;
+};
 
 export function SignInScreen() {
   const theme = useCurrentTheme();
@@ -32,10 +48,43 @@ export function SignInScreen() {
   });
   const [formError, setFormError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const { signIn, sessionErrorMsg, clearSessionErrorMsg } = useAuthProvider();
   const inputRef = useRef<TextInput>(null);
 
   const submitDisabled = isLoading || !formData.email || !formData.password;
+
+  const inputs: InputField[] = [
+    {
+      key: "email",
+      placeholder: "Email",
+      inputMode: "email",
+      textContentType: "emailAddress",
+      value: formData.email,
+      onChange: (value) => handleSetFormData("email", value),
+      autoCapitalize: "none",
+      autoComplete: "email",
+      keyboardType: "email-address",
+    },
+    {
+      key: "password",
+      placeholder: "Password",
+      inputMode: "text",
+      textContentType: "password",
+      value: formData.password,
+      onChange: (value) => handleSetFormData("password", value),
+      autoCapitalize: "none",
+      autoComplete: "password",
+      icon: (
+        <Pressable onPress={() => setShowPassword((prev) => !prev)}>
+          <Icon
+            name={showPassword ? "eye-slash" : "eye"}
+            weight={showPassword ? "normal" : "thin"}
+          />
+        </Pressable>
+      ),
+    },
+  ];
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -115,63 +164,98 @@ export function SignInScreen() {
 
   return (
     <TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss} accessible={false}>
-      <ThemedView header={<BackButton type={"left"} />}>
-        <ThemedText variant="headerLg">Welcome back! 👋</ThemedText>
-        <ThemedText variant="body">Sign in to continue</ThemedText>
-        <View style={styles.form}>
-          <View style={styles.inputs}>
-            <Input
-              placeholder="Email"
-              value={formData.email}
-              onChangeText={(content) => handleSetFormData("email", content)}
-              keyboardType="email-address"
-              inputMode="email"
-              autoComplete="email"
-              textContentType="emailAddress"
-              ref={inputRef}
-              paddingHorizontal="lg"
-              paddingVertical="md"
-              radius="sm"
-              autoCapitalize="none"
-            />
-            {renderFieldError("email")}
-            <Input
-              placeholder="Password"
-              value={formData.password}
-              onChangeText={(content) => handleSetFormData("password", content)}
-              secureTextEntry
-              inputMode="text"
-              autoComplete="password"
-              textContentType="password"
-              paddingHorizontal="lg"
-              paddingVertical="md"
-              radius="sm"
-              autoCapitalize="none"
-            />
-            {renderFieldError("password")}
-          </View>
-          {renderFormError()}
-          <Button variant="primary" onPress={handleSignInPress} disabled={submitDisabled}>
-            <ThemedText variant="button" style={{ color: theme.colors.onAccent }}>
-              {isLoading ? (
-                <ActivityIndicator size="small" color={theme.colors.onAccent} />
-              ) : (
-                "Sign In"
+      <ThemedView header={<Header />}>
+        <View style={styles.container}>
+          <ThemedText variant="body">Sign in to continue</ThemedText>
+          <View style={styles.form}>
+            <View style={styles.inputs}>
+              {inputs.map(
+                ({
+                  key,
+                  placeholder,
+                  value,
+                  onChange,
+                  icon,
+                  inputMode,
+                  textContentType,
+                  autoCapitalize,
+                  autoComplete,
+                  keyboardType,
+                }) => (
+                  <React.Fragment key={key}>
+                    <Input
+                      placeholder={placeholder}
+                      value={value}
+                      onChangeText={onChange}
+                      inputMode={inputMode}
+                      textContentType={textContentType}
+                      autoCapitalize={autoCapitalize}
+                      autoComplete={autoComplete}
+                      keyboardType={keyboardType}
+                      ref={key === "email" ? inputRef : undefined}
+                      secureTextEntry={key === "password" && !showPassword}
+                      rightIcon={icon}
+                    />
+                    {renderFieldError(key)}
+                  </React.Fragment>
+                ),
               )}
-            </ThemedText>
-          </Button>
+            </View>
+            {renderFormError()}
+            <Button variant="primary" onPress={handleSignInPress} disabled={submitDisabled}>
+              <ThemedText variant="button" style={{ color: theme.colors.text.onAccent }}>
+                {isLoading ? (
+                  <ActivityIndicator size="small" color={theme.colors.text.onAccent} />
+                ) : (
+                  "Sign in"
+                )}
+              </ThemedText>
+            </Button>
+          </View>
         </View>
+        <ThemedText style={styles.footer}>
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/(public)/sign-up"
+            replace
+            style={{ color: theme.colors.accent.primary, textDecorationLine: "underline" }}
+          >
+            Sign up
+          </Link>
+        </ThemedText>
       </ThemedView>
     </TouchableWithoutFeedback>
   );
 }
 
+function Header() {
+  return (
+    <View style={headerStyles.container}>
+      <BackButton type={"left"} />
+      <ThemedText variant="header">Welcome back!</ThemedText>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  container: {
+    gap: spacing[8],
+  },
   form: {
     width: "100%",
     gap: spacing[16],
   },
   inputs: {
+    gap: spacing[8],
+  },
+  footer: {
+    textAlign: "center",
+  },
+});
+
+const headerStyles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
     gap: spacing[8],
   },
 });

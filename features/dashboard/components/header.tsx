@@ -7,7 +7,7 @@ import { getGroupInitials } from "@/features/groups/utils/get-group-initials";
 import { Icon } from "@/shared/components/icon";
 import { radius, spacing } from "@/shared/theme/theme";
 
-const Header = () => {
+export function Header() {
   const { colors } = useCurrentTheme();
   const { selectedGroup } = useGroupsProvider();
   const selectedGroupName = selectedGroup?.name ?? "No Group Selected";
@@ -31,9 +31,9 @@ const Header = () => {
         style={({ pressed }) => [styles.switcher, { opacity: pressed ? 0.6 : 1 }]}
       >
         <View
-          style={[styles.avatar, { backgroundColor: colors.accentSoft, borderRadius: radius.md }]}
+          style={[styles.avatar, { backgroundColor: colors.accent.soft, borderRadius: radius.md }]}
         >
-          <ThemedText variant="header" style={[{ color: colors.accent }]}>
+          <ThemedText variant="header" style={[{ color: colors.accent.primary }]}>
             {groupInitials}
           </ThemedText>
         </View>
@@ -48,11 +48,11 @@ const Header = () => {
             {selectedGroupDescription}
           </ThemedText>
         </View>
-        <Icon name="dots-three" weight="bold" size={30} color={colors.icon} />
+        <Icon name="dots-horizontal-rounded" pack="filled" size={25} fill={colors.icon.soft} />
       </Pressable>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -82,5 +82,3 @@ const styles = StyleSheet.create({
     gap: spacing[4],
   },
 });
-
-export { Header };

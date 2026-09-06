@@ -24,8 +24,6 @@ export function CreateListScreen() {
   const canSubmit = newTitle.trim().length > 0;
   const buttonDisabled = !canSubmit || isCreatePending;
   const inputIcon = LIST_TYPES[newType].icon;
-  const titleText =
-    LIST_TYPES[newType].label !== "General" ? `New ${LIST_TYPES[newType].label} List` : "New List";
 
   const handleCreate = () => {
     if (!newTitle.trim()) return;
@@ -46,51 +44,59 @@ export function CreateListScreen() {
     <ThemedView style={styles.container}>
       <View style={styles.header}>
         <BackButton type={"left"} />
-        <ThemedText variant="subHeader">Choose List type</ThemedText>
+        <ThemedText variant="subHeader">Choose list type</ThemedText>
       </View>
 
-      <View style={styles.selectorContainer}>
-        {LIST_TYPES_ARRAY.map((type) => (
+      <View
+        style={[
+          styles.selectorContainer,
+          { borderColor: colors.border.primary, borderRadius: radius.md },
+        ]}
+      >
+        {LIST_TYPES_ARRAY.map((type, index) => (
           <Pressable
             key={type}
             onPress={() => setNewType(type)}
             style={[
               styles.typeSelector,
               {
-                backgroundColor: newType === type ? colors.bgLayer2 : "transparent",
-                borderRadius: radius.sm,
+                backgroundColor: newType === type ? colors.background.layer2 : "transparent",
+                borderRadius: index === 0 ? radius.md : 0,
+                borderTopRightRadius: index === 0 ? radius.md : 0,
+                borderBottomLeftRadius: index === LIST_TYPES_ARRAY.length - 1 ? radius.md : 0,
+                borderBottomRightRadius: index === LIST_TYPES_ARRAY.length - 1 ? radius.md : 0,
+                borderBottomWidth:
+                  index === LIST_TYPES_ARRAY.length - 1 ? 0 : StyleSheet.hairlineWidth,
+                borderBottomColor: colors.border.primary,
               },
             ]}
           >
             <Icon
               name={LIST_TYPES[type].icon}
-              size={20}
-              color={newType === type ? colors.text : colors.textMuted}
+              size={22}
+              fill={newType === type ? colors.icon.primary : colors.text.muted}
             />
             <ThemedText
               style={{
-                color: newType === type ? colors.text : colors.textMuted,
+                color: newType === type ? colors.text.primary : colors.text.muted,
                 flex: 1,
               }}
             >
               {LIST_TYPES[type].label}
             </ThemedText>
             <Icon
-              name={newType === type ? "check-circle" : "circle"}
-              size={18}
-              color={newType === type ? colors.text : colors.textMuted}
-              weight={newType === type ? "fill" : "regular"}
+              name={newType === type ? "checkbox-square" : "checkbox"}
+              size={22}
+              fill={newType === type ? colors.icon.primary : colors.text.muted}
             />
           </Pressable>
         ))}
       </View>
 
-      <ThemedText variant="subHeader">{titleText}</ThemedText>
+      <ThemedText variant="subHeader">Name your list</ThemedText>
 
       <Input
-        leftIcon={<Icon name={inputIcon} size={20} color={colors.text} />}
-        size="md"
-        radius="sm"
+        leftIcon={<Icon name={inputIcon} size={20} fill={colors.icon.primary} />}
         value={newTitle}
         onChangeText={setNewTitle}
         editable={!isCreatePending}
@@ -106,7 +112,7 @@ export function CreateListScreen() {
         loading={isCreatePending}
         disabled={buttonDisabled}
       >
-        <ThemedText variant="button" style={{ color: colors.onAccent }}>
+        <ThemedText variant="button" style={{ color: colors.text.onAccent }}>
           Create List
         </ThemedText>
       </Button>
@@ -124,7 +130,8 @@ const styles = StyleSheet.create({
     gap: H_GAP,
   },
   selectorContainer: {
-    gap: spacing[8],
+    // gap: spacing[8],
+    borderWidth: 1,
   },
   typeSelector: {
     flexDirection: "row",

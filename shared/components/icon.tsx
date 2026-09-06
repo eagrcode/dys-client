@@ -1,149 +1,69 @@
-import {
-  SquareIcon,
-  CheckSquareIcon,
-  CheckIcon,
-  CheckCircleIcon,
-  SelectionIcon,
-  CircleIcon,
-  CircleDashedIcon,
-  CaretRightIcon,
-  CaretLeftIcon,
-  CaretUpIcon,
-  CaretDownIcon,
-  ListBulletsIcon,
-  CalendarDotsIcon,
-  ImagesIcon,
-  ChatTextIcon,
-  DotsThreeIcon,
-  XIcon,
-  ArrowRightIcon,
-  BellIcon,
-  PencilSimpleIcon,
-  TrashIcon,
-  PlusIcon,
-  PlusCircleIcon,
-  ListChecksIcon,
-  ShoppingCartIcon,
-  HouseIcon,
-  UsersThreeIcon,
-  UserIcon,
-  MoonIcon,
-  SunIcon,
-} from "phosphor-react-native";
+import { SvgXml } from "react-native-svg";
+
+import { BOX_ICON_PATHS } from "@/shared/components/boxicon-paths";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 
-type IconProps = {
+export type IconName = keyof typeof BOX_ICON_PATHS;
+export type IconPack = "basic" | "filled";
+export type IconWeightName = "thin" | "normal";
+export type IconWeight = IconWeightName | 200 | 400;
+
+export type IconProps = {
   name: IconName;
   size?: number;
-  color?: string;
+  fill?: string;
+  opacity?: number | string;
+  pack?: IconPack;
   weight?: IconWeight;
+  removePadding?: boolean;
 };
 
-export type IconName =
-  | "square"
-  | "square-check"
-  | "check"
-  | "check-circle"
-  | "selection"
-  | "circle"
-  | "circle-dashed"
-  | "caret-right"
-  | "caret-left"
-  | "caret-up"
-  | "caret-down"
-  | "list-bullets"
-  | "calendar-dots"
-  | "images"
-  | "chat-text"
-  | "dots-three"
-  | "x"
-  | "arrow-right"
-  | "bell"
-  | "pencil-simple"
-  | "trash"
-  | "plus"
-  | "plus-circle"
-  | "list-checks"
-  | "shopping-cart"
-  | "house"
-  | "users"
-  | "user"
-  | "moon"
-  | "sun";
+const WEIGHT_NAMES: Record<IconWeight, IconWeightName> = {
+  200: "thin",
+  400: "normal",
+  thin: "thin",
+  normal: "normal",
+};
 
-export type IconWeight = "thin" | "light" | "regular" | "bold" | "fill";
+const VIEW_BOXES: Record<IconWeightName, string> = {
+  thin: "3 3 18 18",
+  normal: "2 2 20 20",
+};
+
+const DEFAULT_VIEW_BOX = "0 0 24 24";
 
 export function Icon({
   name,
   size = 20,
-  color,
-  weight = "regular",
+  fill,
+  opacity,
+  pack = "basic",
+  weight = "thin",
+  removePadding = true,
 }: IconProps) {
   const { colors } = useCurrentTheme();
-  color = color ?? colors.icon;
+  const resolvedFill = fill ?? colors.icon.primary;
+  const resolvedWeight = WEIGHT_NAMES[weight];
+  const iconPaths = BOX_ICON_PATHS[name] as Partial<
+    Record<IconPack, Partial<Record<IconWeightName, string>>>
+  >;
+  const pathMarkup = iconPaths[pack]?.[resolvedWeight];
 
-  switch (name) {
-    case "square":
-      return <SquareIcon size={27} color={color} weight="regular" />;
-    case "square-check":
-      return <CheckSquareIcon size={27} color={color} weight="regular" />;
-    case "check":
-      return <CheckIcon size={size} color={color} weight={weight} />;
-    case "check-circle":
-      return <CheckCircleIcon size={size} color={color} weight={weight} />;
-    case "selection":
-      return <SelectionIcon size={size} color={color} weight={weight} />;
-    case "circle":
-      return <CircleIcon size={size} color={color} weight={weight} />;
-    case "circle-dashed":
-      return <CircleDashedIcon size={size} color={color} weight={weight} />;
-    case "caret-right":
-      return <CaretRightIcon size={size} color={color} weight={weight} />;
-    case "caret-left":
-      return <CaretLeftIcon size={size} color={color} weight={weight} />;
-    case "caret-up":
-      return <CaretUpIcon size={size} color={color} weight={weight} />;
-    case "caret-down":
-      return <CaretDownIcon size={size} color={color} weight={weight} />;
-    case "list-bullets":
-      return <ListBulletsIcon size={30} color={color} weight={weight} />;
-    case "calendar-dots":
-      return <CalendarDotsIcon size={size} color={color} weight={weight} />;
-    case "images":
-      return <ImagesIcon size={size} color={color} weight={weight} />;
-    case "chat-text":
-      return <ChatTextIcon size={size} color={color} weight={weight} />;
-    case "dots-three":
-      return <DotsThreeIcon size={size} color={color} weight={weight} />;
-    case "x":
-      return <XIcon size={size} color={color} weight={weight} />;
-    case "arrow-right":
-      return <ArrowRightIcon size={size} color={color} weight={weight} />;
-    case "bell":
-      return <BellIcon size={size} color={color} weight={weight} />;
-    case "pencil-simple":
-      return <PencilSimpleIcon size={size} color={color} weight={weight} />;
-    case "trash":
-      return <TrashIcon size={size} color={color} weight={weight} />;
-    case "plus":
-      return <PlusIcon size={size} color={color} weight={weight} />;
-    case "plus-circle":
-      return <PlusCircleIcon size={size} color={color} weight={weight} />;
-    case "list-checks":
-      return <ListChecksIcon size={30} color={color} weight={weight} />;
-    case "shopping-cart":
-      return <ShoppingCartIcon size={30} color={color} weight={weight} />;
-    case "house":
-      return <HouseIcon size={size} color={color} weight={weight} />;
-    case "users":
-      return <UsersThreeIcon size={size} color={color} weight={weight} />;
-    case "user":
-      return <UserIcon size={size} color={color} weight={weight} />;
-    case "moon":
-      return <MoonIcon size={size} color={color} weight={weight} />;
-    case "sun":
-      return <SunIcon size={size} color={color} weight={weight} />;
-    default:
-      return null;
+  if (!pathMarkup) {
+    throw new Error(`Boxicon "${name}" does not provide ${pack}/${resolvedWeight}`);
   }
+
+  const xml = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${DEFAULT_VIEW_BOX}" fill="currentColor">${pathMarkup}</svg>`;
+
+  return (
+    <SvgXml
+      xml={xml}
+      width={size}
+      height={size}
+      color={resolvedFill}
+      fill={resolvedFill}
+      opacity={opacity}
+      viewBox={removePadding ? VIEW_BOXES[resolvedWeight] : DEFAULT_VIEW_BOX}
+    />
+  );
 }

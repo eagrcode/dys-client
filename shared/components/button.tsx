@@ -1,6 +1,6 @@
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import { LinearGradient } from "expo-linear-gradient";
-import { spacing, radius } from "@/shared/theme/theme";
+import { radius } from "@/shared/theme/theme";
 import {
   ActivityIndicator,
   Pressable,
@@ -28,15 +28,19 @@ export function Button({
   style,
   children,
 }: ButtonProps) {
-  const theme = useCurrentTheme();
+  const { colors } = useCurrentTheme();
 
   const isDisabled = disabled || loading;
 
   const variantStyles: Record<ButtonVariant, ViewStyle> = {
     primary: {},
-    secondary: { backgroundColor: "transparent", borderWidth: 1, borderColor: theme.colors.border },
-    secondaryFill1: { backgroundColor: theme.colors.bgLayer1 },
-    secondaryFill2: { backgroundColor: theme.colors.bgLayer2 },
+    secondary: {
+      backgroundColor: "transparent",
+      borderWidth: 1,
+      borderColor: colors.border.primary,
+    },
+    secondaryFill1: { backgroundColor: colors.background.layer1 },
+    secondaryFill2: { backgroundColor: colors.background.layer2 },
   };
 
   return (
@@ -47,8 +51,8 @@ export function Button({
         styles.base,
         variantStyles[variant],
         {
-          opacity: pressed ? 0.85 : isDisabled ? 0.5 : 1,
-          borderRadius: radius.lg,
+          opacity: pressed ? 0.8 : isDisabled ? 0.7 : 1,
+          borderRadius: radius.md,
           overflow: "hidden",
         },
         style,
@@ -56,7 +60,7 @@ export function Button({
     >
       {variant === "primary" && (
         <LinearGradient
-          colors={theme.colors.accentGradient}
+          colors={colors.accent.gradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
@@ -65,7 +69,7 @@ export function Button({
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === "primary" ? theme.colors.onAccent : theme.colors.accent}
+          color={variant === "primary" ? colors.text.onAccent : colors.accent.primary}
         />
       ) : (
         children
@@ -76,7 +80,7 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    padding: spacing[12],
+    padding: 12,
     alignItems: "center",
     justifyContent: "center",
   },

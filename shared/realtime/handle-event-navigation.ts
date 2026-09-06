@@ -18,7 +18,6 @@ export function handleEventNavigation(
   const callerSocketId = event.callerSocketId;
   const isReceiver = callerSocketId !== socket.id;
   const currentPath = socketUserLocation.currentPath;
-  const currentRouteParams = socketUserLocation.currentRouteParams;
 
   if (!isReceiver) {
     log.info("handleEventNavigation() | Ignoring event from self:", {
@@ -36,12 +35,7 @@ export function handleEventNavigation(
 
   switch (event.type) {
     case "list.deleted":
-      if (
-        isReceiver &&
-        (currentPath.includes(`/lists/${event.data.id}`) ||
-          (currentPath.includes(`/list-detail-actions`) &&
-            currentRouteParams.listId === event.data.id))
-      ) {
+      if (isReceiver && currentPath.includes(`/lists/${event.data.id}`)) {
         router.replace("/(app-protected)/lists/overview");
       }
       break;

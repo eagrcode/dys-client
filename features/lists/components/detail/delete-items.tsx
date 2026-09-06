@@ -57,15 +57,15 @@ export function DeleteItems({ listId, selectedItemIds, onCancelSelection }: Prop
         style={[
           deleteItemsBtnStyles.btn,
           {
-            backgroundColor: colors.bgLayer3,
+            backgroundColor: colors.background.layer3,
             borderRadius: radius.full,
-            borderColor: colors.border,
+            borderColor: colors.border.primary,
           },
         ]}
         onPress={onDeletePress}
         disabled={isDeletePending || count === 0}
       >
-        <Icon name="trash" size={30} color={colors.danger} />
+        <Icon name="trash-x" size={30} fill={colors.accent.danger} />
       </Pressable>
       <ThemedText>{btnText}</ThemedText>
     </View>

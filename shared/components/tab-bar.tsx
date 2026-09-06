@@ -14,8 +14,8 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
       style={[
         {
           paddingBottom: insets.bottom ? insets.bottom : spacing[16],
-          backgroundColor: theme.colors.tabBar,
-          borderTopColor: theme.colors.border,
+          backgroundColor: theme.colors.tabBar.primary,
+          borderTopColor: theme.colors.border.primary,
           borderTopWidth: StyleSheet.hairlineWidth,
         },
       ]}
@@ -46,7 +46,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             <Pressable key={route.key} onPress={onPress} style={styles.tabButton}>
               {options.tabBarIcon?.({
                 focused,
-                color: focused ? theme.colors.accent : theme.colors.textMuted,
+                color: focused ? theme.colors.accent.primary : theme.colors.text.muted,
                 size: 28,
               })}
             </Pressable>

@@ -93,7 +93,7 @@ const CreateGroup = () => {
   return (
     <ThemedView style={styles.container}>
       <Animated.View style={animatedStyle}>
-        <View style={[styles.form, { backgroundColor: theme.colors.background }]}>
+        <View style={[styles.form, { backgroundColor: theme.colors.background.primary }]}>
           <ThemedText variant="subHeader" style={{ fontSize: 20, letterSpacing: 2 }}>
             Create a Group
           </ThemedText>
@@ -118,12 +118,11 @@ const CreateGroup = () => {
           {renderFormError()}
           <Button
             variant="primary"
-            style={{ borderRadius: theme.radius.md }}
             onPress={handleCreateGroupPress}
             disabled={submitDisabled}
             loading={isCreating}
           >
-            <ThemedText variant="button" style={{ color: theme.colors.onAccent }}>
+            <ThemedText variant="button" style={{ color: theme.colors.text.onAccent }}>
               Submit
             </ThemedText>
           </Button>

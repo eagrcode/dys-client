@@ -73,7 +73,7 @@ function Row({ item, listId }: { item: ListItem; listId: string }) {
     >
       <ItemLabel item={item} />
       <View style={iconButtonStyles.button}>
-        <Icon name="caret-right" size={20} color={colors.icon} />
+        <Icon name="chevron-right" size={22} fill={colors.icon.soft} />
       </View>
     </Pressable>
   );
@@ -99,10 +99,9 @@ function SelectionRow({ item, selected, onToggleSelected }: SelectionRowProps) {
       <View style={selectionStyles.content}>
         <ItemLabel item={item} />
         <Icon
-          name={selected ? "circle" : "circle-dashed"}
-          weight={selected ? "fill" : "regular"}
-          size={15}
-          color={colors.icon}
+          name={selected ? "checkbox-square" : "checkbox"}
+          size={20}
+          fill={colors.icon.primary}
         />
       </View>
     </Pressable>
@@ -110,7 +109,7 @@ function SelectionRow({ item, selected, onToggleSelected }: SelectionRowProps) {
 }
 
 function CompletionIcon({ item }: { item: ListItem }) {
-  return <Icon name={item.completed ? "square-check" : "square"} />;
+  return <Icon name={item.completed ? "check-square" : "square"} size={22} />;
 }
 
 function ItemLabel({ item }: { item: ListItem }) {

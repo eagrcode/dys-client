@@ -18,9 +18,9 @@ export function Header({ isLoading, isFetching }: { isLoading: boolean; isFetchi
         disabled={isLoading || isFetching}
         onPress={() => router.push("/(app-protected)/lists/create-list")}
         hitSlop={10}
-        style={({ pressed }) => [{ opacity: pressed || isLoading || isFetching ? 0.6 : 1 }]}
+        style={({ pressed }) => [{ opacity: pressed || isLoading || isFetching ? 0.7 : 1 }]}
       >
-        <Icon name="plus" size={25} color={colors.accent} weight="bold" />
+        <Icon name="list-plus" size={25} fill={colors.accent.primary} />
       </Pressable>
     </View>
   );
@@ -31,7 +31,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingLeft: spacing[16],
-    paddingRight: spacing[16],
+    paddingHorizontal: spacing[16],
   },
 });

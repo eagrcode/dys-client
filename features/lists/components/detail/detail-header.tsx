@@ -2,7 +2,6 @@ import { ThemedText } from "@/shared/components/themed-text";
 import { BackButton } from "@/shared/components/back-button";
 import { useCurrentTheme } from "@/shared/hooks/use-current-theme";
 import { View, Pressable, StyleSheet } from "react-native";
-import { router } from "expo-router";
 import { Input } from "@/shared/components/input";
 import { useEffect, useState } from "react";
 import { useRenameList } from "@/features/lists/mutations/use-rename-list";
@@ -18,12 +17,14 @@ export function Header({
   setListMode,
   title,
   onCancelSelection,
+  onOpenOptions,
 }: {
   optionsDisabled: boolean;
   listId: string;
   listMode: ListMode;
   title: string;
   onCancelSelection: () => void;
+  onOpenOptions: () => void;
   setListMode: React.Dispatch<React.SetStateAction<ListMode>>;
 }) {
   const { colors } = useCurrentTheme();
@@ -74,35 +75,30 @@ export function Header({
 
   let headerRight = isSelectMode ? (
     <Pressable onPress={onCancelSelection} hitSlop={10} style={styles.headerRightIcon}>
-      <Icon name="x" size={25} color={colors.icon} />
+      <Icon name="x" size={25} fill={colors.icon.primary} />
     </Pressable>
   ) : isRenaming ? (
     <View style={styles.headerRightRenamingIcons}>
       <Pressable disabled={isSubmitRenameDisabled} onPress={handleSaveRename} hitSlop={10}>
         <Icon
           name="check"
-          size={25}
-          color={isSubmitRenameDisabled ? colors.textDisabled : colors.iconAccent}
-          weight="bold"
+          size={22}
+          fill={isSubmitRenameDisabled ? colors.text.disabled : colors.accent.primary}
+          weight="normal"
         />
       </Pressable>
       <Pressable onPress={() => setListMode("default")} hitSlop={10}>
-        <Icon name="x" size={25} color={colors.icon} />
+        <Icon name="x" size={22} fill={colors.icon.primary} />
       </Pressable>
     </View>
   ) : (
     <Pressable
-      onPress={() =>
-        router.push({
-          pathname: "/(app-protected)/(modals)/list-detail-actions",
-          params: { listId, listMode },
-        })
-      }
+      onPress={onOpenOptions}
       hitSlop={10}
       disabled={optionsDisabled}
       style={styles.headerRightIcon}
     >
-      <Icon name="dots-three" weight="bold" size={30} color={colors.icon} />
+      <Icon name="dots-horizontal-rounded" pack="filled" size={25} fill={colors.icon.soft} />
     </Pressable>
   );
 

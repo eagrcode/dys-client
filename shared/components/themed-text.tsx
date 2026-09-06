@@ -15,18 +15,18 @@ export function ThemedText({ style, variant = "body", children, completed, ...re
 
   const baseStyles = {
     letterSpacing: 0.5,
-    color: colors.text,
+    color: colors.text.primary,
   };
 
   const variantStyles: Record<Variant, TextStyle> = {
     tag: {
       fontFamily: "HankenGrotesk_300Light",
       fontSize: 15,
-      opacity: 0.8,
+      color: colors.text.soft,
     },
     body: {
       fontFamily: "HankenGrotesk_300Light",
-      fontSize: 18,
+      fontSize: 17,
     },
     subHeader: {
       fontFamily: "HankenGrotesk_500Medium",
@@ -35,13 +35,13 @@ export function ThemedText({ style, variant = "body", children, completed, ...re
     header: {
       fontFamily: "HankenGrotesk_600SemiBold",
       fontSize: 22,
-      color: colors.textHeader,
+      color: colors.text.header,
       letterSpacing: 1,
     },
     headerLg: {
       fontFamily: "HankenGrotesk_600SemiBold",
       fontSize: 26,
-      color: colors.textHeader,
+      color: colors.text.header,
       letterSpacing: 1,
     },
     button: {
@@ -51,7 +51,7 @@ export function ThemedText({ style, variant = "body", children, completed, ...re
   };
 
   const completedStyle: TextStyle = completed
-    ? { textDecorationLine: "line-through", opacity: 0.5 }
+    ? { textDecorationLine: "line-through", color: colors.text.muted }
     : {};
 
   return (

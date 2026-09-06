@@ -1,22 +1,47 @@
-import { Platform } from "react-native";
+// Colors
+
+const TEXT = {
+  light: {
+    primary: "hsl(228, 28%, 14%)",
+    header: "hsl(220, 20%, 10%)",
+    soft: "hsl(226, 16%, 34%)",
+    muted: "hsl(225, 12%, 48%)",
+    disabled: "hsl(224, 10%, 67%)",
+  },
+  dark: {
+    primary: "hsl(220, 35%, 93%)",
+    header: "hsl(220, 20%, 95%)",
+    soft: "hsla(220, 35%, 85%, 0.8)",
+    muted: "hsla(220, 35%, 85%, 0.7)",
+    disabled: "hsl(220, 10%, 40%)",
+  },
+} as const;
+
+const BACKGROUND = {
+  light: {
+    primary: "hsl(240, 25%, 95%)",
+    secondary: "hsl(240, 25%, 93%)",
+    layer1: "hsl(240, 25%, 92%)",
+    layer2: "hsl(240, 25%, 90%)",
+    layer3: "hsl(240, 25%, 88%)",
+  },
+  dark: {
+    primary: "hsl(235, 25%, 13%)",
+    secondary: "hsl(235, 25%, 15%)",
+    layer1: "hsl(235, 25%, 16%)",
+    layer2: "hsl(235, 25%, 18%)",
+    layer3: "hsl(235, 25%, 20%)",
+  },
+} as const;
 
 export const Accent = {
-  accent: "#FF8A4C",
-  accentSoft: "rgba(255, 138, 76, 0.16)",
-  accentText: "#6DD6FF",
-  accentDeep: "#0E7490",
-  accentGradient: ["#FF9A5F", "#FF6B3D"] as const,
-
-  violet: "hsl(261, 100%, 74%)",
-  violetSoft: "rgba(168, 121, 255, 0.16)",
-  violetGradient: ["#A879FF", "#7C3AED"] as const,
-
-  cyan: "#6DD6FF",
-  cyanSoft: "rgba(109, 214, 255, 0.14)",
-
+  primary: "hsl(21, 85%, 65%)",
+  deep: "hsl(21, 100%, 55%)",
+  soft: "hsla(21, 100%, 65%, 0.2)",
+  gradient: ["#FF9A5F", "#FF6B3D"] as const,
   success: "#70E0A3",
   warning: "#FFB86B",
-  danger: "#FF6B7A",
+  danger: "hsl(354, 100%, 71%)",
 };
 
 export const spacing = {
@@ -105,201 +130,121 @@ export const shadow = {
 export const Colors = {
   light: {
     // Accents
-    accent: "#BE5032",
-    accentSoft: "rgba(190, 80, 50, 0.13)",
-    accentText: "#0878A6",
-    accentDeep: "#8A321F",
-    accentGradient: ["#E9794F", "#BE5032"] as const,
-
-    violet: "#7C3AED",
-    violetSoft: "rgba(124, 58, 237, 0.12)",
-    violetGradient: ["#A879FF", "#7C3AED"] as const,
-
-    cyan: "#0878A6",
-    cyanSoft: "rgba(8, 120, 166, 0.11)",
-
-    success: "#237E50",
-    warning: "#A95E18",
-    danger: "#C83D52",
+    accent: {
+      primary: "#BE5032",
+      deep: "#8A321F",
+      soft: "rgba(190, 80, 50, 0.13)",
+      gradient: ["#E9794F", "#BE5032"] as const,
+      success: "#237E50",
+      warning: "#A95E18",
+      danger: "#C83D52",
+    },
 
     // Text
-    text: "hsl(228, 28%, 14%)",
-    textHeader: "hsl(220, 20%, 10%)",
-    textSoft: "hsl(226, 16%, 34%)",
-    textMuted: "hsl(225, 12%, 48%)",
-    textDisabled: "hsl(224, 10%, 67%)",
-    errorText: "#C83D52",
-    onAccent: "#FFFFFF",
+    text: {
+      primary: TEXT.light.primary,
+      header: TEXT.light.header,
+      soft: TEXT.light.soft,
+      muted: TEXT.light.muted,
+      disabled: TEXT.light.disabled,
+      error: "#C83D52",
+      onAccent: "#FFFFFF",
+    },
 
     // Backgrounds
-    background: "hsl(225, 35%, 98%)",
-    backgroundSecondary: "hsl(225, 30%, 96%)",
-    bgLayer1: "hsl(0, 0%, 100%)",
-    bgLayer2: "hsl(225, 28%, 94%)",
-    bgLayer3: "hsl(225, 24%, 90%)",
-
-    // Screen Gradients
-    screenGradient: ["#F8F9FD", "#EEF1F8", "#F8F9FD"] as const,
-    homeGradient: ["#FFF8F3", "#F0F2FA", "#F8F9FD"] as const,
-
-    // Ambient Glow
-    ambientGlowPrimary: "#E86F4A",
-    ambientGlowSecondary: "#7C3AED",
+    background: {
+      primary: BACKGROUND.light.primary,
+      secondary: BACKGROUND.light.secondary,
+      layer1: BACKGROUND.light.layer1,
+      layer2: BACKGROUND.light.layer2,
+      layer3: BACKGROUND.light.layer3,
+    },
 
     // Icons
-    icon: "hsl(225, 14%, 38%)",
-    iconAccent: "#BE5032",
+    icon: {
+      primary: "hsl(225, 14%, 38%)",
+      soft: "hsla(225, 14%, 38%, 0.8)",
+    },
 
     // Tab Bar
-    tabBar: "hsl(0, 0%, 100%)",
-    tabIconDefault: "hsl(225, 11%, 52%)",
-    tabIconSelected: "#BE5032",
+    tabBar: {
+      primary: BACKGROUND.light.primary,
+      icon: {
+        focused: "#BE5032",
+        unfocused: "hsl(225, 11%, 52%)",
+      },
+    },
 
     // Header
     header: "hsl(0, 0%, 100%)",
 
     // Borders
-    border: "rgba(35, 43, 70, 0.09)",
-    borderStrong: "rgba(35, 43, 70, 0.17)",
-    overlay: "rgba(0, 0, 0, 0.5)",
-
-    // Dashboard
-    homeTileColors: {
-      Lists: {
-        bg: "rgba(8, 120, 166, 0.10)",
-        border: "rgba(8, 120, 166, 0.20)",
-        icon: "#0878A6",
-        label: "#0878A6",
-      },
-      Calendar: {
-        bg: "rgba(190, 80, 50, 0.10)",
-        border: "rgba(190, 80, 50, 0.20)",
-        icon: "#BE5032",
-        label: "#BE5032",
-      },
-      Albums: {
-        bg: "rgba(124, 58, 237, 0.12)",
-        border: "rgba(124, 58, 237, 0.22)",
-        icon: "#7C3AED",
-        label: "#7C3AED",
-      },
-      Chat: {
-        bg: "rgba(35, 126, 80, 0.10)",
-        border: "rgba(35, 126, 80, 0.20)",
-        icon: "#237E50",
-        label: "#237E50",
-      },
+    border: {
+      primary: "rgba(35, 43, 70, 0.09)",
+      strong: "rgba(35, 43, 70, 0.17)",
     },
+
+    // Overlay
+    overlay: "rgba(0, 0, 0, 0.5)",
   },
 
   dark: {
     // Accents
-    accent: Accent.accent,
-    accentSoft: Accent.accentSoft,
-    accentText: Accent.accentText,
-    accentDeep: Accent.accentDeep,
-    accentGradient: Accent.accentGradient,
-
-    violet: Accent.violet,
-    violetSoft: Accent.violetSoft,
-    violetGradient: Accent.violetGradient,
-
-    cyan: Accent.cyan,
-    cyanSoft: Accent.cyanSoft,
-
-    success: Accent.success,
-    warning: Accent.warning,
-    danger: Accent.danger,
+    accent: {
+      primary: Accent.primary,
+      deep: Accent.deep,
+      soft: Accent.soft,
+      gradient: Accent.gradient,
+      success: Accent.success,
+      warning: Accent.warning,
+      danger: Accent.danger,
+    },
 
     // Text
-    text: "hsl(220, 35%, 90%)",
-    textHeader: "hsl(220, 20%, 93%)",
-    textSoft: "#B8BECC",
-    textMuted: "#7E8798",
-    textDisabled: "#565F70",
-    errorText: Accent.danger,
-    onAccent: "#FFFFFF",
+    text: {
+      primary: TEXT.dark.primary,
+      header: TEXT.dark.header,
+      soft: TEXT.dark.soft,
+      muted: TEXT.dark.muted,
+      disabled: TEXT.dark.disabled,
+      error: Accent.danger,
+      onAccent: "#FFFFFF",
+    },
 
     // Backgrounds
-    background: "hsl(230, 45%, 10%)",
-    backgroundSecondary: "hsl(230, 45%, 11%)",
-
-    bgLayer1: "hsl(230, 40%, 13%)",
-    bgLayer2: "hsl(230, 40%, 15%)",
-    bgLayer3: "hsl(230, 40%, 17%)",
-
-    // Screen Gradients
-    screenGradient: ["#070B18", "#0B1020", "#070B18"] as const,
-    homeGradient: ["#090D1B", "#10172A", "#070B18"] as const,
-
-    // Ambient Glow
-    ambientGlowPrimary: "#7C3AED",
-    ambientGlowSecondary: "#FF6B3D",
+    background: {
+      primary: BACKGROUND.dark.primary,
+      secondary: BACKGROUND.dark.secondary,
+      layer1: BACKGROUND.dark.layer1,
+      layer2: BACKGROUND.dark.layer2,
+      layer3: BACKGROUND.dark.layer3,
+    },
 
     // Icons
-    icon: "hsl(220, 20%, 75%)",
-    iconAccent: Accent.accent,
+    icon: {
+      primary: TEXT.dark.primary,
+      soft: TEXT.dark.soft,
+    },
 
     // Tab Bar
-    tabBar: "hsl(230, 45%, 10%)",
-    tabIconDefault: "#8E95A8",
-    tabIconSelected: Accent.accent,
-
-    // Header
-    header: "#070B18",
-
-    // Borders
-    border: "rgba(200, 200, 200, 0.1)",
-    borderStrong: "rgba(255, 255, 255, 0.14)",
-    overlay: "rgba(0, 0, 0, 0.5)",
-
-    // Dashboard
-    homeTileColors: {
-      Lists: {
-        bg: "#171D2E",
-        border: "rgba(109, 214, 255, 0.24)",
-        icon: "#6DD6FF",
-        label: "#6DD6FF",
-      },
-      Calendar: {
-        bg: "rgba(255, 138, 76, 0.13)",
-        border: "rgba(255, 138, 76, 0.26)",
-        icon: "#FF8A4C",
-        label: "#FF8A4C",
-      },
-      Albums: {
-        bg: "rgba(168, 121, 255, 0.13)",
-        border: "rgba(168, 121, 255, 0.26)",
-        icon: "#A879FF",
-        label: "#A879FF",
-      },
-      Chat: {
-        bg: "rgba(112, 224, 163, 0.12)",
-        border: "rgba(112, 224, 163, 0.24)",
-        icon: "#70E0A3",
-        label: "#70E0A3",
+    tabBar: {
+      primary: BACKGROUND.dark.primary,
+      icon: {
+        focused: Accent.primary,
+        unfocused: TEXT.dark.soft,
       },
     },
+
+    // Header
+    header: BACKGROUND.dark.primary,
+
+    // Borders
+    border: {
+      primary: "hsla(220, 35%, 80%, 0.10)",
+      strong: "hsla(220, 35%, 100%, 0.15)",
+    },
+
+    // Overlay
+    overlay: "rgba(0, 0, 0, 0.5)",
   },
 };
-
-export const Fonts = Platform.select({
-  ios: {
-    sans: "system-ui",
-    serif: "ui-serif",
-    rounded: "ui-rounded",
-    mono: "ui-monospace",
-  },
-  default: {
-    sans: "normal",
-    serif: "serif",
-    rounded: "normal",
-    mono: "monospace",
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});

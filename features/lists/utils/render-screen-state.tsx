@@ -50,7 +50,7 @@ function LoadingState() {
       <ActivityIndicator
         style={{ transform: [{ scale: 1.2 }] }}
         size="small"
-        color={colors.accent}
+        color={colors.accent.primary}
       />
     </View>
   );

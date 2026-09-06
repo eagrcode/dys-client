@@ -60,7 +60,7 @@ function GroupsScreen() {
       <ActivityIndicator
         style={{ transform: [{ scale: 1.2 }] }}
         size="small"
-        color={theme.colors.accent}
+        color={theme.colors.accent.primary}
       />
     </View>
   );
@@ -107,7 +107,7 @@ const Header = () => {
         </ThemedText>
         <ThemedText
           variant="body"
-          style={[headerStyles.subtitle, { color: theme.colors.textMuted }]}
+          style={[headerStyles.subtitle, { color: theme.colors.text.muted }]}
         >
           Choose where you want to spend time.
         </ThemedText>
@@ -119,7 +119,7 @@ const Header = () => {
         onPress={() => router.push("/(app-protected)/create-group")}
         style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
       >
-        <Icon name="plus-circle" size={30} color={theme.colors.accent} weight="fill" />
+        <Icon name="plus" size={30} fill={theme.colors.accent.primary} />
       </Pressable>
     </View>
   );
@@ -184,8 +184,8 @@ const GroupCard = ({
         groupCardStyles.card,
         {
           backgroundColor:
-            isCurrent && !isSwitching ? theme.colors.bgLayer2 : theme.colors.bgLayer1,
-          borderColor: theme.colors.border,
+            isCurrent && !isSwitching ? theme.colors.background.layer2 : theme.colors.background.layer1,
+          borderColor: theme.colors.border.primary,
           borderRadius: theme.radius.xl,
         },
       ]}
@@ -201,10 +201,10 @@ const GroupCard = ({
         <View
           style={[
             groupCardStyles.groupAvatar,
-            { backgroundColor: theme.colors.accentSoft, borderRadius: theme.radius.full },
+            { backgroundColor: theme.colors.accent.soft, borderRadius: theme.radius.full },
           ]}
         >
-          <ThemedText style={[groupCardStyles.initials, { color: theme.colors.accent }]}>
+          <ThemedText style={[groupCardStyles.initials, { color: theme.colors.accent.primary }]}>
             {getGroupInitials(group.name)}
           </ThemedText>
         </View>
@@ -215,14 +215,14 @@ const GroupCard = ({
           </ThemedText>
           <ThemedText
             variant="tag"
-            style={[groupCardStyles.role, { color: theme.colors.textMuted }]}
+            style={[groupCardStyles.role, { color: theme.colors.text.muted }]}
           >
             {isCreator ? "Created by you" : "Member"}
           </ThemedText>
           {group.description ? (
             <ThemedText
               variant="tag"
-              style={[groupCardStyles.description, { color: theme.colors.textMuted }]}
+              style={[groupCardStyles.description, { color: theme.colors.text.muted }]}
               numberOfLines={1}
             >
               {group.description}
@@ -239,7 +239,12 @@ const GroupCard = ({
         onPress={onOpenActions}
         style={({ pressed }) => [{ opacity: pressed ? 0.5 : isSwitching ? 0.4 : 1 }]}
       >
-        <Icon name="dots-three" size={20} color={theme.colors.icon} weight="bold" />
+        <Icon
+          name="dots-horizontal-rounded"
+          size={20}
+          fill={theme.colors.icon.primary}
+          weight="normal"
+        />
       </Pressable>
     </View>
   );

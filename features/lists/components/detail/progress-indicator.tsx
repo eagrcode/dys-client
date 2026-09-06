@@ -17,16 +17,16 @@ export function ProgressIndicator({ items, label }: Props) {
 
   return (
     <View style={styles.container}>
-      <ThemedText variant="tag" style={{ color: colors.accent }}>
+      <ThemedText variant="tag" style={{ color: colors.accent.primary }}>
         {label}
       </ThemedText>
-      <View style={[styles.progressTrack, { backgroundColor: colors.bgLayer3 }]}>
+      <View style={[styles.progressTrack, { backgroundColor: colors.background.layer3 }]}>
         {totalCount > 0 && (
           <View
             style={[
               styles.progressFill,
               {
-                backgroundColor: colors.accent,
+                backgroundColor: colors.accent.primary,
                 width: `${(completedCount / totalCount) * 100}%`,
               },
             ]}

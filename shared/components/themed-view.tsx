@@ -31,7 +31,7 @@ export const ThemedView = ({
           flex: 1,
           paddingTop: insets.top + layout.screenPadding,
           paddingBottom: insets.bottom + layout.screenPadding,
-          backgroundColor: isSecondary ? colors.backgroundSecondary : colors.background,
+          backgroundColor: isSecondary ? colors.background.secondary : colors.background.primary,
         },
         style,
       ]}
@@ -51,8 +51,8 @@ export const ThemedView = ({
           <View
             style={{
               borderTopWidth: StyleSheet.hairlineWidth,
-              borderColor: colors.border,
-              marginTop: spacing[16],
+              borderColor: colors.border.primary,
+              marginTop: spacing[8],
               marginBottom: layout.headerBottomMargin,
             }}
           ></View>

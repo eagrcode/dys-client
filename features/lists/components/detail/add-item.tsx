@@ -39,13 +39,11 @@ export function AddItem({ listId }: Props) {
       leftIcon={
         <Icon
           name="plus"
-          size={22}
-          color={!newItem.trim() ? colors.textMuted : colors.icon}
-          weight="bold"
+          size={20}
+          fill={!newItem.trim() ? colors.text.muted : colors.icon.primary}
+          weight="normal"
         />
       }
-      paddingHorizontal="lg"
-      paddingVertical="md"
       placeholder="New item"
       value={newItem}
       onChangeText={setNewItem}
@@ -53,8 +51,6 @@ export function AddItem({ listId }: Props) {
       submitBehavior="submit"
       maxLength={100}
       autoCapitalize="sentences"
-      borderThickness="hairline"
-      radius="sm"
     />
   );
 }

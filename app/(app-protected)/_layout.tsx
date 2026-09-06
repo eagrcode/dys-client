@@ -4,17 +4,7 @@ import { SocketProvider } from "@/shared/realtime/socket-provider";
 export default function AppProtectedLayout() {
   return (
     <SocketProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen
-          name="(modals)/list-detail-actions"
-          options={{
-            animation: "none",
-            presentation: "transparentModal",
-            gestureEnabled: false,
-            contentStyle: { backgroundColor: "transparent" },
-          }}
-        />
-      </Stack>
+      <Stack screenOptions={{ headerShown: false }} />
     </SocketProvider>
   );
 }

@@ -31,7 +31,7 @@ const TILE_CONFIG = [
   {
     id: "lists",
     name: "Lists",
-    icon: "list-bullets",
+    icon: "list-ul-square",
     route: "/(app-protected)/lists/overview",
     tag: "Outstanding",
     featureDisabled: false,
@@ -39,7 +39,7 @@ const TILE_CONFIG = [
   {
     id: "calendar",
     name: "Calendar",
-    icon: "calendar-dots",
+    icon: "calendar-alt",
     route: "/(app-protected)/calendar",
     tag: "Coming soon",
     featureDisabled: true,
@@ -47,7 +47,7 @@ const TILE_CONFIG = [
   {
     id: "albums",
     name: "Albums",
-    icon: "images",
+    icon: "image-portrait",
     route: "/(app-protected)/albums",
     tag: "Coming soon",
     featureDisabled: true,
@@ -55,7 +55,7 @@ const TILE_CONFIG = [
   {
     id: "chat",
     name: "Chat",
-    icon: "chat-text",
+    icon: "message-detail",
     route: "/(app-protected)/text-channels",
     tag: "Coming soon",
     featureDisabled: true,
@@ -138,9 +138,9 @@ function Tile({ name, icon, route, label, featureDisabled, showLabelSkeleton }: 
         style={[
           styles.tile,
           {
-            borderRadius: radius.sm,
-            backgroundColor: colors.bgLayer1,
-            borderColor: colors.border,
+            borderRadius: radius.md,
+            backgroundColor: colors.background.layer1,
+            borderColor: colors.border.primary,
             opacity: featureDisabled ? 0.4 : 1,
           },
         ]}
@@ -155,7 +155,7 @@ function Tile({ name, icon, route, label, featureDisabled, showLabelSkeleton }: 
               style={[
                 styles.labelSkeleton,
                 {
-                  backgroundColor: colors.bgLayer3,
+                  backgroundColor: colors.background.layer3,
                 },
               ]}
             />
@@ -169,7 +169,7 @@ function Tile({ name, icon, route, label, featureDisabled, showLabelSkeleton }: 
         </View>
 
         <View style={styles.icon}>
-          <Icon name={icon} size={25} color={colors.icon} />
+          <Icon name={icon} size={30} fill={colors.icon.primary} />
         </View>
       </View>
     </Pressable>
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
   tile: {
     width: "100%",
-    minHeight: 80,
+    minHeight: 90,
     flexDirection: "row",
     justifyContent: "space-between",
     padding: spacing[12],

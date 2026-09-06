@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { useRouter } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { authAPI } from "@/features/auth/api/auth-api";
 import { saveTokens, clearTokens, getToken } from "@/shared/storage/token-manager";
 import { log } from "@/shared/logging/logger";
@@ -49,6 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [sessionErrorMsg, setSessionErrorMsg] = useState<string | null>(null);
 
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     loadUser();
@@ -211,6 +213,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       log.error("AuthProvider - endSession | Error during session cleanup:", error);
     } finally {
       setUser(null);
+      queryClient.clear();
       router.replace("/sign-in");
     }
   };

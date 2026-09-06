@@ -21,10 +21,10 @@ export default function YouScreen() {
         <View
           style={[
             styles.avatar,
-            { backgroundColor: theme.colors.accent, borderRadius: theme.radius.full },
+            { backgroundColor: theme.colors.accent.primary, borderRadius: theme.radius.full },
           ]}
         >
-          <ThemedText style={[styles.initials, { color: theme.colors.onAccent }]}>
+          <ThemedText style={[styles.initials, { color: theme.colors.text.onAccent }]}>
             {initials}
           </ThemedText>
         </View>
@@ -41,14 +41,14 @@ export default function YouScreen() {
             <Icon
               name={theme.scheme === "light" ? "moon" : "sun"}
               size={20}
-              color={theme.colors.icon}
-              weight="fill"
+              fill={theme.colors.icon.primary}
+              pack="filled"
             />
             <ThemedText>{theme.scheme === "light" ? "Dark Mode" : "Light Mode"}</ThemedText>
           </View>
         </Button>
         <Button variant="secondary" onPress={signOut}>
-          <ThemedText style={{ color: theme.colors.danger }}>Sign Out</ThemedText>
+          <ThemedText style={{ color: theme.colors.accent.danger }}>Sign Out</ThemedText>
         </Button>
       </View>
     </ThemedView>
